@@ -1,0 +1,39 @@
+{
+  "name": "awesome-teamspeak",
+  "version": "0.0.1",
+  "description": "A bot that brings awesomeness to teamspeak servers",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc",
+    "eslint": "eslint src --ext ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/barricas/awesome-teamspeak.git"
+  },
+  "keywords": [
+    "ts3",
+    "teamspeak",
+    "bot"
+  ],
+  "author": "Gabriel Santos",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://gitlab.com/barricas/awesome-teamspeak/issues"
+  },
+  "homepage": "https://gitlab.com/barricas/awesome-teamspeak#readme",
+  "dependencies": {
+    "@types/node": "^13.1.8",
+    "ts3-nodejs-library": "^2.3.2",
+    "typescript": "^3.7.5"
+  },
+  "devDependencies": {
+    "eslint-plugin-import": "^2.20.0",
+    "@typescript-eslint/eslint-plugin": "^2.16.0",
+    "@typescript-eslint/parser": "^2.16.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "ts-node-dev": "^1.0.0-pre.44"
+  }
+}
