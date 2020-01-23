@@ -1,6 +1,6 @@
 import { TeamSpeak } from "ts3-nodejs-library";
 
-export class BotEventHandler
+export class EventHandler
 {
     constructor(private server: TeamSpeak)
     {

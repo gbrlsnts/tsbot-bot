@@ -1,4 +1,4 @@
-import { BotFactory } from './Bot/BotFactory';
+import { Factory } from './Bot/Factory';
 import { ConnectionProtocol } from './Bot/ConnectionProtocol';
 
 const configuration = {
@@ -11,7 +11,7 @@ const configuration = {
     password: 'zFScOXvI'
 };
 
-const bot = new BotFactory(configuration);
+const bot = new Factory(configuration);
 
 bot.create()
     .then(bot => {

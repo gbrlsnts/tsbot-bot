@@ -1,12 +1,12 @@
 import { TeamSpeak, QueryProtocol } from 'ts3-nodejs-library';
-import { BotConfiguration } from './BotConfiguration';
+import { Configuration } from './Configuration';
 import { ConnectionProtocol } from './ConnectionProtocol';
 import { Bot } from './Bot';
-import { BotEventHandler } from './BotEventHandler';
+import { EventHandler } from './EventHandler';
 
-export class BotFactory
+export class Factory
 {
-    constructor(public connectionConfiguration: BotConfiguration)
+    constructor(public connectionConfiguration: Configuration)
     {
 
     }
@@ -25,7 +25,7 @@ export class BotFactory
             protocol,
         });
 
-        new BotEventHandler(ts3server);
+        new EventHandler(ts3server);
 
         return new Bot(ts3server);
     }

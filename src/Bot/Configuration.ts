@@ -1,6 +1,6 @@
 import { ConnectionProtocol } from "./ConnectionProtocol";
 
-export interface BotConfiguration {
+export interface Configuration {
     /** Host to connect to */
     host: string;
     /** Query port */
