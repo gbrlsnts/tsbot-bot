@@ -3,6 +3,7 @@ import { Configuration } from './Configuration';
 import { ConnectionProtocol } from './ConnectionProtocol';
 import { Bot } from './Bot';
 import { EventHandler } from './EventHandler';
+import { Context } from './Context';
 
 export class Factory
 {
@@ -25,8 +26,18 @@ export class Factory
             protocol,
         });
 
-        new EventHandler(ts3server);
+        const whoami = await ts3server.whoami();
 
-        return new Bot(ts3server);
+        const context = new Context(
+            whoami.client_database_id,
+            whoami.client_id,
+            whoami.client_unique_identifier,
+            whoami.virtualserver_id,
+            whoami.virtualserver_unique_identifier
+        );
+
+        const eventHandler = new EventHandler(ts3server);
+
+        return new Bot(ts3server, context, eventHandler);
     }
 }

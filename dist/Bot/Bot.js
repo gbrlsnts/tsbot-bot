@@ -11,8 +11,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const ts3_nodejs_library_1 = require("ts3-nodejs-library");
 class Bot {
-    constructor(server) {
+    constructor(server, context, eventHandler) {
         this.server = server;
+        this.context = context;
+        this.eventHandler = eventHandler;
+    }
+    getContext() {
+        return this.context;
+    }
+    getEventHandler() {
+        return this.eventHandler;
     }
     whoami() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -27,6 +35,14 @@ class Bot {
             catch (error) {
                 console.log('Got error', error);
             }
+        });
+    }
+    createChannel(name, password) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.server.channelCreate(name, {
+                channel_password: password,
+                channel_flag_permanent: 1
+            });
         });
     }
 }

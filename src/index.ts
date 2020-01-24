@@ -15,10 +15,12 @@ const bot = new Factory(configuration);
 
 bot.create()
     .then(bot => {
-        bot.whoami().then(whoami => {
-            console.log(whoami);
-            return bot.sendServerMessage('Hello all!');
-        });
+        bot.sendServerMessage('Hello all!');
+
+        bot.createChannel('Test channel')
+            .then(channel => console.log(channel))
+            .catch(e => console.log(e.msg));
+
     })
     .catch(error => {
         console.log('Got error', error);
