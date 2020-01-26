@@ -1,4 +1,4 @@
-import { ConnectionProtocol } from "./ConnectionProtocol";
+import { ConnectionProtocol } from "../Bot/ConnectionProtocol";
 
 export interface Configuration {
     /** Host to connect to */

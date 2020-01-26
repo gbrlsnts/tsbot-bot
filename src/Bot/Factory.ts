@@ -1,28 +1,27 @@
 import { TeamSpeak, QueryProtocol } from 'ts3-nodejs-library';
-import { Configuration } from './Configuration';
 import { ConnectionProtocol } from './ConnectionProtocol';
 import { Bot } from './Bot';
 import { EventHandler } from './EventHandler';
 import { Context } from './Context';
+import { LocalLoader } from '../Configuration/LocalLoader';
+import { resolve as pathResolve } from 'path';
 
 export class Factory
 {
-    constructor(public connectionConfiguration: Configuration)
+    async create(serverId: string): Promise<Bot>
     {
+        const configLoader = new LocalLoader(pathResolve('server_configs'));
+        const configuration = await configLoader.loadConfiguration(serverId);
 
-    }
-
-    async create(): Promise<Bot>
-    {
-        const protocol = this.connectionConfiguration.protocol === ConnectionProtocol.ssh ? QueryProtocol.SSH : QueryProtocol.RAW;
+        const protocol = configuration.protocol === ConnectionProtocol.SSH ? QueryProtocol.SSH : QueryProtocol.RAW;
 
         const ts3server = await TeamSpeak.connect({
-            host: this.connectionConfiguration.host,
-            queryport: this.connectionConfiguration.queryport,
-            serverport: this.connectionConfiguration.serverport,
-            nickname: this.connectionConfiguration.nickname,
-            username: this.connectionConfiguration.username,
-            password: this.connectionConfiguration.password,
+            host: configuration.host,
+            queryport: configuration.queryport,
+            serverport: configuration.serverport,
+            nickname: configuration.nickname,
+            username: configuration.username,
+            password: configuration.password,
             protocol,
         });
 

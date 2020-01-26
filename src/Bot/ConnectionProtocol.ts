@@ -1,4 +1,4 @@
 export enum ConnectionProtocol {
-    raw,
-    ssh
+    RAW,
+    SSH
 }

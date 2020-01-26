@@ -14,20 +14,21 @@ const ConnectionProtocol_1 = require("./ConnectionProtocol");
 const Bot_1 = require("./Bot");
 const EventHandler_1 = require("./EventHandler");
 const Context_1 = require("./Context");
+const LocalLoader_1 = require("../Configuration/LocalLoader");
+const path_1 = require("path");
 class Factory {
-    constructor(connectionConfiguration) {
-        this.connectionConfiguration = connectionConfiguration;
-    }
-    create() {
+    create(serverId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const protocol = this.connectionConfiguration.protocol === ConnectionProtocol_1.ConnectionProtocol.ssh ? ts3_nodejs_library_1.QueryProtocol.SSH : ts3_nodejs_library_1.QueryProtocol.RAW;
+            const configLoader = new LocalLoader_1.LocalLoader(path_1.resolve('server_configs'));
+            const configuration = yield configLoader.loadConfiguration(serverId);
+            const protocol = configuration.protocol === ConnectionProtocol_1.ConnectionProtocol.SSH ? ts3_nodejs_library_1.QueryProtocol.SSH : ts3_nodejs_library_1.QueryProtocol.RAW;
             const ts3server = yield ts3_nodejs_library_1.TeamSpeak.connect({
-                host: this.connectionConfiguration.host,
-                queryport: this.connectionConfiguration.queryport,
-                serverport: this.connectionConfiguration.serverport,
-                nickname: this.connectionConfiguration.nickname,
-                username: this.connectionConfiguration.username,
-                password: this.connectionConfiguration.password,
+                host: configuration.host,
+                queryport: configuration.queryport,
+                serverport: configuration.serverport,
+                nickname: configuration.nickname,
+                username: configuration.username,
+                password: configuration.password,
                 protocol,
             });
             const whoami = yield ts3server.whoami();

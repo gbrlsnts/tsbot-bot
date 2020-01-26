@@ -1,0 +1,11 @@
+{
+    connection: {
+        host: 'server-host',
+        queryport: 10011,
+        serverport: 9987,
+        nickname: 'BOT',
+        protocol: ConnectionProtocol.raw,
+        username: 'bot',
+        password: 'password'
+    }
+}

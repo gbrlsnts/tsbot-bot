@@ -7,12 +7,12 @@ const configuration = {
     queryport: 10011,
     serverport: 9987,
     nickname: 'TS BOT',
-    protocol: ConnectionProtocol_1.ConnectionProtocol.raw,
+    protocol: ConnectionProtocol_1.ConnectionProtocol.RAW,
     username: 'bot',
     password: 'zFScOXvI'
 };
-const bot = new Factory_1.Factory(configuration);
-bot.create()
+const botFactory = new Factory_1.Factory();
+botFactory.create('testserver')
     .then(bot => {
     bot.sendServerMessage('Hello all!');
     bot.createChannel('Test channel')

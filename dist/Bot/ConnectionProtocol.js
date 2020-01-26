@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ConnectionProtocol;
 (function (ConnectionProtocol) {
-    ConnectionProtocol[ConnectionProtocol["raw"] = 0] = "raw";
-    ConnectionProtocol[ConnectionProtocol["ssh"] = 1] = "ssh";
+    ConnectionProtocol[ConnectionProtocol["RAW"] = 0] = "RAW";
+    ConnectionProtocol[ConnectionProtocol["SSH"] = 1] = "SSH";
 })(ConnectionProtocol = exports.ConnectionProtocol || (exports.ConnectionProtocol = {}));
 //# sourceMappingURL=ConnectionProtocol.js.map

@@ -6,14 +6,14 @@ const configuration = {
     queryport: 10011,
     serverport: 9987,
     nickname: 'TS BOT',
-    protocol: ConnectionProtocol.raw,
+    protocol: ConnectionProtocol.RAW,
     username: 'bot',
     password: 'zFScOXvI'
 };
 
-const bot = new Factory(configuration);
+const botFactory = new Factory();
 
-bot.create()
+botFactory.create('testserver')
     .then(bot => {
         bot.sendServerMessage('Hello all!');
 
