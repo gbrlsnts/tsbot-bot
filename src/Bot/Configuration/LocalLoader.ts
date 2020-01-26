@@ -2,7 +2,7 @@ import { Configuration } from "./Configuration";
 import { LoaderInterface } from "./LoaderInterface";
 import { readdir, readFile } from "fs";
 import { join as pathJoin } from "path";
-import { ConnectionProtocol } from "../Bot/ConnectionProtocol";
+import { ConnectionProtocol } from "../ConnectionProtocol";
 
 export class LocalLoader implements LoaderInterface
 {

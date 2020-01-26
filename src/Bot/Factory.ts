@@ -3,7 +3,7 @@ import { ConnectionProtocol } from './ConnectionProtocol';
 import { Bot } from './Bot';
 import { EventHandler } from './EventHandler';
 import { Context } from './Context';
-import { LocalLoader } from '../Configuration/LocalLoader';
+import { LocalLoader } from './Configuration/LocalLoader';
 import { resolve as pathResolve } from 'path';
 
 export class Factory
