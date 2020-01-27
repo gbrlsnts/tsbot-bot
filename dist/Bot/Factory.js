@@ -14,7 +14,7 @@ const ConnectionProtocol_1 = require("./ConnectionProtocol");
 const Bot_1 = require("./Bot");
 const EventHandler_1 = require("./EventHandler");
 const Context_1 = require("./Context");
-const LocalLoader_1 = require("../Configuration/LocalLoader");
+const LocalLoader_1 = require("./Configuration/LocalLoader");
 const path_1 = require("path");
 class Factory {
     create(serverId) {

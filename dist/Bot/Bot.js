@@ -16,16 +16,14 @@ class Bot {
         this.context = context;
         this.eventHandler = eventHandler;
     }
+    getServer() {
+        return this.server;
+    }
     getContext() {
         return this.context;
     }
     getEventHandler() {
         return this.eventHandler;
-    }
-    whoami() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.server.whoami();
-        });
     }
     sendServerMessage(message) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -37,12 +35,42 @@ class Bot {
             }
         });
     }
-    createChannel(name, password) {
+    createChannel(name, password, parent, afterChannel) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.server.channelCreate(name, {
                 channel_password: password,
-                channel_flag_permanent: 1
+                channel_flag_permanent: 1,
+                channel_order: afterChannel,
+                cpid: parent,
             });
+        });
+    }
+    createSpacer(name, afterChannel) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.server.channelCreate(name, {
+                channel_maxclients: 0,
+                channel_codec_quality: 0,
+                channel_flag_permanent: 1,
+                channel_order: afterChannel,
+            });
+        });
+    }
+    deleteChannel(channelId, force) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.server.channelDelete(channelId, force ? 1 : 0);
+        });
+    }
+    setChannelGroupToClient(databaseId, channelId, groupId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const group = yield this.server.getChannelGroupByID(groupId);
+            if (!group)
+                throw new Error('Could not find channel group with id ' + groupId);
+            return yield group.setClient(channelId, databaseId);
+        });
+    }
+    getClientByDbid(databaseId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.server.getClientByDBID(databaseId);
         });
     }
 }
