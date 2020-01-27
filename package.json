@@ -29,7 +29,7 @@
   "dependencies": {
     "@types/node": "^13.1.8",
     "randomstring": "^1.1.5",
-    "ts3-nodejs-library": "^2.3.2",
+    "ts3-nodejs-library": "^2.3.3",
     "typescript": "^3.7.5"
   },
   "devDependencies": {
