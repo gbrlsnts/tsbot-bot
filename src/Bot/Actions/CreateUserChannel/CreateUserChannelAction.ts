@@ -105,7 +105,7 @@ export class CreateUserChannelAction implements ActionInterface
 
             this.cleanUpCreatedChannels(toDelete);
             
-            return Promise.reject(`Error while creating channels: ${e.message}`);
+            return Promise.reject(new Error(`Error while creating channels: ${e.message}`));
         }
 
         return channels;
