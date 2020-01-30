@@ -12,15 +12,15 @@ class ChannelUtils {
             if (channel.pid !== 0) {
                 continue;
             }
-            if (hasStart) {
-                channels.push(channel);
-            }
             if (channel.cid === start) {
                 hasStart = true;
             }
             if (channel.cid === end) {
                 hasEnd = true;
                 break;
+            }
+            if (hasStart && channel.cid !== start && channel.cid !== end) {
+                channels.push(channel);
             }
         }
         return {

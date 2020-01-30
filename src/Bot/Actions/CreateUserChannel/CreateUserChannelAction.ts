@@ -46,7 +46,7 @@ export class CreateUserChannelAction implements ActionInterface
 
         // In practice will never go through due to the previous statement, but typescript hint won't detect it
         if(!startChannel)
-        throw new Error('Unable to find start channel');
+            throw new Error('Unable to find start channel');
 
         return channelsInZone.channels.pop() || startChannel;
     }

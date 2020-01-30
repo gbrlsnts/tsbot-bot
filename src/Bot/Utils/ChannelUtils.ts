@@ -18,10 +18,6 @@ export class ChannelUtils {
                 continue;
             }
 
-            if(hasStart) {
-                channels.push(channel);
-            }
-
             if(channel.cid === start) {
                 hasStart = true;
             }
@@ -29,6 +25,10 @@ export class ChannelUtils {
             if(channel.cid === end) {
                 hasEnd = true;
                 break;
+            }
+
+            if(hasStart && channel.cid !== start && channel.cid !== end) {
+                channels.push(channel);
             }
         }
 
