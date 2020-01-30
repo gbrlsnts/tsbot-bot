@@ -1,11 +1,28 @@
 {
-    connection: {
-        host: 'server-host',
-        queryport: 10011,
-        serverport: 9987,
-        nickname: 'BOT',
-        protocol: ConnectionProtocol.raw,
-        username: 'bot',
-        password: 'password'
+    "connection": {
+        "host": "server-host",
+        "queryport": 10011,
+        "serverport": 9987,
+        "nickname": "TS BOT",
+        "protocol": "RAW",
+        "username": "bot",
+        "password": "password"
+    },
+    "crawler": {
+        "interval": 300,
+        "zones": [
+            {
+                "name": "regular",
+                "start": 10,
+                "end": 15,
+                "timeEmpty": 3600
+            },
+            {
+                "name": "vip",
+                "start": 20,
+                "end": 30,
+                "timeEmpty": 7200
+            }
+        ]
     }
 }

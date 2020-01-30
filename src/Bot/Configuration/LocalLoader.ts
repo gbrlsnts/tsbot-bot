@@ -94,15 +94,7 @@ export class LocalLoader implements LoaderInterface
         } catch(e) {
             return Promise.reject(new Error('Could not parse configuration contents: ' + e.message));
         }
-        
-        return Promise.resolve({
-            host: json.connection.host,
-            queryport: json.connection.queryport,
-            serverport: json.connection.serverport,
-            protocol: json.connection.protocol === 'SSH' ? ConnectionProtocol.SSH : ConnectionProtocol.RAW,
-            username: json.connection.username,
-            password: json.connection.password,
-            nickname: json.connection.nickname,
-        });
+
+        return Promise.resolve(json);
     }
 }

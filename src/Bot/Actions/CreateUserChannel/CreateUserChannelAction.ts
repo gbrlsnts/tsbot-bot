@@ -1,10 +1,10 @@
 import { ActionInterface } from "../ActionInterface";
-import { ActionResult } from "../ActionResult";
 import { CreateUserChannelData } from "./CreateUserChannelData";
 import { Bot } from "../../Bot";
 import { TeamSpeakChannel } from "ts3-nodejs-library";
 import { generate } from "randomstring";
 import { CreateUserChannelActionResult } from "./CreateUserChannelActionResult";
+import { ChannelUtils } from "../../Utils/ChannelUtils";
 
 export class CreateUserChannelAction implements ActionInterface
 {
@@ -30,36 +30,25 @@ export class CreateUserChannelAction implements ActionInterface
     {
         const channelList = await this.bot.getServer().channelList();
 
-        let hasStart = false,
-            hasEnd = false,
-            lastChannel;
+        const startChannel = channelList.find(c => c.cid === this.data.userChannelStart);
 
-        for(let channel of channelList) {
-            if(channel.pid !== 0) {
-                continue;
-            }
+        const channelsInZone = ChannelUtils.getTopChannelsBetween(
+            channelList,
+            this.data.userChannelStart,
+            this.data.userChannelEnd
+        );
 
-            if(channel.cid === this.data.userChannelStart) {
-                hasStart = true;
-            }
-                
-            if(channel.cid === this.data.userChannelEnd) {
-                hasEnd = true;
-                break;
-            }
-                
-            if(hasStart) {
-                lastChannel = channel;
-            }
-        }
-
-        if(!hasStart || !hasEnd)
+        if(!channelsInZone.hasStart || !channelsInZone.hasEnd)
             throw new Error('Start or End delimiter channels don\'t exist');
 
-        if(!lastChannel)
+        if(!startChannel && channelsInZone.channels.length === 0)
             throw new Error('Unable to determine channel to create new channel after it');
 
-        return lastChannel;
+        // In practice will never go through due to the previous statement, but typescript hint won't detect it
+        if(!startChannel)
+        throw new Error('Unable to find start channel');
+
+        return channelsInZone.channels.pop() || startChannel;
     }
 
     private async createChannelsHierarchy(): Promise<TeamSpeakChannel[]>

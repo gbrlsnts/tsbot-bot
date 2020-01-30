@@ -5,7 +5,12 @@ class CreateUserChannelActionResult {
         this.channelList = channelList;
     }
     getResultData() {
-        return this.channelList;
+        const channel = this.channelList[0].cid;
+        const subchannels = this.channelList.slice(1).map(c => c.cid);
+        return {
+            channel,
+            subchannels,
+        };
     }
 }
 exports.CreateUserChannelActionResult = CreateUserChannelActionResult;

@@ -17,19 +17,19 @@ const Context_1 = require("./Context");
 const LocalLoader_1 = require("./Configuration/LocalLoader");
 const path_1 = require("path");
 class Factory {
-    create(serverId) {
+    create(server) {
         return __awaiter(this, void 0, void 0, function* () {
             const configLoader = new LocalLoader_1.LocalLoader(path_1.resolve('server_configs'));
-            const configuration = yield configLoader.loadConfiguration(serverId);
-            const protocol = configuration.protocol === ConnectionProtocol_1.ConnectionProtocol.SSH ? ts3_nodejs_library_1.QueryProtocol.SSH : ts3_nodejs_library_1.QueryProtocol.RAW;
+            const configuration = yield configLoader.loadConfiguration(server);
             const ts3server = yield ts3_nodejs_library_1.TeamSpeak.connect({
-                host: configuration.host,
-                queryport: configuration.queryport,
-                serverport: configuration.serverport,
-                nickname: configuration.nickname,
-                username: configuration.username,
-                password: configuration.password,
-                protocol,
+                host: configuration.connection.host,
+                queryport: configuration.connection.queryport,
+                serverport: configuration.connection.serverport,
+                nickname: configuration.connection.nickname,
+                username: configuration.connection.username,
+                password: configuration.connection.password,
+                protocol: configuration.connection.protocol === ConnectionProtocol_1.ConnectionProtocol.SSH
+                    ? ts3_nodejs_library_1.QueryProtocol.SSH : ts3_nodejs_library_1.QueryProtocol.RAW,
             });
             const whoami = yield ts3server.whoami();
             const context = new Context_1.Context(whoami.client_database_id, whoami.client_id, whoami.client_unique_identifier, whoami.virtualserver_id, whoami.virtualserver_unique_identifier);

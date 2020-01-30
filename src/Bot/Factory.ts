@@ -8,21 +8,20 @@ import { resolve as pathResolve } from 'path';
 
 export class Factory
 {
-    async create(serverId: string): Promise<Bot>
+    async create(server: string): Promise<Bot>
     {
         const configLoader = new LocalLoader(pathResolve('server_configs'));
-        const configuration = await configLoader.loadConfiguration(serverId);
-
-        const protocol = configuration.protocol === ConnectionProtocol.SSH ? QueryProtocol.SSH : QueryProtocol.RAW;
+        const configuration = await configLoader.loadConfiguration(server);
 
         const ts3server = await TeamSpeak.connect({
-            host: configuration.host,
-            queryport: configuration.queryport,
-            serverport: configuration.serverport,
-            nickname: configuration.nickname,
-            username: configuration.username,
-            password: configuration.password,
-            protocol,
+            host: configuration.connection.host,
+            queryport: configuration.connection.queryport,
+            serverport: configuration.connection.serverport,
+            nickname: configuration.connection.nickname,
+            username: configuration.connection.username,
+            password: configuration.connection.password,
+            protocol: configuration.connection.protocol === ConnectionProtocol.SSH 
+                ? QueryProtocol.SSH : QueryProtocol.RAW,
         });
 
         const whoami = await ts3server.whoami();

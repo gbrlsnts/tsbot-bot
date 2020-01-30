@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const randomstring_1 = require("randomstring");
 const CreateUserChannelActionResult_1 = require("./CreateUserChannelActionResult");
+const ChannelUtils_1 = require("../../Utils/ChannelUtils");
 class CreateUserChannelAction {
     constructor(bot, data) {
         this.bot = bot;
@@ -30,27 +31,16 @@ class CreateUserChannelAction {
     getChannelToCreateAfter() {
         return __awaiter(this, void 0, void 0, function* () {
             const channelList = yield this.bot.getServer().channelList();
-            let hasStart = false, hasEnd = false, lastChannel;
-            for (let channel of channelList) {
-                if (channel.pid !== 0) {
-                    continue;
-                }
-                if (channel.cid === this.data.userChannelStart) {
-                    hasStart = true;
-                }
-                if (channel.cid === this.data.userChannelEnd) {
-                    hasEnd = true;
-                    break;
-                }
-                if (hasStart) {
-                    lastChannel = channel;
-                }
-            }
-            if (!hasStart || !hasEnd)
+            const startChannel = channelList.find(c => c.cid === this.data.userChannelStart);
+            const channelsInZone = ChannelUtils_1.ChannelUtils.getTopChannelsBetween(channelList, this.data.userChannelStart, this.data.userChannelEnd);
+            if (!channelsInZone.hasStart || !channelsInZone.hasEnd)
                 throw new Error('Start or End delimiter channels don\'t exist');
-            if (!lastChannel)
+            if (!startChannel && channelsInZone.channels.length === 0)
                 throw new Error('Unable to determine channel to create new channel after it');
-            return lastChannel;
+            // In practice will never go through due to the previous statement, but typescript hint won't detect it
+            if (!startChannel)
+                throw new Error('Unable to find start channel');
+            return channelsInZone.channels.pop() || startChannel;
         });
     }
     createChannelsHierarchy() {
@@ -78,7 +68,7 @@ class CreateUserChannelAction {
                 if (spacer != null)
                     toDelete.push(spacer);
                 this.cleanUpCreatedChannels(toDelete);
-                return Promise.reject(`Error while creating channels: ${e.message}`);
+                return Promise.reject(new Error(`Error while creating channels: ${e.message}`));
             }
             return channels;
         });

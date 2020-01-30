@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = require("fs");
 const path_1 = require("path");
-const ConnectionProtocol_1 = require("../ConnectionProtocol");
 class LocalLoader {
     constructor(configFolder) {
         this.configFolder = configFolder;
@@ -88,15 +87,7 @@ class LocalLoader {
             catch (e) {
                 return Promise.reject(new Error('Could not parse configuration contents: ' + e.message));
             }
-            return Promise.resolve({
-                host: json.connection.host,
-                queryport: json.connection.queryport,
-                serverport: json.connection.serverport,
-                protocol: json.connection.protocol === 'SSH' ? ConnectionProtocol_1.ConnectionProtocol.SSH : ConnectionProtocol_1.ConnectionProtocol.RAW,
-                username: json.connection.username,
-                password: json.connection.password,
-                nickname: json.connection.nickname,
-            });
+            return Promise.resolve(json);
         });
     }
 }
