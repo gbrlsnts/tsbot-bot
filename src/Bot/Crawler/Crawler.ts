@@ -1,20 +1,19 @@
 import { Bot } from "../Bot";
-import { Database } from "../../Database/DatabaseInterface";
+import { Repository } from "../../Repository/RepositoryInterface";
 import { CrawlerConfiguration, CrawlZone } from "../Configuration/Configuration";
 import { clearTimeout } from "timers";
 import { TeamSpeakChannel } from "ts3-nodejs-library";
 import { ChannelUtils } from "../Utils/ChannelUtils";
+import { CrawlerChannel } from "../../Entities/Channel";
 
 export class Crawler
 {
     private readonly bootTimer: number = 30;
 
     private isBooted: boolean = false;
-    private isRunning: boolean = false;
-
     private timer?: NodeJS.Timeout;
 
-    constructor(private bot: Bot, private database: Database, private config: CrawlerConfiguration)
+    constructor(private bot: Bot, private repository: Repository, private config: CrawlerConfiguration)
     {
 
     }
@@ -39,10 +38,14 @@ export class Crawler
         if(this.timer)
             clearTimeout(this.timer);
 
+        const interval = this.getTimerInterval();
+
         this.timer = setTimeout(
-            () => this.crawl.bind(this),
-            this.getTimerInterval()
+            this.crawl.bind(this),
+            interval
         );
+
+        console.log(`Next crawl to run in ${interval/1000} seconds`);
     }
 
     private getTimerInterval()
@@ -55,24 +58,28 @@ export class Crawler
 
     private async crawl()
     {
-        this.isRunning = true;
+        console.log('starting crawl...');
 
-        // fetch channel list, check time empty on channels per zone
+        try {
+            const channelList = await this.bot.getServer().channelList();
 
-        const channels = await this.bot.getServer().channelList();
+            const emptyChannelList: TeamSpeakChannel[] = [];
+            this.config.zones.forEach(zone => {
+                emptyChannelList.push(...this.checkZoneChannels(zone, channelList));
+            });
 
-        this.config.zones.forEach(z => this.checkZoneChannels(z, channels));
+            console.log('Empty channels list:', emptyChannelList.map(c=>c.name));
 
-        await Promise.all(this.config.zones.map(z => this.checkZoneChannels(z, channels)))
-            .catch(e => { throw e });
-
-        // grab all channels and trigger database update
-
-        this.isRunning = false;
-        this.startTimer();
+            this.updateChannelsState(emptyChannelList);
+        } catch(e) {
+            console.log(`Crawl error: ${e.message}`);
+        } finally {
+            this.startTimer();
+            console.log('crawl ended');
+        }
     }
 
-    private async checkZoneChannels(zone: CrawlZone, allChannels: TeamSpeakChannel[])
+    private checkZoneChannels(zone: CrawlZone, allChannels: TeamSpeakChannel[]): TeamSpeakChannel[]
     {
         const channelsInZone = ChannelUtils.getTopChannelsBetween(
             allChannels,
@@ -83,16 +90,29 @@ export class Crawler
         if(!channelsInZone.hasStart || !channelsInZone.hasEnd)
             throw new Error(`Unable to find start or end in zone ${zone.name}`);
 
-        channelsInZone.channels.forEach(channel => {
-            // need to check if tree has any client online
-        });
+        return channelsInZone.channels
+            .filter(channel => !ChannelUtils.isChannelSpacer(channel.name))
+            .filter(channel => {
+                const subTotalClients = ChannelUtils
+                    .getAllSubchannels(channel, allChannels)
+                    .map(sub => sub.totalClients)
+                    .reduce((accumulator, current) => accumulator + current);
 
-        // return a list of channels with not empty or empty status
+                    return channel.totalClients + subTotalClients === 0;
+            });
     }
 
-    private updateState()
+    private updateChannelsState(channelList: TeamSpeakChannel[])
     {
-        // update channels state in the database, cleanup if necessary
+        // get last crawl information
+
+        // get channels in db 
+
+        // add time between crawls to the empty times / initialize new empty channels
+
+        // emit events for channels empty for too long
+
+        // send empty channel list to repository
     }
 
     private emitDeleteChannelEvent()

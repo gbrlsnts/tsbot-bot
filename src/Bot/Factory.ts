@@ -5,6 +5,8 @@ import { EventHandler } from './EventHandler';
 import { Context } from './Context';
 import { LocalLoader } from './Configuration/LocalLoader';
 import { resolve as pathResolve } from 'path';
+import { LocalRepository } from '../Repository/LocalRepository';
+import { Crawler } from './Crawler/Crawler';
 
 export class Factory
 {
@@ -35,7 +37,17 @@ export class Factory
         );
 
         const eventHandler = new EventHandler(ts3server);
+        const bot =  new Bot(ts3server, context, eventHandler);
 
-        return new Bot(ts3server, context, eventHandler);
+        if(configuration.crawler) {
+            new Crawler(bot, this.getRepository(), configuration.crawler).boot();
+        }
+
+        return bot;
+    }
+
+    private getRepository()
+    {
+        return new LocalRepository();
     }
 }

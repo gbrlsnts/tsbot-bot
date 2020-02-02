@@ -29,6 +29,29 @@ class ChannelUtils {
             channels
         };
     }
+    /**
+     * Get all subchannels in a channel
+     * @param channel The channel to get all sub channels
+     * @param channelList The server channel list
+     */
+    static getAllSubchannels(channel, channelList) {
+        const subChannelList = [];
+        channelList
+            .filter(channelToFilter => channelToFilter.pid === channel.cid)
+            .forEach(subChannel => {
+            const children = this.getAllSubchannels(subChannel, channelList);
+            subChannelList.push(subChannel, ...children);
+        });
+        return subChannelList;
+    }
+    /**
+     * Check if a given channel name is a spacer
+     * @param channelName The channel name to check
+     */
+    static isChannelSpacer(channelName) {
+        return this.spacerRegex.test(channelName);
+    }
 }
 exports.ChannelUtils = ChannelUtils;
+ChannelUtils.spacerRegex = new RegExp('\[[\*lcr]spacer.*\].*');
 //# sourceMappingURL=ChannelUtils.js.map

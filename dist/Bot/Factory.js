@@ -16,6 +16,8 @@ const EventHandler_1 = require("./EventHandler");
 const Context_1 = require("./Context");
 const LocalLoader_1 = require("./Configuration/LocalLoader");
 const path_1 = require("path");
+const LocalRepository_1 = require("../Repository/LocalRepository");
+const Crawler_1 = require("./Crawler/Crawler");
 class Factory {
     create(server) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -34,8 +36,15 @@ class Factory {
             const whoami = yield ts3server.whoami();
             const context = new Context_1.Context(whoami.client_database_id, whoami.client_id, whoami.client_unique_identifier, whoami.virtualserver_id, whoami.virtualserver_unique_identifier);
             const eventHandler = new EventHandler_1.EventHandler(ts3server);
-            return new Bot_1.Bot(ts3server, context, eventHandler);
+            const bot = new Bot_1.Bot(ts3server, context, eventHandler);
+            if (configuration.crawler) {
+                new Crawler_1.Crawler(bot, this.getRepository(), configuration.crawler).boot();
+            }
+            return bot;
         });
+    }
+    getRepository() {
+        return new LocalRepository_1.LocalRepository();
     }
 }
 exports.Factory = Factory;
