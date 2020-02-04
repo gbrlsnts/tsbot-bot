@@ -1,10 +1,30 @@
-import { access, readFile, writeFile } from "fs";
+import { access, readFile, writeFile, write } from "fs";
 
 export default class FileReaderWriter
 {
+    /** Conents to initialize a base file */
+    private baseContents: string = '';
+
     constructor(readonly filePath: string)
     {
 
+    }
+
+    /**
+     * Set the contents used to initialize a file
+     * @param contents Contents used to initialize a file
+     */
+    public setBaseContents(contents: string)
+    {
+        this.baseContents = contents;
+    }
+
+    /**
+     * Get the contents used to initialize a file
+     */
+    public getBaseContents(): string
+    {
+        return this.baseContents;
     }
 
     /**
@@ -53,5 +73,24 @@ export default class FileReaderWriter
                 resolve();
             });
         });
+    }
+
+    /**
+     * Initialize a base file
+     * @param force Write empty file even if it already exists
+     */
+    public async initializeFile(force: boolean = false): Promise<void>
+    {
+        try {
+            await this.checkFile();
+
+            if(!force) {
+                return Promise.resolve();                
+            }
+        } catch(e) {
+            // file doesnt exist.. 
+        }
+        
+        return this.writeFileContents(this.baseContents);
     }
 }

@@ -20,9 +20,19 @@ class LocalRepository {
         this.crawlsFilePath = path_1.join(this.databasePath, 'crawls.json');
         this.emptyChannelsFilePath = path_1.join(this.databasePath, 'emptychannels.json');
     }
+    getCrawls() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const loader = yield this.getFileLoader(this.crawlsFilePath);
+            const crawls = yield loader.loadFileJson();
+            crawls.forEach(crawl => {
+                crawl.runAt = new Date(crawl.runAt);
+            });
+            return Promise.resolve(crawls);
+        });
+    }
     getPreviousCrawl() {
         return __awaiter(this, void 0, void 0, function* () {
-            const crawls = yield new FileJson_1.default(this.crawlsFilePath).loadFileJson();
+            const crawls = yield this.getCrawls();
             // sort ASC
             const sortedCrawls = crawls.sort((a, b) => {
                 if (a.runAt > b.runAt)
@@ -37,19 +47,39 @@ class LocalRepository {
     }
     addPreviousCrawl(crawl) {
         return __awaiter(this, void 0, void 0, function* () {
-            const file = new FileJson_1.default(this.crawlsFilePath);
-            const crawls = yield file.loadFileJson();
+            const loader = yield this.getFileLoader(this.crawlsFilePath);
+            const crawls = yield loader.loadFileJson();
             crawls.push(crawl);
-            file.saveFileJson(crawls);
+            loader.saveFileJson(crawls);
         });
     }
     getCrawlerEmptyChannels() {
         return __awaiter(this, void 0, void 0, function* () {
-            return new FileJson_1.default(this.emptyChannelsFilePath).loadFileJson();
+            const loader = yield this.getFileLoader(this.emptyChannelsFilePath);
+            const channels = yield loader.loadFileJson();
+            channels.forEach(channel => {
+                channel.lastUpdated = new Date(channel.lastUpdated);
+            });
+            return Promise.resolve(channels);
         });
     }
     setCrawlerEmptyChannels(channelList) {
-        return new FileJson_1.default(this.emptyChannelsFilePath).saveFileJson(channelList);
+        return __awaiter(this, void 0, void 0, function* () {
+            const loader = yield this.getFileLoader(this.emptyChannelsFilePath);
+            return loader.saveFileJson(channelList);
+        });
+    }
+    /**
+     * Get the fileloader. Initialize an empty file if it doesn't exist
+     * @param filePath Path to the data file
+     */
+    getFileLoader(filePath) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const loader = new FileJson_1.default(filePath);
+            loader.setBaseContents('[]');
+            yield loader.initializeFile();
+            return loader;
+        });
     }
 }
 exports.LocalRepository = LocalRepository;

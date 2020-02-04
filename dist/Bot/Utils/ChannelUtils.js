@@ -6,7 +6,7 @@ class ChannelUtils {
      * @param start Start channel Id
      * @param end End channel Id
      */
-    static getTopChannelsBetween(allChannels, start, end) {
+    static getTopChannelsBetween(allChannels, start, end, includeSpacers = true) {
         let hasStart = false, hasEnd = false, channels = [];
         for (let channel of allChannels) {
             if (channel.pid !== 0) {
@@ -19,7 +19,8 @@ class ChannelUtils {
                 hasEnd = true;
                 break;
             }
-            if (hasStart && channel.cid !== start && channel.cid !== end) {
+            if (hasStart && channel.cid !== start && channel.cid !== end &&
+                (includeSpacers || (!includeSpacers && !this.isChannelSpacer(channel.name)))) {
                 channels.push(channel);
             }
         }

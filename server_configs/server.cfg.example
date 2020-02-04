@@ -13,12 +13,14 @@
         "zones": [
             {
                 "name": "regular",
+                "spacerAsSeparator": false,
                 "start": 10,
                 "end": 15,
                 "timeEmpty": 3600
             },
             {
                 "name": "vip",
+                "spacerAsSeparator": true,
                 "start": 20,
                 "end": 30,
                 "timeEmpty": 7200

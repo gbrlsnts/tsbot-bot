@@ -14,8 +14,21 @@ export class LocalRepository implements Repository
         this.emptyChannelsFilePath = pathJoin(this.databasePath, 'emptychannels.json');
     }
 
+    async getCrawls(): Promise<CrawlInfo[]>
+    {
+        const loader = await this.getFileLoader<CrawlInfo[]>(this.crawlsFilePath);
+
+        const crawls = await loader.loadFileJson();
+
+        crawls.forEach(crawl => {
+            crawl.runAt = new Date(crawl.runAt);
+        });
+
+        return Promise.resolve(crawls);
+    }
+
     async getPreviousCrawl(): Promise<CrawlInfo | undefined> {
-        const crawls = await new FileJson<CrawlInfo[]>(this.crawlsFilePath).loadFileJson();
+        const crawls = await this.getCrawls();
 
         // sort ASC
         const sortedCrawls = crawls.sort((a, b) => {
@@ -33,19 +46,43 @@ export class LocalRepository implements Repository
     }
     
     async addPreviousCrawl(crawl: CrawlInfo): Promise<void> {
-        const file = new FileJson<CrawlInfo[]>(this.crawlsFilePath);
-        const crawls = await file.loadFileJson();
+        const loader = await this.getFileLoader<CrawlInfo[]>(this.crawlsFilePath);
+        const crawls = await loader.loadFileJson();
 
         crawls.push(crawl);
 
-        file.saveFileJson(crawls);
+        loader.saveFileJson(crawls);
     }
 
     async getCrawlerEmptyChannels(): Promise<CrawlerChannel[]> {
-        return new FileJson<CrawlerChannel[]>(this.emptyChannelsFilePath).loadFileJson();
+        const loader = await this.getFileLoader<CrawlerChannel[]>(this.emptyChannelsFilePath);
+
+        const channels = await loader.loadFileJson()
+
+        channels.forEach(channel => {
+            channel.lastUpdated = new Date(channel.lastUpdated);
+        });
+
+        return Promise.resolve(channels);
     }
 
-    setCrawlerEmptyChannels(channelList: CrawlerChannel[]): Promise<void> {
-        return new FileJson<CrawlerChannel[]>(this.emptyChannelsFilePath).saveFileJson(channelList);
+    async setCrawlerEmptyChannels(channelList: CrawlerChannel[]): Promise<void> {
+        const loader = await this.getFileLoader<CrawlerChannel[]>(this.emptyChannelsFilePath);
+
+        return loader.saveFileJson(channelList);
+    }
+
+    /**
+     * Get the fileloader. Initialize an empty file if it doesn't exist
+     * @param filePath Path to the data file
+     */
+    private async getFileLoader<T>(filePath: string): Promise<FileJson<T>>
+    {
+        const loader = new FileJson<T>(filePath);
+        loader.setBaseContents('[]');
+
+        await loader.initializeFile();
+
+        return loader;
     }
 }

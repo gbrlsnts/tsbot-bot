@@ -10,7 +10,7 @@ export class ChannelUtils
      * @param start Start channel Id
      * @param end End channel Id
      */
-    static getTopChannelsBetween(allChannels: TeamSpeakChannel[], start: number, end: number): ChannelsBetweenResult
+    static getTopChannelsBetween(allChannels: TeamSpeakChannel[], start: number, end: number, includeSpacers: boolean = true): ChannelsBetweenResult
     {
         let hasStart = false,
             hasEnd = false,
@@ -30,7 +30,9 @@ export class ChannelUtils
                 break;
             }
 
-            if(hasStart && channel.cid !== start && channel.cid !== end) {
+            if(hasStart && channel.cid !== start && channel.cid !== end &&
+                (includeSpacers || (!includeSpacers && !this.isChannelSpacer(channel.name)))
+                ) {
                 channels.push(channel);
             }
         }

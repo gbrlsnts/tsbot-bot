@@ -66,10 +66,10 @@ export class Crawler
 
         try {
             const channelList = await this.bot.getServer().channelList();
-            const emptyChannelList: TeamSpeakChannel[] = [];
+            const emptyChannelList: ZoneCrawlResult[] = [];
 
             this.config.zones.forEach(zone => {
-                const channelsInZone = ChannelUtils.getTopChannelsBetween(channelList, zone.start, zone.end);
+                const channelsInZone = ChannelUtils.getTopChannelsBetween(channelList, zone.start, zone.end, !zone.spacerAsSeparator);
 
                 if(!channelsInZone.hasStart || !channelsInZone.hasEnd)
                     throw new Error(`Unable to find start or end in zone ${zone.name}`);
@@ -77,12 +77,16 @@ export class Crawler
                 const zoneEmptyChannels = channelsInZone.channels.filter(channel => {
                     return !ChannelUtils.isChannelSpacer(channel.name) &&
                         ChannelUtils.countChannelTreeTotalClients(channel, channelList) === 0;
-                });
+                }).map(channel => channel.cid);
 
-                emptyChannelList.push(...zoneEmptyChannels);
+                emptyChannelList.push({
+                    zone: zone.name,
+                    empty: zoneEmptyChannels,
+                    total: channelsInZone.channels.length
+                });
             });
 
-            console.log('Empty channels list:', emptyChannelList.map(c=>c.name));
+            console.log('Empty channels list:', emptyChannelList.map(c=>c.empty));
 
             await this.updateChannelsState(emptyChannelList);
         } catch(e) {
@@ -93,42 +97,78 @@ export class Crawler
         }
     }
 
-    private async updateChannelsState(emptyChannelList: TeamSpeakChannel[])
+    private async updateChannelsState(emptyChannelList: ZoneCrawlResult[])
     {
         const prevCrawl = await this.repository.getPreviousCrawl();
-        const prevCrawlChannels = await this.repository.getCrawlerEmptyChannels();
+        const emptyChannelIds: number[] = Array.prototype.concat.apply([], emptyChannelList.map(zoneResult => zoneResult.empty));
+        let prevCrawlChannels = await this.repository.getCrawlerEmptyChannels();
 
         if(prevCrawl) {
-            const secondsFromPrevCrawl = (new Date().getMilliseconds() - prevCrawl.runAt.getMilliseconds()) / 1000;
+            const secondsFromPrevCrawl = Math.round((new Date().getTime() - prevCrawl.runAt.getTime()) / 1000);
 
             // filter out channels no longer in the empty list and then add empty time
-            prevCrawlChannels.filter(prevChannel => {
-                    return emptyChannelList.find(c => c.cid == prevChannel.channelId) !== undefined;
-                })
-                .forEach(channel => channel.timeEmpty += secondsFromPrevCrawl);    
+            prevCrawlChannels = this.getChannelsStillEmpty(prevCrawlChannels, emptyChannelIds);
+
+            prevCrawlChannels.forEach(channel => {
+                channel.timeEmpty += secondsFromPrevCrawl;
+                channel.lastUpdated = new Date();
+            });    
         }
 
-        // filter out channels in previous crawls and initialize empty time
-        const newEmptyChannels: CrawlerChannel[] = emptyChannelList.filter(emptyChannel => {
-                return prevCrawlChannels.find(c => c.channelId == emptyChannel.cid) === undefined;
-            })
-            .map(channel => {
-                return {
-                    channelId: channel.cid,
-                    timeEmpty: 0,
-                    lastUpdated: new Date()
-                };
-            });
-
+        const newEmptyChannels = this.getNewEmptyChannels(prevCrawlChannels, emptyChannelIds);
         const finalEmptyChannelList = [...prevCrawlChannels, ...newEmptyChannels];
+
+        await this.repository.addPreviousCrawl({
+            runAt: new Date(),
+            zones: emptyChannelList.map(zoneResult => {
+                return {
+                    zone: zoneResult.zone,
+                    emptyChannels: zoneResult.empty.length,
+                    totalChannels: zoneResult.total
+                };
+            }),
+        });
 
         await this.repository.setCrawlerEmptyChannels(finalEmptyChannelList);
         await this.verifyChannelsToDelete(finalEmptyChannelList);
     }
 
-    private verifyChannelsToDelete(empyChannelList: CrawlerChannel[])
+    private getChannelsStillEmpty(previousCrawlChannels: CrawlerChannel[], currentCrawlIds: number[]): CrawlerChannel[]
+    {
+        // filter out channels no longer in the empty list
+        return previousCrawlChannels.filter(prev => {
+            return currentCrawlIds.find(id => id == prev.channelId);
+        });
+    }
+
+    private getNewEmptyChannels(previousCrawlChannels: CrawlerChannel[], currentCrawlIds: number[]): CrawlerChannel[]
+    {
+        // filter out channels in previous crawls and initialize empty time
+        return currentCrawlIds.filter(emptyChannel => {
+                // id can't be in previous crawls
+                return previousCrawlChannels.every(prev => prev.channelId !== emptyChannel);
+            })
+            .map(channel => {
+                return {
+                    channelId: channel,
+                    timeEmpty: 0,
+                    lastUpdated: new Date()
+                };
+            });
+    }
+
+    private async verifyChannelsToDelete(empyChannelList: CrawlerChannel[])
     {
         // for each zone, check which exceed the time limit
         // delete or emit event for those that exceeded
     }
+}
+
+interface ZoneCrawlResult {
+    /** the crawled zone */
+    zone: string;
+    /** empty channels id's */
+    empty: number[];
+    /** total number of channels, including non-empty */
+    total: number;
 }

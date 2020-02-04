@@ -16,6 +16,7 @@ const FileReaderWriter_1 = __importDefault(require("./FileReaderWriter"));
 class FileJson extends FileReaderWriter_1.default {
     constructor(filePath) {
         super(filePath);
+        this.setBaseContents('{}');
     }
     /**
      * Load a file as json and map to a type
@@ -63,12 +64,24 @@ class FileJson extends FileReaderWriter_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             let contents = null;
             try {
-                contents = JSON.stringify(object);
+                contents = JSON.stringify(object, null, 4);
             }
             catch (e) {
                 return Promise.reject(new Error('Could stringify object: ' + e.message));
             }
             return Promise.resolve(contents);
+        });
+    }
+    /**
+     * Initialize an empty file
+     * @param force Write empty file even if it already exists
+     */
+    initializeFile(force = false) {
+        const _super = Object.create(null, {
+            initializeFile: { get: () => super.initializeFile }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            return _super.initializeFile.call(this, force);
         });
     }
 }

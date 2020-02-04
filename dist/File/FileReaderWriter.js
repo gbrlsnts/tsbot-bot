@@ -13,6 +13,21 @@ const fs_1 = require("fs");
 class FileReaderWriter {
     constructor(filePath) {
         this.filePath = filePath;
+        /** Conents to initialize a base file */
+        this.baseContents = '';
+    }
+    /**
+     * Set the contents used to initialize a file
+     * @param contents Contents used to initialize a file
+     */
+    setBaseContents(contents) {
+        this.baseContents = contents;
+    }
+    /**
+     * Get the contents used to initialize a file
+     */
+    getBaseContents() {
+        return this.baseContents;
     }
     /**
      * Try to validate the file by accessing it
@@ -57,6 +72,24 @@ class FileReaderWriter {
                     resolve();
                 });
             });
+        });
+    }
+    /**
+     * Initialize a base file
+     * @param force Write empty file even if it already exists
+     */
+    initializeFile(force = false) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.checkFile();
+                if (!force) {
+                    return Promise.resolve();
+                }
+            }
+            catch (e) {
+                // file doesnt exist.. 
+            }
+            return this.writeFileContents(this.baseContents);
         });
     }
 }

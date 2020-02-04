@@ -5,6 +5,7 @@ export default class FileJson<T> extends FileReaderWriter
     constructor(filePath: string)
     {
         super(filePath);
+        this.setBaseContents('{}');
     }
 
     /**
@@ -59,11 +60,20 @@ export default class FileJson<T> extends FileReaderWriter
         let contents = null;
 
         try {
-            contents = JSON.stringify(object);
+            contents = JSON.stringify(object, null, 4);
         } catch(e) {
             return Promise.reject(new Error('Could stringify object: ' + e.message));
         }
 
         return Promise.resolve(contents);
+    }
+
+    /**
+     * Initialize an empty file
+     * @param force Write empty file even if it already exists
+     */
+    public async initializeFile(force: boolean = false): Promise<void>
+    {
+        return super.initializeFile(force);
     }
 }
