@@ -16,7 +16,7 @@ const EventHandler_1 = require("./EventHandler");
 const Context_1 = require("./Context");
 const LocalLoader_1 = require("./Configuration/LocalLoader");
 const path_1 = require("path");
-const LocalRepository_1 = require("../Repository/LocalRepository");
+const LocalRepository_1 = require("./Crawler/Repository/LocalRepository");
 const Crawler_1 = require("./Crawler/Crawler");
 class Factory {
     create(server) {
@@ -44,7 +44,7 @@ class Factory {
         });
     }
     getRepository() {
-        return new LocalRepository_1.LocalRepository();
+        return new LocalRepository_1.LocalRepository(path_1.resolve('database'));
     }
 }
 exports.Factory = Factory;

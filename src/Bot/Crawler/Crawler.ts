@@ -1,10 +1,10 @@
 import { Bot } from "../Bot";
-import { Repository } from "../../Repository/RepositoryInterface";
-import { CrawlerConfiguration, CrawlZone } from "../Configuration/Configuration";
+import { Repository } from "./Repository/RepositoryInterface";
+import { CrawlerConfiguration } from "../Configuration/Configuration";
 import { clearTimeout } from "timers";
 import { TeamSpeakChannel } from "ts3-nodejs-library";
 import { ChannelUtils } from "../Utils/ChannelUtils";
-import { CrawlerChannel } from "../../Entities/Channel";
+import { CrawlerChannel } from "./CrawlerTypes";
 
 export class Crawler
 {
@@ -13,7 +13,11 @@ export class Crawler
     private isBooted: boolean = false;
     private timer?: NodeJS.Timeout;
 
-    constructor(private bot: Bot, private repository: Repository, private config: CrawlerConfiguration)
+    constructor(
+        private bot: Bot,
+        private repository: Repository,
+        private config: CrawlerConfiguration
+    )
     {
 
     }
@@ -62,15 +66,25 @@ export class Crawler
 
         try {
             const channelList = await this.bot.getServer().channelList();
-
             const emptyChannelList: TeamSpeakChannel[] = [];
+
             this.config.zones.forEach(zone => {
-                emptyChannelList.push(...this.checkZoneChannels(zone, channelList));
+                const channelsInZone = ChannelUtils.getTopChannelsBetween(channelList, zone.start, zone.end);
+
+                if(!channelsInZone.hasStart || !channelsInZone.hasEnd)
+                    throw new Error(`Unable to find start or end in zone ${zone.name}`);
+
+                const zoneEmptyChannels = channelsInZone.channels.filter(channel => {
+                    return !ChannelUtils.isChannelSpacer(channel.name) &&
+                        ChannelUtils.countChannelTreeTotalClients(channel, channelList) === 0;
+                });
+
+                emptyChannelList.push(...zoneEmptyChannels);
             });
 
             console.log('Empty channels list:', emptyChannelList.map(c=>c.name));
 
-            this.updateChannelsState(emptyChannelList);
+            await this.updateChannelsState(emptyChannelList);
         } catch(e) {
             console.log(`Crawl error: ${e.message}`);
         } finally {
@@ -79,44 +93,42 @@ export class Crawler
         }
     }
 
-    private checkZoneChannels(zone: CrawlZone, allChannels: TeamSpeakChannel[]): TeamSpeakChannel[]
+    private async updateChannelsState(emptyChannelList: TeamSpeakChannel[])
     {
-        const channelsInZone = ChannelUtils.getTopChannelsBetween(
-            allChannels,
-            zone.start,
-            zone.end
-        );
+        const prevCrawl = await this.repository.getPreviousCrawl();
+        const prevCrawlChannels = await this.repository.getCrawlerEmptyChannels();
 
-        if(!channelsInZone.hasStart || !channelsInZone.hasEnd)
-            throw new Error(`Unable to find start or end in zone ${zone.name}`);
+        if(prevCrawl) {
+            const secondsFromPrevCrawl = (new Date().getMilliseconds() - prevCrawl.runAt.getMilliseconds()) / 1000;
 
-        return channelsInZone.channels
-            .filter(channel => !ChannelUtils.isChannelSpacer(channel.name))
-            .filter(channel => {
-                const subTotalClients = ChannelUtils
-                    .getAllSubchannels(channel, allChannels)
-                    .map(sub => sub.totalClients)
-                    .reduce((accumulator, current) => accumulator + current);
+            // filter out channels no longer in the empty list and then add empty time
+            prevCrawlChannels.filter(prevChannel => {
+                    return emptyChannelList.find(c => c.cid == prevChannel.channelId) !== undefined;
+                })
+                .forEach(channel => channel.timeEmpty += secondsFromPrevCrawl);    
+        }
 
-                    return channel.totalClients + subTotalClients === 0;
+        // filter out channels in previous crawls and initialize empty time
+        const newEmptyChannels: CrawlerChannel[] = emptyChannelList.filter(emptyChannel => {
+                return prevCrawlChannels.find(c => c.channelId == emptyChannel.cid) === undefined;
+            })
+            .map(channel => {
+                return {
+                    channelId: channel.cid,
+                    timeEmpty: 0,
+                    lastUpdated: new Date()
+                };
             });
+
+        const finalEmptyChannelList = [...prevCrawlChannels, ...newEmptyChannels];
+
+        await this.repository.setCrawlerEmptyChannels(finalEmptyChannelList);
+        await this.verifyChannelsToDelete(finalEmptyChannelList);
     }
 
-    private updateChannelsState(channelList: TeamSpeakChannel[])
+    private verifyChannelsToDelete(empyChannelList: CrawlerChannel[])
     {
-        // get last crawl information
-
-        // get channels in db 
-
-        // add time between crawls to the empty times / initialize new empty channels
-
-        // emit events for channels empty for too long
-
-        // send empty channel list to repository
-    }
-
-    private emitDeleteChannelEvent()
-    {
-        // emit event to delete the channel
+        // for each zone, check which exceed the time limit
+        // delete or emit event for those that exceeded
     }
 }

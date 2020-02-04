@@ -8,9 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs_1 = require("fs");
 const path_1 = require("path");
+const FileJson_1 = __importDefault(require("../../File/FileJson"));
 class LocalLoader {
     constructor(configFolder) {
         this.configFolder = configFolder;
@@ -21,73 +24,8 @@ class LocalLoader {
      */
     loadConfiguration(name) {
         return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                fs_1.readdir(this.configFolder, (err, files) => {
-                    if (err)
-                        return reject(new Error(`Error while scanning configurations folder <${this.configFolder}>`));
-                    let configFile = null;
-                    files.forEach(fileName => {
-                        if (this.isValidConfigExtension(fileName) && this.isWantedConfig(fileName, name)) {
-                            configFile = fileName;
-                        }
-                    });
-                    if (configFile === null)
-                        return reject(new Error('No configuration found for the server'));
-                    this.getConfigContents(configFile)
-                        .then(configContents => this.mapConfigContentsToConfiguration(configContents))
-                        .then(configuration => resolve(configuration))
-                        .catch(error => reject(error));
-                });
-            });
-        });
-    }
-    /**
-     * Verify if a filename has the valid extension for a server configuration
-     * @param fileName File name to check
-     */
-    isValidConfigExtension(fileName) {
-        return fileName.endsWith('.cfg');
-    }
-    /**
-     * Verify if a configuration belongs to a given server Id
-     * @param fileName File name to check
-     * @param name The configuration name to compare
-     */
-    isWantedConfig(fileName, name) {
-        const split = fileName.split('.');
-        if (split.length !== 2)
-            return false;
-        return split[0] === name;
-    }
-    /**
-     * Get the contents of a configuration file
-     * @param fileName File to load contents from
-     */
-    getConfigContents(fileName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                fs_1.readFile(path_1.join(this.configFolder, fileName), 'utf8', (err, data) => {
-                    if (err)
-                        return reject(new Error('Error reading configuration contents'));
-                    resolve(data);
-                });
-            });
-        });
-    }
-    /**
-     * Map a configuration file contents to a Configuration object
-     * @param contents The contents to map
-     */
-    mapConfigContentsToConfiguration(contents) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let json = null;
-            try {
-                json = JSON.parse(contents);
-            }
-            catch (e) {
-                return Promise.reject(new Error('Could not parse configuration contents: ' + e.message));
-            }
-            return Promise.resolve(json);
+            const file = new FileJson_1.default(path_1.join(this.configFolder, `${name}.cfg`));
+            return file.loadFileJson();
         });
     }
 }

@@ -1,6 +1,7 @@
 import { TeamSpeakChannel } from "ts3-nodejs-library";
 
-export class ChannelUtils {
+export class ChannelUtils
+{
 
     private static spacerRegex = new RegExp('\[[\*lcr]spacer.*\].*');
 
@@ -59,6 +60,20 @@ export class ChannelUtils {
             });
 
         return subChannelList;
+    }
+
+    /**
+     * Counts the total clients for a given channel and subchannels
+     * @param channel Channel to count clients
+     * @param channelList List with all server channels
+     */
+    static countChannelTreeTotalClients(channel: TeamSpeakChannel, channelList: TeamSpeakChannel[]): number
+    {
+        const subTotalClients = this.getAllSubchannels(channel, channelList)
+                    .map(sub => sub.totalClients)
+                    .reduce((accumulator, current) => accumulator + current);
+
+        return channel.totalClients + subTotalClients;
     }
 
     /**

@@ -5,7 +5,7 @@ import { EventHandler } from './EventHandler';
 import { Context } from './Context';
 import { LocalLoader } from './Configuration/LocalLoader';
 import { resolve as pathResolve } from 'path';
-import { LocalRepository } from '../Repository/LocalRepository';
+import { LocalRepository } from './Crawler/Repository/LocalRepository';
 import { Crawler } from './Crawler/Crawler';
 
 export class Factory
@@ -48,6 +48,6 @@ export class Factory
 
     private getRepository()
     {
-        return new LocalRepository();
+        return new LocalRepository(pathResolve('database'));
     }
 }

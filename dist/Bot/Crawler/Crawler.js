@@ -47,10 +47,17 @@ class Crawler {
                 const channelList = yield this.bot.getServer().channelList();
                 const emptyChannelList = [];
                 this.config.zones.forEach(zone => {
-                    emptyChannelList.push(...this.checkZoneChannels(zone, channelList));
+                    const channelsInZone = ChannelUtils_1.ChannelUtils.getTopChannelsBetween(channelList, zone.start, zone.end);
+                    if (!channelsInZone.hasStart || !channelsInZone.hasEnd)
+                        throw new Error(`Unable to find start or end in zone ${zone.name}`);
+                    const zoneEmptyChannels = channelsInZone.channels.filter(channel => {
+                        return !ChannelUtils_1.ChannelUtils.isChannelSpacer(channel.name) &&
+                            ChannelUtils_1.ChannelUtils.countChannelTreeTotalClients(channel, channelList) === 0;
+                    });
+                    emptyChannelList.push(...zoneEmptyChannels);
                 });
                 console.log('Empty channels list:', emptyChannelList.map(c => c.name));
-                this.updateChannelsState(emptyChannelList);
+                yield this.updateChannelsState(emptyChannelList);
             }
             catch (e) {
                 console.log(`Crawl error: ${e.message}`);
@@ -61,29 +68,37 @@ class Crawler {
             }
         });
     }
-    checkZoneChannels(zone, allChannels) {
-        const channelsInZone = ChannelUtils_1.ChannelUtils.getTopChannelsBetween(allChannels, zone.start, zone.end);
-        if (!channelsInZone.hasStart || !channelsInZone.hasEnd)
-            throw new Error(`Unable to find start or end in zone ${zone.name}`);
-        return channelsInZone.channels
-            .filter(channel => !ChannelUtils_1.ChannelUtils.isChannelSpacer(channel.name))
-            .filter(channel => {
-            const subTotalClients = ChannelUtils_1.ChannelUtils
-                .getAllSubchannels(channel, allChannels)
-                .map(sub => sub.totalClients)
-                .reduce((accumulator, current) => accumulator + current);
-            return channel.totalClients + subTotalClients === 0;
+    updateChannelsState(emptyChannelList) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const prevCrawl = yield this.repository.getPreviousCrawl();
+            const prevCrawlChannels = yield this.repository.getCrawlerEmptyChannels();
+            if (prevCrawl) {
+                const secondsFromPrevCrawl = (new Date().getMilliseconds() - prevCrawl.runAt.getMilliseconds()) / 1000;
+                // filter out channels no longer in the empty list and then add empty time
+                prevCrawlChannels.filter(prevChannel => {
+                    return emptyChannelList.find(c => c.cid == prevChannel.channelId) !== undefined;
+                })
+                    .forEach(channel => channel.timeEmpty += secondsFromPrevCrawl);
+            }
+            // filter out channels in previous crawls and initialize empty time
+            const newEmptyChannels = emptyChannelList.filter(emptyChannel => {
+                return prevCrawlChannels.find(c => c.channelId == emptyChannel.cid) === undefined;
+            })
+                .map(channel => {
+                return {
+                    channelId: channel.cid,
+                    timeEmpty: 0,
+                    lastUpdated: new Date()
+                };
+            });
+            const finalEmptyChannelList = [...prevCrawlChannels, ...newEmptyChannels];
+            yield this.repository.setCrawlerEmptyChannels(finalEmptyChannelList);
+            yield this.verifyChannelsToDelete(finalEmptyChannelList);
         });
     }
-    updateChannelsState(channelList) {
-        // get last crawl information
-        // get channels in db 
-        // add time between crawls to the empty times / initialize new empty channels
-        // emit events for channels empty for too long
-        // send empty channel list to repository
-    }
-    emitDeleteChannelEvent() {
-        // emit event to delete the channel
+    verifyChannelsToDelete(empyChannelList) {
+        // for each zone, check which exceed the time limit
+        // delete or emit event for those that exceeded
     }
 }
 exports.Crawler = Crawler;
