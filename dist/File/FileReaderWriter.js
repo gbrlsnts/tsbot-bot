@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = require("fs");
 class FileReaderWriter {
@@ -32,15 +23,13 @@ class FileReaderWriter {
     /**
      * Try to validate the file by accessing it
      */
-    checkFile() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                fs_1.access(this.filePath, (err) => {
-                    if (err) {
-                        return reject(new Error(err.message));
-                    }
-                    resolve();
-                });
+    async checkFile() {
+        return new Promise((resolve, reject) => {
+            fs_1.access(this.filePath, (err) => {
+                if (err) {
+                    return reject(new Error(err.message));
+                }
+                resolve();
             });
         });
     }
@@ -48,14 +37,12 @@ class FileReaderWriter {
      * Get the contents of a json file
      * @param fileName File to load contents from
      */
-    getFileContents() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                fs_1.readFile(this.filePath, 'utf8', (err, data) => {
-                    if (err)
-                        return reject(new Error('Error reading file contents'));
-                    resolve(data);
-                });
+    async getFileContents() {
+        return new Promise((resolve, reject) => {
+            fs_1.readFile(this.filePath, 'utf8', (err, data) => {
+                if (err)
+                    return reject(new Error('Error reading file contents'));
+                resolve(data);
             });
         });
     }
@@ -63,14 +50,12 @@ class FileReaderWriter {
      * Write the contents to a file
      * @param fileName File to load contents from
      */
-    writeFileContents(contents) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                fs_1.writeFile(this.filePath, contents, (err) => {
-                    if (err)
-                        return reject(new Error('Error writing file contents'));
-                    resolve();
-                });
+    async writeFileContents(contents) {
+        return new Promise((resolve, reject) => {
+            fs_1.writeFile(this.filePath, contents, (err) => {
+                if (err)
+                    return reject(new Error('Error writing file contents'));
+                resolve();
             });
         });
     }
@@ -78,19 +63,17 @@ class FileReaderWriter {
      * Initialize a base file
      * @param force Write empty file even if it already exists
      */
-    initializeFile(force = false) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                yield this.checkFile();
-                if (!force) {
-                    return Promise.resolve();
-                }
+    async initializeFile(force = false) {
+        try {
+            await this.checkFile();
+            if (!force) {
+                return Promise.resolve();
             }
-            catch (e) {
-                // file doesnt exist.. 
-            }
-            return this.writeFileContents(this.baseContents);
-        });
+        }
+        catch (e) {
+            // file doesnt exist.. 
+        }
+        return this.writeFileContents(this.baseContents);
     }
 }
 exports.default = FileReaderWriter;
