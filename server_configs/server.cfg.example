@@ -16,6 +16,7 @@
                 "spacerAsSeparator": false,
                 "start": 10,
                 "end": 15,
+                "inactiveIcon": 569213714,
                 "timeInactiveNotify": 2000,
                 "timeInactiveMax": 3600
             },

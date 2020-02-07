@@ -1,5 +1,14 @@
-export interface ChannelInactiveEvent
+export interface ChannelInactiveDeleteEvent
 {
-    /** Channel Id to notify of inactivity */
+    /** Inactive channel to delete */
     channelId: number;
+}
+
+export interface ChannelInactiveNotifyEvent
+{
+    /** Inactive channel to delete */
+    channelId: number;
+
+    /** Icon to set on the channel */
+    icon?: number;
 }

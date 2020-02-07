@@ -31,3 +31,10 @@ export interface ZoneCrawlResult {
     /** total number of channels, including non-empty */
     total: number;
 }
+
+export interface ZoneProcessResult {
+    /** the crawled zone */
+    zone: string;
+    /** channels empty */
+    channels: CrawlerChannel[];
+}

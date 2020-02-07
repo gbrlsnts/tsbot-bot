@@ -1,8 +1,8 @@
 import { Bot } from "../Bot";
-import { CrawlerConfiguration } from "../Configuration/Configuration";
+import { CrawlerConfiguration, CrawlZone } from "../Configuration/Configuration";
 import { clearTimeout } from "timers";
 import { ChannelUtils } from "../Utils/ChannelUtils";
-import { ZoneCrawlResult, CrawlerChannel } from "./CrawlerTypes";
+import { ZoneCrawlResult, CrawlerChannel, ZoneProcessResult } from "./CrawlerTypes";
 import { ProcessResult } from "./ProcessResult";
 
 export class Crawler
@@ -115,11 +115,33 @@ export class Crawler
         }
     }
 
-    private raiseChannelEvents(emptyChannelList: CrawlerChannel[])
+    private raiseChannelEvents(result: ZoneProcessResult[])
     {
-        // raise notify or delete events depending on zone config...
         const botEvents = this.bot.getBotEvents();
 
-        emptyChannelList.forEach(channel => botEvents.raiseChannelInactiveNotify(channel.channelId));
+        result.forEach(({ zone, channels }) => {
+            const config = this.config.zones.find(conf => conf.name === zone);
+
+            if(!config)
+                return;
+
+            channels
+                .filter(channel => this.channelExceededNotifyTime(config, channel))
+                .forEach(channel => botEvents.raiseChannelInactiveNotify(channel.channelId, config.inactiveIcon));
+
+            channels
+                .filter(channel => this.channelExceededMaxTime(config, channel))
+                .forEach(channel => botEvents.raiseChannelInactiveDelete(channel.channelId));
+        });
+    }
+
+    private channelExceededNotifyTime(zone: CrawlZone, channel: CrawlerChannel): boolean
+    {
+        return channel.timeEmpty >= zone.timeInactiveNotify && channel.timeEmpty < zone.timeInactiveMax;
+    }
+
+    private channelExceededMaxTime(zone: CrawlZone, channel: CrawlerChannel): boolean
+    {
+        return channel.timeEmpty >= zone.timeInactiveMax;
     }
 }

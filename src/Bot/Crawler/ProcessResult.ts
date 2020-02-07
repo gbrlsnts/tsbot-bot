@@ -1,6 +1,7 @@
-import { CrawlerChannel, ZoneCrawlResult } from "./CrawlerTypes";
+import { CrawlerChannel, ZoneCrawlResult, ZoneProcessResult } from "./CrawlerTypes";
 import { RepositoryInterface } from "./Repository/RepositoryInterface";
 import { Factory } from "./Repository/Factory";
+import { Z_NO_COMPRESSION } from "zlib";
 
 export class ProcessResult
 {
@@ -11,7 +12,7 @@ export class ProcessResult
         this.repository = new Factory().create();
     }
 
-    async processResults(): Promise<CrawlerChannel[]>
+    async processResults(): Promise<ZoneProcessResult[]>
     {
         const prevCrawl = await this.repository.getPreviousCrawl();
         const emptyChannelIds: number[] = Array.prototype.concat.apply([], this.result.map(zoneResult => zoneResult.empty));
@@ -46,7 +47,7 @@ export class ProcessResult
 
         await this.repository.setCrawlerEmptyChannels(finalEmptyChannelList);
 
-        return finalEmptyChannelList;
+        return this.getProcessingResult(finalEmptyChannelList);
     }
 
     private getChannelsStillEmpty(previousCrawlChannels: CrawlerChannel[], currentCrawlIds: number[]): CrawlerChannel[]
@@ -71,5 +72,19 @@ export class ProcessResult
                     lastUpdated: new Date()
                 };
             });
+    }
+
+    private getProcessingResult(channelList: CrawlerChannel[]): ZoneProcessResult[]
+    {
+        return this.result.map(zone => {
+            const channels = channelList.filter(channel => {
+                return zone.empty.find(id => id === channel.channelId);
+            });
+
+            return {
+                zone: zone.zone,
+                channels
+            }
+        });
     }
 }

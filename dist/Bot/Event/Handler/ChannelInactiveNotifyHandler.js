@@ -6,10 +6,10 @@ class ChannelInactiveNotifyHandler {
         this.event = event;
     }
     async handle() {
-        const channel = await this.bot.getServer().getChannelByID(this.event.channelId);
-        if (!channel)
+        if (!this.event.icon)
             return;
-        this.bot.sendServerMessage(`Channel ${channel.name} is inactive and will be deleted soon!`);
+        // todo: set is notified flag in the repository as well
+        await this.bot.setChannelIcon(this.event.channelId, this.event.icon);
     }
 }
 exports.ChannelInactiveNotifyHandler = ChannelInactiveNotifyHandler;

@@ -74,10 +74,25 @@ class Crawler {
             }
         }
     }
-    raiseChannelEvents(emptyChannelList) {
-        // raise notify or delete events depending on zone config...
+    raiseChannelEvents(result) {
         const botEvents = this.bot.getBotEvents();
-        emptyChannelList.forEach(channel => botEvents.raiseChannelInactiveNotify(channel.channelId));
+        result.forEach(({ zone, channels }) => {
+            const config = this.config.zones.find(conf => conf.name === zone);
+            if (!config)
+                return;
+            channels
+                .filter(channel => this.channelExceededNotifyTime(config, channel))
+                .forEach(channel => botEvents.raiseChannelInactiveNotify(channel.channelId, config.inactiveIcon));
+            channels
+                .filter(channel => this.channelExceededMaxTime(config, channel))
+                .forEach(channel => botEvents.raiseChannelInactiveDelete(channel.channelId));
+        });
+    }
+    channelExceededNotifyTime(zone, channel) {
+        return channel.timeEmpty >= zone.timeInactiveNotify && channel.timeEmpty < zone.timeInactiveMax;
+    }
+    channelExceededMaxTime(zone, channel) {
+        return channel.timeEmpty >= zone.timeInactiveMax;
     }
 }
 exports.Crawler = Crawler;

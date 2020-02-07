@@ -60,7 +60,7 @@ export class Bot
         });
     }
 
-    async deleteChannel(channelId: number, force: boolean)
+    async deleteChannel(channelId: number, force: boolean = false)
     {
         return await this.server.channelDelete(channelId, force ? 1 : 0);
     }
@@ -78,5 +78,10 @@ export class Bot
     async getClientByDbid(databaseId: number)
     {
         return await this.server.getClientByDBID(databaseId);
+    }
+
+    async setChannelIcon(channelId: number, iconId: number)
+    {
+        return await this.server.channelSetPerm(channelId, 'i_icon_id', iconId);
     }
 }

@@ -41,7 +41,7 @@ class Bot {
             channel_order: afterChannel,
         });
     }
-    async deleteChannel(channelId, force) {
+    async deleteChannel(channelId, force = false) {
         return await this.server.channelDelete(channelId, force ? 1 : 0);
     }
     async setChannelGroupToClient(databaseId, channelId, groupId) {
@@ -52,6 +52,9 @@ class Bot {
     }
     async getClientByDbid(databaseId) {
         return await this.server.getClientByDBID(databaseId);
+    }
+    async setChannelIcon(channelId, iconId) {
+        return await this.server.channelSetPerm(channelId, 'i_icon_id', iconId);
     }
 }
 exports.Bot = Bot;

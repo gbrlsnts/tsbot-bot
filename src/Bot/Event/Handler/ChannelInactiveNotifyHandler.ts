@@ -1,20 +1,19 @@
 import { EventHandlerInterface } from "../EventHandlerInterface";
 import { Bot } from "../../Bot";
-import { ChannelInactiveEvent } from "../EventTypes";
+import { ChannelInactiveNotifyEvent } from "../EventTypes";
 
 export class ChannelInactiveNotifyHandler implements EventHandlerInterface
 {
-    constructor(private readonly bot: Bot, private readonly event: ChannelInactiveEvent)
+    constructor(private readonly bot: Bot, private readonly event: ChannelInactiveNotifyEvent)
     {
 
     }
 
     async handle(): Promise<void> {
-        const channel = await this.bot.getServer().getChannelByID(this.event.channelId);
-
-        if(!channel)
+        if(!this.event.icon)
             return;
 
-        this.bot.sendServerMessage(`Channel ${channel.name} is inactive and will be deleted soon!`);
+        // todo: set is notified flag in the repository as well
+        await this.bot.setChannelIcon(this.event.channelId, this.event.icon);
     }
 }

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const BotEvent_1 = require("./BotEvent");
 const ChannelInactiveNotifyHandler_1 = require("./Handler/ChannelInactiveNotifyHandler");
+const ChannelInactiveDeleteHandler_1 = require("./Handler/ChannelInactiveDeleteHandler");
 class MasterEventHandler {
     constructor(bot) {
         this.bot = bot;
@@ -29,8 +30,9 @@ class MasterEventHandler {
             new ChannelInactiveNotifyHandler_1.ChannelInactiveNotifyHandler(this.bot, event).handle()
                 .catch(e => console.log('Error handling event:', e));
         });
-        botEvents.on(BotEvent_1.BotEventName.channelInactiveDeleteEvent, ({ channelId }) => {
-            console.log(`Channel ${channelId} delete event`);
+        botEvents.on(BotEvent_1.BotEventName.channelInactiveDeleteEvent, event => {
+            new ChannelInactiveDeleteHandler_1.ChannelInactiveDeleteHandler(this.bot, event).handle()
+                .catch(e => console.log('Error handling event:', e));
         });
     }
     registerClientConnectHandler() {

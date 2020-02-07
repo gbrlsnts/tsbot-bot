@@ -41,6 +41,8 @@ export interface CrawlZone {
     start: number;
     /** Zone end channel Id */
     end: number;
+    /** Icon name for inactive channels */
+    inactiveIcon?: number;
     /** Time in seconds a channel can be inactive before triggering a notification */
     timeInactiveNotify: number;
     /** Time in seconds a channel can be inactive before it is deleted */

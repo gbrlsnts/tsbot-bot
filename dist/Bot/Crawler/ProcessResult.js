@@ -32,7 +32,7 @@ class ProcessResult {
             }),
         });
         await this.repository.setCrawlerEmptyChannels(finalEmptyChannelList);
-        return finalEmptyChannelList;
+        return this.getProcessingResult(finalEmptyChannelList);
     }
     getChannelsStillEmpty(previousCrawlChannels, currentCrawlIds) {
         // filter out channels no longer in the empty list
@@ -51,6 +51,17 @@ class ProcessResult {
                 channelId: channel,
                 timeEmpty: 0,
                 lastUpdated: new Date()
+            };
+        });
+    }
+    getProcessingResult(channelList) {
+        return this.result.map(zone => {
+            const channels = channelList.filter(channel => {
+                return zone.empty.find(id => id === channel.channelId);
+            });
+            return {
+                zone: zone.zone,
+                channels
             };
         });
     }

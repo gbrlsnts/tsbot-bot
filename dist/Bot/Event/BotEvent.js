@@ -5,8 +5,8 @@ class BotEvent extends events_1.EventEmitter {
     raiseChannelNotInactiveNotify(channelId) {
         this.emit(BotEventName.channelInactiveNotifyEvent, { channelId });
     }
-    raiseChannelInactiveNotify(channelId) {
-        this.emit(BotEventName.channelInactiveNotifyEvent, { channelId });
+    raiseChannelInactiveNotify(channelId, icon) {
+        this.emit(BotEventName.channelInactiveNotifyEvent, { channelId, icon });
     }
     raiseChannelInactiveDelete(channelId) {
         this.emit(BotEventName.channelInactiveDeleteEvent, { channelId });
