@@ -1,10 +1,9 @@
 import { Bot } from "../Bot";
-import { Repository } from "./Repository/RepositoryInterface";
 import { CrawlerConfiguration } from "../Configuration/Configuration";
 import { clearTimeout } from "timers";
-import { TeamSpeakChannel } from "ts3-nodejs-library";
 import { ChannelUtils } from "../Utils/ChannelUtils";
-import { CrawlerChannel } from "./CrawlerTypes";
+import { ZoneCrawlResult, CrawlerChannel } from "./CrawlerTypes";
+import { ProcessResult } from "./ProcessResult";
 
 export class Crawler
 {
@@ -15,7 +14,6 @@ export class Crawler
 
     constructor(
         private bot: Bot,
-        private repository: Repository,
         private config: CrawlerConfiguration
     )
     {
@@ -88,7 +86,10 @@ export class Crawler
 
             console.log('Empty channels list:', emptyChannelList.map(c=>c.empty));
 
-            await this.updateChannelsState(emptyChannelList);
+            const processResult = new ProcessResult(emptyChannelList);
+            const results = await processResult.processResults();
+
+            this.raiseChannelEvents(results);
         } catch(e) {
             console.log(`Crawl error: ${e.message}`);
         } finally {
@@ -97,78 +98,11 @@ export class Crawler
         }
     }
 
-    private async updateChannelsState(emptyChannelList: ZoneCrawlResult[])
+    private raiseChannelEvents(emptyChannelList: CrawlerChannel[])
     {
-        const prevCrawl = await this.repository.getPreviousCrawl();
-        const emptyChannelIds: number[] = Array.prototype.concat.apply([], emptyChannelList.map(zoneResult => zoneResult.empty));
-        let prevCrawlChannels = await this.repository.getCrawlerEmptyChannels();
+        // raise notify or delete events depending on zone config...
+        const botEvents = this.bot.getBotEvents();
 
-        if(prevCrawl) {
-            const secondsFromPrevCrawl = Math.round((new Date().getTime() - prevCrawl.runAt.getTime()) / 1000);
-
-            // filter out channels no longer in the empty list and then add empty time
-            prevCrawlChannels = this.getChannelsStillEmpty(prevCrawlChannels, emptyChannelIds);
-
-            prevCrawlChannels.forEach(channel => {
-                channel.timeEmpty += secondsFromPrevCrawl;
-                channel.lastUpdated = new Date();
-            });    
-        }
-
-        const newEmptyChannels = this.getNewEmptyChannels(prevCrawlChannels, emptyChannelIds);
-        const finalEmptyChannelList = [...prevCrawlChannels, ...newEmptyChannels];
-
-        await this.repository.addPreviousCrawl({
-            runAt: new Date(),
-            zones: emptyChannelList.map(zoneResult => {
-                return {
-                    zone: zoneResult.zone,
-                    emptyChannels: zoneResult.empty.length,
-                    totalChannels: zoneResult.total
-                };
-            }),
-        });
-
-        await this.repository.setCrawlerEmptyChannels(finalEmptyChannelList);
-        await this.verifyChannelsToDelete(finalEmptyChannelList);
+        emptyChannelList.forEach(channel => botEvents.raiseChannelInactiveNotify(channel.channelId));
     }
-
-    private getChannelsStillEmpty(previousCrawlChannels: CrawlerChannel[], currentCrawlIds: number[]): CrawlerChannel[]
-    {
-        // filter out channels no longer in the empty list
-        return previousCrawlChannels.filter(prev => {
-            return currentCrawlIds.find(id => id == prev.channelId);
-        });
-    }
-
-    private getNewEmptyChannels(previousCrawlChannels: CrawlerChannel[], currentCrawlIds: number[]): CrawlerChannel[]
-    {
-        // filter out channels in previous crawls and initialize empty time
-        return currentCrawlIds.filter(emptyChannel => {
-                // id can't be in previous crawls
-                return previousCrawlChannels.every(prev => prev.channelId !== emptyChannel);
-            })
-            .map(channel => {
-                return {
-                    channelId: channel,
-                    timeEmpty: 0,
-                    lastUpdated: new Date()
-                };
-            });
-    }
-
-    private async verifyChannelsToDelete(empyChannelList: CrawlerChannel[])
-    {
-        // for each zone, check which exceed the time limit
-        // delete or emit event for those that exceeded
-    }
-}
-
-interface ZoneCrawlResult {
-    /** the crawled zone */
-    zone: string;
-    /** empty channels id's */
-    empty: number[];
-    /** total number of channels, including non-empty */
-    total: number;
 }

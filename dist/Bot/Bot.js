@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const ts3_nodejs_library_1 = require("ts3-nodejs-library");
+const BotEvent_1 = require("./Event/BotEvent");
 class Bot {
-    constructor(server, context, eventHandler) {
+    constructor(server, context) {
         this.server = server;
         this.context = context;
-        this.eventHandler = eventHandler;
+        this.botEvents = new BotEvent_1.BotEvent();
     }
     getServer() {
         return this.server;
@@ -13,8 +14,8 @@ class Bot {
     getContext() {
         return this.context;
     }
-    getEventHandler() {
-        return this.eventHandler;
+    getBotEvents() {
+        return this.botEvents;
     }
     async sendServerMessage(message) {
         try {

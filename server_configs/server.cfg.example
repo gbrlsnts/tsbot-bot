@@ -16,14 +16,16 @@
                 "spacerAsSeparator": false,
                 "start": 10,
                 "end": 15,
-                "timeEmpty": 3600
+                "timeInactiveNotify": 2000,
+                "timeInactiveMax": 3600
             },
             {
                 "name": "vip",
                 "spacerAsSeparator": true,
                 "start": 20,
                 "end": 30,
-                "timeEmpty": 7200
+                "timeInactiveNotify": 5000,
+                "timeInactiveMax": 7200
             }
         ]
     }

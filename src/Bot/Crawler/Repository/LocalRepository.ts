@@ -1,9 +1,9 @@
 import { join as pathJoin } from 'path';
-import { Repository } from "./RepositoryInterface";
+import { RepositoryInterface } from "./RepositoryInterface";
 import { CrawlerChannel, CrawlInfo } from "../CrawlerTypes";
 import FileJson from '../../../File/FileJson';
 
-export class LocalRepository implements Repository
+export class LocalRepository implements RepositoryInterface
 {
     private readonly crawlsFilePath: string;
     private readonly emptyChannelsFilePath: string;

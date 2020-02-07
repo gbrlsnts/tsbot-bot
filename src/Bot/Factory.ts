@@ -1,11 +1,10 @@
 import { TeamSpeak, QueryProtocol } from 'ts3-nodejs-library';
 import { ConnectionProtocol } from './ConnectionProtocol';
 import { Bot } from './Bot';
-import { EventHandler } from './EventHandler';
+import { MasterEventHandler } from './Event/MasterEventHandler';
 import { Context } from './Context';
 import { LocalLoader } from './Configuration/LocalLoader';
 import { resolve as pathResolve } from 'path';
-import { LocalRepository } from './Crawler/Repository/LocalRepository';
 import { Crawler } from './Crawler/Crawler';
 
 export class Factory
@@ -36,18 +35,13 @@ export class Factory
             whoami.virtualserver_unique_identifier
         );
 
-        const eventHandler = new EventHandler(ts3server);
-        const bot =  new Bot(ts3server, context, eventHandler);
+        const bot =  new Bot(ts3server, context);
+        const eventHandler = new MasterEventHandler(bot);
 
         if(configuration.crawler) {
-            new Crawler(bot, this.getRepository(), configuration.crawler).boot();
+            new Crawler(bot, configuration.crawler).boot();
         }
 
         return bot;
-    }
-
-    private getRepository()
-    {
-        return new LocalRepository(pathResolve('database'));
     }
 }

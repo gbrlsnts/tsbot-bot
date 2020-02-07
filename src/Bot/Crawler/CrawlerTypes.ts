@@ -22,3 +22,12 @@ export interface CrawlZoneInfo {
     /** total channels */
     totalChannels: number;
 }
+
+export interface ZoneCrawlResult {
+    /** the crawled zone */
+    zone: string;
+    /** empty channels id's */
+    empty: number[];
+    /** total number of channels, including non-empty */
+    total: number;
+}

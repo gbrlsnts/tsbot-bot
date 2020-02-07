@@ -1,12 +1,15 @@
 import { TeamSpeak, TextMessageTargetMode } from "ts3-nodejs-library";
 import { Context } from "./Context";
-import { EventHandler } from "./EventHandler";
+import { MasterEventHandler } from "./Event/MasterEventHandler";
+import { BotEvent } from "./Event/BotEvent";
 
 export class Bot
 {
-    constructor(private server: TeamSpeak, private context: Context, private eventHandler: EventHandler)
-    {
+    private readonly botEvents: BotEvent;
 
+    constructor(private server: TeamSpeak, private context: Context)
+    {
+        this.botEvents = new BotEvent();
     }
 
     getServer(): TeamSpeak
@@ -19,9 +22,9 @@ export class Bot
         return this.context;
     }
 
-    getEventHandler(): EventHandler
+    getBotEvents(): BotEvent
     {
-        return this.eventHandler;
+        return this.botEvents;
     }
 
     async sendServerMessage(message: string)
