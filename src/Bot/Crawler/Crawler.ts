@@ -10,7 +10,11 @@ export class Crawler
     private readonly bootTimer: number = 30;
 
     private isBooted: boolean = false;
+    private isRunning: boolean = false;
+
     private timer?: NodeJS.Timeout;
+
+    private onCrawlEnd?: CallableFunction;
 
     constructor(
         private bot: Bot,
@@ -32,7 +36,13 @@ export class Crawler
 
     reload(config: CrawlerConfiguration)
     {
-        // apply config and reload
+        if(!this.isRunning) {
+            this.config = config;
+
+            return;
+        }
+
+        this.onCrawlEnd = () => this.config = config;
     }
 
     private startTimer()
@@ -61,6 +71,7 @@ export class Crawler
     private async crawl()
     {
         console.log('starting crawl...');
+        this.isRunning = true;
 
         try {
             const channelList = await this.bot.getServer().channelList();
@@ -95,6 +106,12 @@ export class Crawler
         } finally {
             this.startTimer();
             console.log('crawl ended');
+            this.isRunning = false;
+
+            if(this.onCrawlEnd) {
+                this.onCrawlEnd();
+                this.onCrawlEnd = undefined;
+            }
         }
     }
 

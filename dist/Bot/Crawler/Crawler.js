@@ -9,6 +9,7 @@ class Crawler {
         this.config = config;
         this.bootTimer = 30;
         this.isBooted = false;
+        this.isRunning = false;
     }
     boot() {
         if (this.isBooted)
@@ -17,7 +18,11 @@ class Crawler {
         this.isBooted = true;
     }
     reload(config) {
-        // apply config and reload
+        if (!this.isRunning) {
+            this.config = config;
+            return;
+        }
+        this.onCrawlEnd = () => this.config = config;
     }
     startTimer() {
         if (this.timer)
@@ -33,6 +38,7 @@ class Crawler {
     }
     async crawl() {
         console.log('starting crawl...');
+        this.isRunning = true;
         try {
             const channelList = await this.bot.getServer().channelList();
             const emptyChannelList = [];
@@ -61,6 +67,11 @@ class Crawler {
         finally {
             this.startTimer();
             console.log('crawl ended');
+            this.isRunning = false;
+            if (this.onCrawlEnd) {
+                this.onCrawlEnd();
+                this.onCrawlEnd = undefined;
+            }
         }
     }
     raiseChannelEvents(emptyChannelList) {
