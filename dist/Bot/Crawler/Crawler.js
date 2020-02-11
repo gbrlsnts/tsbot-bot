@@ -57,7 +57,7 @@ class Crawler {
                 });
             });
             console.log('Empty channels list:', emptyChannelList.map(c => c.empty));
-            const processResult = new ProcessResult_1.ProcessResult(emptyChannelList);
+            const processResult = new ProcessResult_1.ProcessResult(emptyChannelList, this.config.interval);
             const results = await processResult.processResults();
             this.raiseChannelEvents(results);
         }

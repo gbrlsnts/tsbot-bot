@@ -2,8 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const Factory_1 = require("./Repository/Factory");
 class ProcessResult {
-    constructor(result) {
+    constructor(result, crawlInterval) {
         this.result = result;
+        this.crawlInterval = crawlInterval;
         this.repository = new Factory_1.Factory().create();
     }
     async processResults() {
@@ -31,7 +32,13 @@ class ProcessResult {
                 };
             }),
         });
-        await this.repository.setCrawlerEmptyChannels(finalEmptyChannelList);
+        // if for some reason the crawling hasnt ran for a while, reset the database so there aren't accidental deletions
+        if (prevCrawl && this.shouldResetDatabase(prevCrawl.runAt)) {
+            await this.repository.setCrawlerEmptyChannels([]);
+        }
+        else {
+            await this.repository.setCrawlerEmptyChannels(finalEmptyChannelList);
+        }
         return this.getProcessingResult(finalEmptyChannelList);
     }
     getChannelsStillEmpty(previousCrawlChannels, currentCrawlIds) {
@@ -65,6 +72,11 @@ class ProcessResult {
                 channels
             };
         });
+    }
+    shouldResetDatabase(lastCrawl) {
+        const diff = new Date().getTime() - lastCrawl.getTime();
+        // if the difference is bigger than 5 crawls then reset
+        return diff > this.crawlInterval * 5 * 1000;
     }
 }
 exports.ProcessResult = ProcessResult;
