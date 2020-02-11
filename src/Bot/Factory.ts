@@ -3,16 +3,14 @@ import { ConnectionProtocol } from './ConnectionProtocol';
 import { Bot } from './Bot';
 import { MasterEventHandler } from './Event/MasterEventHandler';
 import { Context } from './Context';
-import { LocalLoader } from './Configuration/LocalLoader';
-import { resolve as pathResolve } from 'path';
+import { Factory as LoaderFactory } from './Configuration/Factory';
 import { Crawler } from './Crawler/Crawler';
 
 export class Factory
 {
     async create(server: string): Promise<Bot>
     {
-        const configLoader = new LocalLoader(pathResolve('server_configs'));
-        const configuration = await configLoader.loadConfiguration(server);
+        const configuration = await new LoaderFactory().create().loadConfiguration(server);
 
         const ts3server = await TeamSpeak.connect({
             ...configuration.connection,
