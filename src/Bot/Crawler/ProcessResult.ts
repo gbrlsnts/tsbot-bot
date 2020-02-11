@@ -69,6 +69,7 @@ export class ProcessResult
                 return {
                     channelId: channel,
                     timeEmpty: 0,
+                    isNotified: false,
                     lastUpdated: new Date()
                 };
             });

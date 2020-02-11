@@ -72,6 +72,34 @@ export class LocalRepository implements RepositoryInterface
         return loader.saveFileJson(channelList);
     }
 
+    async getChannelById(channelId: number): Promise<CrawlerChannel>
+    {
+        const loader = await this.getFileLoader<CrawlerChannel[]>(this.emptyChannelsFilePath);
+
+        const channels = await loader.loadFileJson();
+        const channel = channels.find(channel => channel.channelId === channelId);
+
+        if(!channel)
+            throw new Error('Unable to find channel id ' + channelId);
+
+        return channel;
+    }
+
+    async setChannelNotified(channelId: number, notified: boolean): Promise<void>
+    {
+        const loader = await this.getFileLoader<CrawlerChannel[]>(this.emptyChannelsFilePath);
+
+        const channels = await loader.loadFileJson();
+        const channelToUpdate = channels.find(channel => channel.channelId === channelId);
+
+        if(!channelToUpdate)
+            return;
+
+        channelToUpdate.isNotified = true;
+
+        await loader.saveFileJson(channels);
+    }
+
     /**
      * Get the fileloader. Initialize an empty file if it doesn't exist
      * @param filePath Path to the data file
