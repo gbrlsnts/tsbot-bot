@@ -27,13 +27,15 @@ class MasterEventHandler {
             console.log(`Channel ${channelId} not inactive notify`);
         });
         botEvents.on(BotEvent_1.BotEventName.channelInactiveNotifyEvent, event => {
-            new ChannelInactiveNotifyHandler_1.ChannelInactiveNotifyHandler(this.bot, event).handle()
-                .catch(e => console.log('Error handling event:', e));
+            this.handleBotEvent(new ChannelInactiveNotifyHandler_1.ChannelInactiveNotifyHandler(this.bot, event));
         });
         botEvents.on(BotEvent_1.BotEventName.channelInactiveDeleteEvent, event => {
-            new ChannelInactiveDeleteHandler_1.ChannelInactiveDeleteHandler(this.bot, event).handle()
-                .catch(e => console.log('Error handling event:', e));
+            this.handleBotEvent(new ChannelInactiveDeleteHandler_1.ChannelInactiveDeleteHandler(this.bot, event));
         });
+    }
+    handleBotEvent(event) {
+        event.handle()
+            .catch(e => console.log('Error handling event:', e));
     }
     registerClientConnectHandler() {
         this.bot.getServer().on('clientconnect', event => {
