@@ -1,13 +1,12 @@
 import { CrawlerChannel, ZoneCrawlResult, ZoneProcessResult } from "./CrawlerTypes";
 import { RepositoryInterface } from "./Repository/RepositoryInterface";
 import { Factory } from "./Repository/Factory";
-import { Z_NO_COMPRESSION } from "zlib";
 
 export class ProcessResult
 {
     private readonly repository: RepositoryInterface;
 
-    constructor(private readonly result: ZoneCrawlResult[])
+    constructor(private readonly result: ZoneCrawlResult[], private readonly crawlInterval: number)
     {
         this.repository = new Factory().create();
     }
@@ -45,7 +44,13 @@ export class ProcessResult
             }),
         });
 
-        await this.repository.setCrawlerEmptyChannels(finalEmptyChannelList);
+        // if for some reason the crawling hasnt ran for a while, reset the database so there aren't accidental deletions
+        if(prevCrawl && this.shouldResetDatabase(prevCrawl.runAt)) {
+            await this.repository.setCrawlerEmptyChannels([]);
+        } else {
+            await this.repository.setCrawlerEmptyChannels(finalEmptyChannelList);
+        }
+        
 
         return this.getProcessingResult(finalEmptyChannelList);
     }
@@ -87,5 +92,13 @@ export class ProcessResult
                 channels
             }
         });
+    }
+
+    private shouldResetDatabase(lastCrawl: Date)
+    {
+        const diff = new Date().getTime() - lastCrawl.getTime();
+
+        // if the difference is bigger than 5 crawls then reset
+        return diff > this.crawlInterval * 5 * 1000;
     }
 }

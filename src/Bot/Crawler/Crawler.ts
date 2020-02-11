@@ -97,7 +97,7 @@ export class Crawler
 
             console.log('Empty channels list:', emptyChannelList.map(c=>c.empty));
 
-            const processResult = new ProcessResult(emptyChannelList);
+            const processResult = new ProcessResult(emptyChannelList, this.config.interval);
             const results = await processResult.processResults();
 
             this.raiseChannelEvents(results);
