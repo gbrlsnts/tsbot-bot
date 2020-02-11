@@ -15,14 +15,8 @@ export class Factory
         const configuration = await configLoader.loadConfiguration(server);
 
         const ts3server = await TeamSpeak.connect({
-            host: configuration.connection.host,
-            queryport: configuration.connection.queryport,
-            serverport: configuration.connection.serverport,
-            nickname: configuration.connection.nickname,
-            username: configuration.connection.username,
-            password: configuration.connection.password,
-            protocol: configuration.connection.protocol === ConnectionProtocol.SSH 
-                ? QueryProtocol.SSH : QueryProtocol.RAW,
+            ...configuration.connection,
+            protocol: configuration.connection.protocol === ConnectionProtocol.RAW ? QueryProtocol.RAW : QueryProtocol.SSH,
         });
 
         const whoami = await ts3server.whoami();
