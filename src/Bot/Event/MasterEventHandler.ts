@@ -2,6 +2,7 @@ import { Bot } from "../Bot";
 import { BotEventName } from "./BotEvent";
 import { ChannelInactiveNotifyHandler } from "./Handler/ChannelInactiveNotifyHandler";
 import { ChannelInactiveDeleteHandler } from "./Handler/ChannelInactiveDeleteHandler";
+import { EventHandlerInterface } from "./EventHandlerInterface";
 
 export class MasterEventHandler
 {
@@ -36,14 +37,18 @@ export class MasterEventHandler
         });
 
         botEvents.on(BotEventName.channelInactiveNotifyEvent, event => {
-            new ChannelInactiveNotifyHandler(this.bot, event).handle()
-                .catch(e => console.log('Error handling event:', e));
+            this.handleBotEvent(new ChannelInactiveNotifyHandler(this.bot, event));
         });
 
         botEvents.on(BotEventName.channelInactiveDeleteEvent, event => {
-            new ChannelInactiveDeleteHandler(this.bot, event).handle()
-                .catch(e => console.log('Error handling event:', e));
+            this.handleBotEvent(new ChannelInactiveDeleteHandler(this.bot, event));
         });
+    }
+
+    private handleBotEvent(event: EventHandlerInterface)
+    {
+        event.handle()
+            .catch(e => console.log('Error handling event:', e));
     }
 
     private registerClientConnectHandler()
