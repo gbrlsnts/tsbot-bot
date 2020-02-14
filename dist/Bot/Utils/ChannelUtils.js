@@ -63,6 +63,19 @@ class ChannelUtils {
     static isChannelSpacer(channelName) {
         return this.spacerRegex.test(channelName);
     }
+    /**
+     * Get the channel before the specified channel
+     * @param channelId The channel Id to find the previous channel
+     */
+    static getChannelBefore(channelId, channelList) {
+        let channelBefore;
+        for (let channel of channelList) {
+            if (channel.cid === channelId)
+                break;
+            channelBefore = channel;
+        }
+        return channelBefore;
+    }
 }
 exports.ChannelUtils = ChannelUtils;
 ChannelUtils.spacerRegex = new RegExp('\[[\*lcr]spacer.*\].*');

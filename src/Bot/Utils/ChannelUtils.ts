@@ -86,6 +86,24 @@ export class ChannelUtils
     {
         return this.spacerRegex.test(channelName);
     }
+
+    /**
+     * Get the channel before the specified channel
+     * @param channelId The channel Id to find the previous channel
+     */
+    static getChannelBefore(channelId: number, channelList: TeamSpeakChannel[]): TeamSpeakChannel | undefined
+    {
+        let channelBefore: TeamSpeakChannel | undefined;
+
+        for(let channel of channelList) {
+            if(channel.cid === channelId)
+                break;
+
+            channelBefore = channel;
+        }
+
+        return channelBefore;
+    }
 }
 
 export interface ChannelsBetweenResult {

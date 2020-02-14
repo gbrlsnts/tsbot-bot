@@ -2,14 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const events_1 = require("events");
 class BotEvent extends events_1.EventEmitter {
-    raiseChannelNotInactiveNotify(channelId) {
-        this.emit(BotEventName.channelInactiveNotifyEvent, { channelId });
+    raiseChannelNotInactiveNotify(channelId, zone) {
+        this.emit(BotEventName.channelInactiveNotifyEvent, { channelId, zone });
     }
-    raiseChannelInactiveNotify(channelId, icon) {
-        this.emit(BotEventName.channelInactiveNotifyEvent, { channelId, icon });
+    raiseChannelInactiveNotify(channelId, zone, icon) {
+        this.emit(BotEventName.channelInactiveNotifyEvent, { channelId, zone, icon });
     }
-    raiseChannelInactiveDelete(channelId) {
-        this.emit(BotEventName.channelInactiveDeleteEvent, { channelId });
+    raiseChannelInactiveDelete(channelId, zone) {
+        this.emit(BotEventName.channelInactiveDeleteEvent, { channelId, zone });
     }
 }
 exports.BotEvent = BotEvent;

@@ -3,19 +3,19 @@ import { ChannelInactiveDeleteEvent, ChannelInactiveNotifyEvent } from "./EventT
 
 export class BotEvent extends EventEmitter
 {
-    raiseChannelNotInactiveNotify(channelId: number)
+    raiseChannelNotInactiveNotify(channelId: number, zone: string)
     {
-        this.emit(BotEventName.channelInactiveNotifyEvent, { channelId });
+        this.emit(BotEventName.channelInactiveNotifyEvent, { channelId, zone });
     }
 
-    raiseChannelInactiveNotify(channelId: number, icon?: number)
+    raiseChannelInactiveNotify(channelId: number, zone: string, icon?: number)
     {
-        this.emit(BotEventName.channelInactiveNotifyEvent, { channelId, icon });
+        this.emit(BotEventName.channelInactiveNotifyEvent, { channelId, zone, icon });
     }
 
-    raiseChannelInactiveDelete(channelId: number)
+    raiseChannelInactiveDelete(channelId: number, zone: string)
     {
-        this.emit(BotEventName.channelInactiveDeleteEvent, { channelId });
+        this.emit(BotEventName.channelInactiveDeleteEvent, { channelId, zone });
     }
 }
 

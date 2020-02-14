@@ -3,11 +3,16 @@ import { BotEventName } from "./BotEvent";
 import { ChannelInactiveNotifyHandler } from "./Handler/ChannelInactiveNotifyHandler";
 import { ChannelInactiveDeleteHandler } from "./Handler/ChannelInactiveDeleteHandler";
 import { EventHandlerInterface } from "./EventHandlerInterface";
+import { AwilixContainer } from "awilix";
+import { Configuration } from "../Configuration/Configuration";
 
 export class MasterEventHandler
 {
-    constructor(private bot: Bot)
+    private readonly bot: Bot;
+
+    constructor(private readonly container: AwilixContainer)
     {
+        this.bot = container.resolve('bot');
         this.registerServerEvents();
         this.registerBotEvents();
     }
@@ -41,7 +46,16 @@ export class MasterEventHandler
         });
 
         botEvents.on(BotEventName.channelInactiveDeleteEvent, event => {
-            this.handleBotEvent(new ChannelInactiveDeleteHandler(this.bot, event));
+            const config = this.container.resolve<Configuration>('config').crawler;
+
+            if(!config)
+                return;
+
+            this.handleBotEvent(new ChannelInactiveDeleteHandler(
+                this.bot,
+                config,
+                event
+            ));
         });
     }
 

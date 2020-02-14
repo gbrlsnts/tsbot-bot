@@ -82,10 +82,10 @@ class Crawler {
                 return;
             channels
                 .filter(channel => this.channelExceededNotifyTime(config, channel))
-                .forEach(channel => botEvents.raiseChannelInactiveNotify(channel.channelId, config.inactiveIcon));
+                .forEach(channel => botEvents.raiseChannelInactiveNotify(channel.channelId, config.name, config.inactiveIcon));
             channels
                 .filter(channel => this.channelExceededMaxTime(config, channel))
-                .forEach(channel => botEvents.raiseChannelInactiveDelete(channel.channelId));
+                .forEach(channel => botEvents.raiseChannelInactiveDelete(channel.channelId, config.name));
         });
     }
     channelExceededNotifyTime(zone, channel) {

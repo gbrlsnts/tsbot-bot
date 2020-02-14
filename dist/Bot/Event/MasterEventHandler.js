@@ -4,8 +4,9 @@ const BotEvent_1 = require("./BotEvent");
 const ChannelInactiveNotifyHandler_1 = require("./Handler/ChannelInactiveNotifyHandler");
 const ChannelInactiveDeleteHandler_1 = require("./Handler/ChannelInactiveDeleteHandler");
 class MasterEventHandler {
-    constructor(bot) {
-        this.bot = bot;
+    constructor(container) {
+        this.container = container;
+        this.bot = container.resolve('bot');
         this.registerServerEvents();
         this.registerBotEvents();
     }
@@ -30,7 +31,10 @@ class MasterEventHandler {
             this.handleBotEvent(new ChannelInactiveNotifyHandler_1.ChannelInactiveNotifyHandler(this.bot, event));
         });
         botEvents.on(BotEvent_1.BotEventName.channelInactiveDeleteEvent, event => {
-            this.handleBotEvent(new ChannelInactiveDeleteHandler_1.ChannelInactiveDeleteHandler(this.bot, event));
+            const config = this.container.resolve('config').crawler;
+            if (!config)
+                return;
+            this.handleBotEvent(new ChannelInactiveDeleteHandler_1.ChannelInactiveDeleteHandler(this.bot, config, event));
         });
     }
     handleBotEvent(event) {
