@@ -11,6 +11,9 @@ export class ProcessResult
         this.repository = new Factory().create();
     }
 
+    /**
+     * Process crawling results
+     */
     async processResults(): Promise<ZoneProcessResult[]>
     {
         const prevCrawl = await this.repository.getPreviousCrawl();
@@ -58,6 +61,11 @@ export class ProcessResult
         return this.getProcessingResult(finalEmptyChannelList, prevCrawlActiveNotifiedChannels);
     }
 
+    /**
+     * Get channels that are still empty from a previous crawl
+     * @param previousCrawlChannels Channels of the previous crawl
+     * @param currentCrawlIds Channel Ids on the current crawl
+     */
     private getChannelsStillEmpty(previousCrawlChannels: CrawlerChannel[], currentCrawlIds: number[]): CrawlerChannel[]
     {
         // filter out channels no longer in the empty list
@@ -66,6 +74,11 @@ export class ProcessResult
         });
     }
 
+    /**
+     * Get channels that are now active and were notified previously
+     * @param previousCrawlChannels Channels of the previous crawl
+     * @param currentCrawlIds Channel Ids on the current crawl
+     */
     private getChannelsActiveNotified(previousCrawlChannels: CrawlerChannel[], currentCrawlIds: number[]): CrawlerChannel[]
     {
         // filter channels no longer empty
@@ -74,6 +87,11 @@ export class ProcessResult
         });
     }
 
+    /**
+     * Get new channels that are empty
+     * @param previousCrawlChannels Channels of the previous crawl
+     * @param currentCrawlIds Channel Ids on the current crawl
+     */
     private getNewEmptyChannels(previousCrawlChannels: CrawlerChannel[], currentCrawlIds: number[]): CrawlerChannel[]
     {
         // filter out channels in previous crawls and initialize empty time
@@ -91,6 +109,11 @@ export class ProcessResult
             });
     }
 
+    /**
+     * Get the processed results of a crawl
+     * @param inactiveList List of inactive channels
+     * @param activeNotifiedList List of active and notified channels
+     */
     private getProcessingResult(inactiveList: CrawlerChannel[], activeNotifiedList: CrawlerChannel[]): ZoneProcessResult[]
     {
         return this.result.map(zone => {
@@ -106,6 +129,10 @@ export class ProcessResult
         });
     }
 
+    /**
+     * Check if the database should be reset. It returns true if the last crawl ran more than 5 crawls time ago
+     * @param lastCrawl The run time of the last crawl
+     */
     private shouldResetDatabase(lastCrawl: Date)
     {
         const diff = new Date().getTime() - lastCrawl.getTime();

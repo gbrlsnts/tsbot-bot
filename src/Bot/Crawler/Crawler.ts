@@ -24,6 +24,9 @@ export class Crawler
 
     }
 
+    /**
+     * Boot the crawler
+     */
     boot()
     {
         if(this.isBooted)
@@ -34,6 +37,10 @@ export class Crawler
         this.isBooted = true;
     }
 
+    /**
+     * Reload the crawler config
+     * @param config the config to apply
+     */
     reload(config: CrawlerConfiguration)
     {
         if(!this.isRunning) {
@@ -45,6 +52,9 @@ export class Crawler
         this.onCrawlEnd = () => this.config = config;
     }
 
+    /**
+     * Start the crawl timer
+     */
     private startTimer()
     {
         if(this.timer)
@@ -60,6 +70,9 @@ export class Crawler
         console.log(`Next crawl to run in ${interval/1000} seconds`);
     }
 
+    /**
+     * Get the interval to run the crawl timer
+     */
     private getTimerInterval()
     {
         if(this.isBooted)
@@ -68,6 +81,9 @@ export class Crawler
         return this.bootTimer * 1000;
     }
 
+    /**
+     * Do a crawl
+     */
     private async crawl()
     {
         console.log('starting crawl...');
@@ -118,6 +134,10 @@ export class Crawler
         }
     }
 
+    /**
+     * Raise events for the processed results
+     * @param result Crawl processing result
+     */
     private raiseChannelEvents(result: ZoneProcessResult[])
     {
         const botEvents = this.bot.getBotEvents();
@@ -141,11 +161,21 @@ export class Crawler
         });
     }
 
+    /**
+     * Check if the channel has exceeded the notifytime
+     * @param zone The channel zone
+     * @param channel The channel
+     */
     private channelExceededNotifyTime(zone: CrawlZone, channel: CrawlerChannel): boolean
     {
         return channel.timeEmpty >= zone.timeInactiveNotify && channel.timeEmpty < zone.timeInactiveMax;
     }
 
+    /**
+     * Check if the channel exceeded the max inactive time
+     * @param zone The channel zone
+     * @param channel The channel
+     */
     private channelExceededMaxTime(zone: CrawlZone, channel: CrawlerChannel): boolean
     {
         return channel.timeEmpty >= zone.timeInactiveMax;

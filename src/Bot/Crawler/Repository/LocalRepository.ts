@@ -14,6 +14,9 @@ export class LocalRepository implements RepositoryInterface
         this.emptyChannelsFilePath = pathJoin(this.databasePath, 'emptychannels.json');
     }
 
+    /**
+     * Get all crawls
+     */
     async getCrawls(): Promise<CrawlInfo[]>
     {
         const loader = await this.getFileLoader<CrawlInfo[]>(this.crawlsFilePath);
@@ -27,6 +30,9 @@ export class LocalRepository implements RepositoryInterface
         return Promise.resolve(crawls);
     }
 
+    /**
+     * Get the previous crawl
+     */
     async getPreviousCrawl(): Promise<CrawlInfo | undefined> {
         const crawls = await this.getCrawls();
 
@@ -45,6 +51,10 @@ export class LocalRepository implements RepositoryInterface
         return sortedCrawls.pop();
     }
     
+    /**
+     * Add a crawl
+     * @param crawl The crawl info to add
+     */
     async addPreviousCrawl(crawl: CrawlInfo): Promise<void> {
         const loader = await this.getFileLoader<CrawlInfo[]>(this.crawlsFilePath);
         const crawls = await loader.loadFileJson();
@@ -54,6 +64,9 @@ export class LocalRepository implements RepositoryInterface
         loader.saveFileJson(crawls);
     }
 
+    /**
+     * Get all empty channels
+     */
     async getCrawlerEmptyChannels(): Promise<CrawlerChannel[]> {
         const loader = await this.getFileLoader<CrawlerChannel[]>(this.emptyChannelsFilePath);
 
@@ -66,12 +79,20 @@ export class LocalRepository implements RepositoryInterface
         return Promise.resolve(channels);
     }
 
+    /**
+     * Save all channels of a crawl
+     * @param channelList The channel list to save
+     */
     async setCrawlerEmptyChannels(channelList: CrawlerChannel[]): Promise<void> {
         const loader = await this.getFileLoader<CrawlerChannel[]>(this.emptyChannelsFilePath);
 
         return loader.saveFileJson(channelList);
     }
 
+    /**
+     * Get an empty channel by Id
+     * @param channelId The channel Id
+     */
     async getChannelById(channelId: number): Promise<CrawlerChannel>
     {
         const loader = await this.getFileLoader<CrawlerChannel[]>(this.emptyChannelsFilePath);
@@ -85,6 +106,11 @@ export class LocalRepository implements RepositoryInterface
         return channel;
     }
 
+    /**
+     * Set a channel notified value
+     * @param channelId The channel Id to set
+     * @param notified The notified value
+     */
     async setChannelNotified(channelId: number, notified: boolean): Promise<void>
     {
         const loader = await this.getFileLoader<CrawlerChannel[]>(this.emptyChannelsFilePath);
