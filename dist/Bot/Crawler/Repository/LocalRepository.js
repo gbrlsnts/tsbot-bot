@@ -11,6 +11,9 @@ class LocalRepository {
         this.crawlsFilePath = path_1.join(this.databasePath, 'crawls.json');
         this.emptyChannelsFilePath = path_1.join(this.databasePath, 'emptychannels.json');
     }
+    /**
+     * Get all crawls
+     */
     async getCrawls() {
         const loader = await this.getFileLoader(this.crawlsFilePath);
         const crawls = await loader.loadFileJson();
@@ -19,6 +22,9 @@ class LocalRepository {
         });
         return Promise.resolve(crawls);
     }
+    /**
+     * Get the previous crawl
+     */
     async getPreviousCrawl() {
         const crawls = await this.getCrawls();
         // sort ASC
@@ -32,12 +38,19 @@ class LocalRepository {
         // last element will be the latest
         return sortedCrawls.pop();
     }
+    /**
+     * Add a crawl
+     * @param crawl The crawl info to add
+     */
     async addPreviousCrawl(crawl) {
         const loader = await this.getFileLoader(this.crawlsFilePath);
         const crawls = await loader.loadFileJson();
         crawls.push(crawl);
         loader.saveFileJson(crawls);
     }
+    /**
+     * Get all empty channels
+     */
     async getCrawlerEmptyChannels() {
         const loader = await this.getFileLoader(this.emptyChannelsFilePath);
         const channels = await loader.loadFileJson();
@@ -46,10 +59,18 @@ class LocalRepository {
         });
         return Promise.resolve(channels);
     }
+    /**
+     * Save all channels of a crawl
+     * @param channelList The channel list to save
+     */
     async setCrawlerEmptyChannels(channelList) {
         const loader = await this.getFileLoader(this.emptyChannelsFilePath);
         return loader.saveFileJson(channelList);
     }
+    /**
+     * Get an empty channel by Id
+     * @param channelId The channel Id
+     */
     async getChannelById(channelId) {
         const loader = await this.getFileLoader(this.emptyChannelsFilePath);
         const channels = await loader.loadFileJson();
@@ -58,6 +79,11 @@ class LocalRepository {
             throw new Error('Unable to find channel id ' + channelId);
         return channel;
     }
+    /**
+     * Set a channel notified value
+     * @param channelId The channel Id to set
+     * @param notified The notified value
+     */
     async setChannelNotified(channelId, notified) {
         const loader = await this.getFileLoader(this.emptyChannelsFilePath);
         const channels = await loader.loadFileJson();

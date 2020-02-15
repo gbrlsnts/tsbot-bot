@@ -11,12 +11,19 @@ class Crawler {
         this.isBooted = false;
         this.isRunning = false;
     }
+    /**
+     * Boot the crawler
+     */
     boot() {
         if (this.isBooted)
             return;
         this.startTimer();
         this.isBooted = true;
     }
+    /**
+     * Reload the crawler config
+     * @param config the config to apply
+     */
     reload(config) {
         if (!this.isRunning) {
             this.config = config;
@@ -24,6 +31,9 @@ class Crawler {
         }
         this.onCrawlEnd = () => this.config = config;
     }
+    /**
+     * Start the crawl timer
+     */
     startTimer() {
         if (this.timer)
             timers_1.clearTimeout(this.timer);
@@ -31,11 +41,17 @@ class Crawler {
         this.timer = setTimeout(this.crawl.bind(this), interval);
         console.log(`Next crawl to run in ${interval / 1000} seconds`);
     }
+    /**
+     * Get the interval to run the crawl timer
+     */
     getTimerInterval() {
         if (this.isBooted)
             return this.config.interval * 1000;
         return this.bootTimer * 1000;
     }
+    /**
+     * Do a crawl
+     */
     async crawl() {
         console.log('starting crawl...');
         this.isRunning = true;
@@ -77,6 +93,10 @@ class Crawler {
             }
         }
     }
+    /**
+     * Raise events for the processed results
+     * @param result Crawl processing result
+     */
     raiseChannelEvents(result) {
         const botEvents = this.bot.getBotEvents();
         result.forEach(({ zone, channels, activeNotifiedChannels }) => {
@@ -93,9 +113,19 @@ class Crawler {
                 .forEach(channel => botEvents.raiseChannelNotInactiveNotify(channel.channelId));
         });
     }
+    /**
+     * Check if the channel has exceeded the notifytime
+     * @param zone The channel zone
+     * @param channel The channel
+     */
     channelExceededNotifyTime(zone, channel) {
         return channel.timeEmpty >= zone.timeInactiveNotify && channel.timeEmpty < zone.timeInactiveMax;
     }
+    /**
+     * Check if the channel exceeded the max inactive time
+     * @param zone The channel zone
+     * @param channel The channel
+     */
     channelExceededMaxTime(zone, channel) {
         return channel.timeEmpty >= zone.timeInactiveMax;
     }

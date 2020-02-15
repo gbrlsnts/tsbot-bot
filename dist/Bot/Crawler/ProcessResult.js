@@ -7,6 +7,9 @@ class ProcessResult {
         this.crawlInterval = crawlInterval;
         this.repository = new Factory_1.Factory().create();
     }
+    /**
+     * Process crawling results
+     */
     async processResults() {
         const prevCrawl = await this.repository.getPreviousCrawl();
         const emptyChannelIds = Array.prototype.concat.apply([], this.result.map(zoneResult => zoneResult.empty));
@@ -42,18 +45,33 @@ class ProcessResult {
         await this.repository.setCrawlerEmptyChannels(finalEmptyChannelList);
         return this.getProcessingResult(finalEmptyChannelList, prevCrawlActiveNotifiedChannels);
     }
+    /**
+     * Get channels that are still empty from a previous crawl
+     * @param previousCrawlChannels Channels of the previous crawl
+     * @param currentCrawlIds Channel Ids on the current crawl
+     */
     getChannelsStillEmpty(previousCrawlChannels, currentCrawlIds) {
         // filter out channels no longer in the empty list
         return previousCrawlChannels.filter(prev => {
             return currentCrawlIds.find(id => id === prev.channelId);
         });
     }
+    /**
+     * Get channels that are now active and were notified previously
+     * @param previousCrawlChannels Channels of the previous crawl
+     * @param currentCrawlIds Channel Ids on the current crawl
+     */
     getChannelsActiveNotified(previousCrawlChannels, currentCrawlIds) {
         // filter channels no longer empty
         return previousCrawlChannels.filter(prev => {
             return prev.isNotified && currentCrawlIds.every(id => id !== prev.channelId);
         });
     }
+    /**
+     * Get new channels that are empty
+     * @param previousCrawlChannels Channels of the previous crawl
+     * @param currentCrawlIds Channel Ids on the current crawl
+     */
     getNewEmptyChannels(previousCrawlChannels, currentCrawlIds) {
         // filter out channels in previous crawls and initialize empty time
         return currentCrawlIds.filter(emptyChannel => {
@@ -69,6 +87,11 @@ class ProcessResult {
             };
         });
     }
+    /**
+     * Get the processed results of a crawl
+     * @param inactiveList List of inactive channels
+     * @param activeNotifiedList List of active and notified channels
+     */
     getProcessingResult(inactiveList, activeNotifiedList) {
         return this.result.map(zone => {
             const channels = inactiveList.filter(channel => {
@@ -81,6 +104,10 @@ class ProcessResult {
             };
         });
     }
+    /**
+     * Check if the database should be reset. It returns true if the last crawl ran more than 5 crawls time ago
+     * @param lastCrawl The run time of the last crawl
+     */
     shouldResetDatabase(lastCrawl) {
         const diff = new Date().getTime() - lastCrawl.getTime();
         // if the difference is bigger than 5 crawls then reset
