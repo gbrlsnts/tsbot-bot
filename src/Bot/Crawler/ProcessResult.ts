@@ -50,11 +50,11 @@ export class ProcessResult
 
         // if for some reason the crawling hasnt ran for a while, reset the database so there aren't accidental deletions
         if(prevCrawl && this.shouldResetDatabase(prevCrawl.runAt)) {
-            await this.repository.setCrawlerEmptyChannels([]);
-        } else {
-            await this.repository.setCrawlerEmptyChannels(finalEmptyChannelList);
+            finalEmptyChannelList.forEach(channel => channel.timeEmpty = 0);
         }
         
+        await this.repository.setCrawlerEmptyChannels(finalEmptyChannelList);
+
         return this.getProcessingResult(finalEmptyChannelList, prevCrawlActiveNotifiedChannels);
     }
 
