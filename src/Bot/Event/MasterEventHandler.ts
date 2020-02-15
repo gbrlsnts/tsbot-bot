@@ -5,6 +5,7 @@ import { ChannelInactiveDeleteHandler } from "./Handler/ChannelInactiveDeleteHan
 import { EventHandlerInterface } from "./EventHandlerInterface";
 import { AwilixContainer } from "awilix";
 import { Configuration } from "../Configuration/Configuration";
+import { ChannelNotInactiveHandler } from "./Handler/ChannelNotInactiveHandler";
 
 export class MasterEventHandler
 {
@@ -37,8 +38,8 @@ export class MasterEventHandler
     {
         const botEvents = this.bot.getBotEvents();
 
-        botEvents.on(BotEventName.channelNotInactiveNotifyEvent, ({ channelId }) => {
-            console.log(`Channel ${channelId} not inactive notify`)
+        botEvents.on(BotEventName.channelNotInactiveNotifyEvent, (event) => {
+            this.handleBotEvent(new ChannelNotInactiveHandler(this.bot, event));
         });
 
         botEvents.on(BotEventName.channelInactiveNotifyEvent, event => {

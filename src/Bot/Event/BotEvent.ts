@@ -1,11 +1,11 @@
 import { EventEmitter } from "events";
-import { ChannelInactiveDeleteEvent, ChannelInactiveNotifyEvent } from "./EventTypes";
+import { ChannelInactiveNotifyEvent, ZoneChannelEvent, ChannelEvent } from "./EventTypes";
 
 export class BotEvent extends EventEmitter
 {
-    raiseChannelNotInactiveNotify(channelId: number, zone: string)
+    raiseChannelNotInactiveNotify(channelId: number)
     {
-        this.emit(BotEventName.channelInactiveNotifyEvent, { channelId, zone });
+        this.emit(BotEventName.channelNotInactiveNotifyEvent, { channelId });
     }
 
     raiseChannelInactiveNotify(channelId: number, zone: string, icon?: number)
@@ -21,9 +21,9 @@ export class BotEvent extends EventEmitter
 
 export interface BotEvent
 {
-    on(event: 'bot.user.channel.not-inactive.notify', listener: (event: ChannelInactiveDeleteEvent) => void): this;
+    on(event: 'bot.user.channel.not-inactive.notify', listener: (event: ChannelEvent) => void): this;
     on(event: 'bot.user.channel.inactive.notify', listener: (event: ChannelInactiveNotifyEvent) => void): this;
-    on(event: 'bot.user.channel.delete.notify', listener: (event: ChannelInactiveDeleteEvent) => void): this;
+    on(event: 'bot.user.channel.delete.notify', listener: (event: ZoneChannelEvent) => void): this;
 }
 
 export class BotEventName

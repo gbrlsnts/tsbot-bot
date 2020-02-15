@@ -122,7 +122,7 @@ export class Crawler
     {
         const botEvents = this.bot.getBotEvents();
 
-        result.forEach(({ zone, channels }) => {
+        result.forEach(({ zone, channels, activeNotifiedChannels }) => {
             const config = this.config.zones.find(conf => conf.name === zone);
 
             if(!config)
@@ -135,6 +135,9 @@ export class Crawler
             channels
                 .filter(channel => this.channelExceededMaxTime(config, channel))
                 .forEach(channel => botEvents.raiseChannelInactiveDelete(channel.channelId, config.name));
+
+            activeNotifiedChannels
+                .forEach(channel => botEvents.raiseChannelNotInactiveNotify(channel.channelId));
         });
     }
 

@@ -11,8 +11,11 @@ class ProcessResult {
         const prevCrawl = await this.repository.getPreviousCrawl();
         const emptyChannelIds = Array.prototype.concat.apply([], this.result.map(zoneResult => zoneResult.empty));
         let prevCrawlChannels = await this.repository.getCrawlerEmptyChannels();
+        let prevCrawlActiveNotifiedChannels = [];
         if (prevCrawl) {
             const secondsFromPrevCrawl = Math.round((new Date().getTime() - prevCrawl.runAt.getTime()) / 1000);
+            // get channels now active again
+            prevCrawlActiveNotifiedChannels = this.getChannelsActiveNotified(prevCrawlChannels, emptyChannelIds);
             // filter out channels no longer in the empty list and then add empty time
             prevCrawlChannels = this.getChannelsStillEmpty(prevCrawlChannels, emptyChannelIds);
             prevCrawlChannels.forEach(channel => {
@@ -39,12 +42,18 @@ class ProcessResult {
         else {
             await this.repository.setCrawlerEmptyChannels(finalEmptyChannelList);
         }
-        return this.getProcessingResult(finalEmptyChannelList);
+        return this.getProcessingResult(finalEmptyChannelList, prevCrawlActiveNotifiedChannels);
     }
     getChannelsStillEmpty(previousCrawlChannels, currentCrawlIds) {
         // filter out channels no longer in the empty list
         return previousCrawlChannels.filter(prev => {
-            return currentCrawlIds.find(id => id == prev.channelId);
+            return currentCrawlIds.find(id => id === prev.channelId);
+        });
+    }
+    getChannelsActiveNotified(previousCrawlChannels, currentCrawlIds) {
+        // filter channels no longer empty
+        return previousCrawlChannels.filter(prev => {
+            return prev.isNotified && currentCrawlIds.every(id => id !== prev.channelId);
         });
     }
     getNewEmptyChannels(previousCrawlChannels, currentCrawlIds) {
@@ -62,14 +71,15 @@ class ProcessResult {
             };
         });
     }
-    getProcessingResult(channelList) {
+    getProcessingResult(inactiveList, activeNotifiedList) {
         return this.result.map(zone => {
-            const channels = channelList.filter(channel => {
+            const channels = inactiveList.filter(channel => {
                 return zone.empty.find(id => id === channel.channelId);
             });
             return {
                 zone: zone.zone,
-                channels
+                activeNotifiedChannels: activeNotifiedList,
+                channels,
             };
         });
     }

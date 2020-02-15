@@ -1,20 +1,17 @@
-export interface ChannelInactiveDeleteEvent
+export interface ChannelEvent
 {
-    /** Inactive channel to delete */
+    /** Triggered event's channel */
     channelId: number;
+}
 
+export interface ZoneChannelEvent extends ChannelEvent
+{
     /** Zone the channel belongs to */
     zone: string;
 }
 
-export interface ChannelInactiveNotifyEvent
+export interface ChannelInactiveNotifyEvent extends ZoneChannelEvent
 {
-    /** Inactive channel to delete */
-    channelId: number;
-
-    /** Zone the channel belongs to */
-    zone: string;
-
     /** Icon to set on the channel */
     icon?: number;
 }

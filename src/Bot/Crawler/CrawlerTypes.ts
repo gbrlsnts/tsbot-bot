@@ -39,4 +39,6 @@ export interface ZoneProcessResult {
     zone: string;
     /** channels empty */
     channels: CrawlerChannel[];
+    /** channels that have returned to active but were previously notified */
+    activeNotifiedChannels: CrawlerChannel[];
 }

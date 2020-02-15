@@ -84,4 +84,9 @@ export class Bot
     {
         return await this.server.channelSetPerm(channelId, 'i_icon_id', iconId);
     }
+
+    async removeChannelIcon(channelId: number)
+    {
+        return await this.setChannelIcon(channelId, 0);
+    }
 }

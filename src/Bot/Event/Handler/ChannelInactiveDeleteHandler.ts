@@ -1,7 +1,7 @@
 import { TeamSpeakChannel } from "ts3-nodejs-library";
 import { EventHandlerInterface } from "../EventHandlerInterface";
 import { Bot } from "../../Bot";
-import { ChannelInactiveDeleteEvent } from "../EventTypes";
+import { ZoneChannelEvent } from "../EventTypes";
 import { CrawlerConfiguration } from "../../Configuration/Configuration";
 import { ChannelUtils } from "../../Utils/ChannelUtils";
 
@@ -10,7 +10,7 @@ export class ChannelInactiveDeleteHandler implements EventHandlerInterface
     constructor(
         private readonly bot: Bot,
         private readonly config: CrawlerConfiguration,
-        private readonly event: ChannelInactiveDeleteEvent
+        private readonly event: ZoneChannelEvent
     )
     {
 
