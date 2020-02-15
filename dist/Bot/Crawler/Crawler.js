@@ -43,17 +43,20 @@ class Crawler {
             const channelList = await this.bot.getServer().channelList();
             const emptyChannelList = [];
             this.config.zones.forEach(zone => {
-                const channelsInZone = ChannelUtils_1.ChannelUtils.getTopChannelsBetween(channelList, zone.start, zone.end, !zone.spacerAsSeparator);
-                if (!channelsInZone.hasStart || !channelsInZone.hasEnd)
-                    throw new Error(`Unable to find start or end in zone ${zone.name}`);
-                const zoneEmptyChannels = channelsInZone.channels.filter(channel => {
+                const channelsInZoneResult = ChannelUtils_1.ChannelUtils.getZoneTopChannels(channelList, zone.start, zone.end, !zone.spacerAsSeparator);
+                if (channelsInZoneResult.isLeft()) {
+                    console.warn(zone.name, channelsInZoneResult.value.reason);
+                    return;
+                }
+                const zoneEmptyChannels = channelsInZoneResult.value.channels
+                    .filter(channel => {
                     return !ChannelUtils_1.ChannelUtils.isChannelSpacer(channel.name) &&
                         ChannelUtils_1.ChannelUtils.countChannelTreeTotalClients(channel, channelList) === 0;
                 }).map(channel => channel.cid);
                 emptyChannelList.push({
                     zone: zone.name,
                     empty: zoneEmptyChannels,
-                    total: channelsInZone.channels.length
+                    total: channelsInZoneResult.value.channels.length
                 });
             });
             console.log('Empty channels list:', emptyChannelList.map(c => c.empty));

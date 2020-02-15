@@ -1,4 +1,7 @@
 import { TeamSpeakChannel } from "ts3-nodejs-library";
+import { Either, left, right } from "../../Lib/Either";
+import { BotError, invalidZoneError } from "../Error";
+import { Failure } from "../../Lib/Failure";
 
 export class ChannelUtils
 {
@@ -6,14 +9,15 @@ export class ChannelUtils
     private static spacerRegex = new RegExp('\[[\*lcr]spacer.*\].*');
 
     /**
-     * Get all top level channels that are between 2 channels
+     * Get all top level channels that are in a zone
      * @param start Start channel Id
      * @param end End channel Id
      */
-    static getTopChannelsBetween(allChannels: TeamSpeakChannel[], start: number, end: number, includeSpacers: boolean = true): ChannelsBetweenResult
+    static getZoneTopChannels(allChannels: TeamSpeakChannel[], start: number, end: number, includeSpacers: boolean = true): 
+        Either<Failure<BotError.InvalidZone>, ZoneChannelsResult>
     {
-        let hasStart = false,
-            hasEnd = false,
+        let startChannel: TeamSpeakChannel | undefined,
+            endChannel: TeamSpeakChannel | undefined,
             channels: TeamSpeakChannel[] = [];
 
         for(let channel of allChannels) {
@@ -22,26 +26,29 @@ export class ChannelUtils
             }
 
             if(channel.cid === start) {
-                hasStart = true;
+                startChannel = channel;
             }
                 
             if(channel.cid === end) {
-                hasEnd = true;
+                endChannel = channel;
                 break;
             }
 
-            if(hasStart && channel.cid !== start && channel.cid !== end &&
+            if(startChannel && channel.cid !== start && channel.cid !== end &&
                 (includeSpacers || (!includeSpacers && !this.isChannelSpacer(channel.name)))
                 ) {
                 channels.push(channel);
             }
         }
 
-        return {
-            hasStart,
-            hasEnd,
+        if(!startChannel || !endChannel)
+            return left(invalidZoneError());
+
+        return right({
+            start: startChannel,
+            end: endChannel,
             channels
-        };
+        });
     }
 
     /**
@@ -106,11 +113,11 @@ export class ChannelUtils
     }
 }
 
-export interface ChannelsBetweenResult {
-    /** If the start was found in the specified range */
-    hasStart: boolean,
-    /** If the end was found in the specified range */
-    hasEnd: boolean,
-    /** The channels between start and end */
-    channels: TeamSpeakChannel[]
+export interface ZoneChannelsResult {
+    /** the start channel delimiter */
+    start: TeamSpeakChannel,
+    /** the end channel delimiter */
+    end: TeamSpeakChannel,
+    /** channels between start and end */
+    channels: TeamSpeakChannel[],
 }

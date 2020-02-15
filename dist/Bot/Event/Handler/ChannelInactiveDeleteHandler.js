@@ -11,22 +11,33 @@ class ChannelInactiveDeleteHandler {
         const channel = await this.bot.getServer().getChannelByID(this.event.channelId);
         if (!channel)
             return;
+        await this.deleteSpacerWhenConfigured();
+        await this.bot.deleteChannel(channel.cid);
+    }
+    async deleteSpacerWhenConfigured() {
         const zone = this.config.zones.find(zone => zone.name === this.event.zone);
-        if (zone && zone.spacerAsSeparator) {
-            const allChannelList = await this.bot.getServer().channelList();
-            const zoneChannelList = ChannelUtils_1.ChannelUtils.getTopChannelsBetween(allChannelList, zone.start, zone.end, true);
-            let spacer;
-            // will be deleting first. remove spacer after when there are more channels
-            if (channel.cid === zoneChannelList.channels[0].cid && zoneChannelList.channels.length > 1) {
-                spacer = zoneChannelList.channels[1];
-            }
-            else {
-                spacer = ChannelUtils_1.ChannelUtils.getChannelBefore(channel.cid, zoneChannelList.channels);
-            }
+        if (!(zone && zone.spacerAsSeparator))
+            return;
+        const allChannelList = await this.bot.getServer().channelList();
+        ChannelUtils_1.ChannelUtils
+            .getZoneTopChannels(allChannelList, zone.start, zone.end, true)
+            .applyOnRight(result => this.getSpacerToDelete(result.channels))
+            .applyOnRight(spacer => {
             if (spacer && ChannelUtils_1.ChannelUtils.isChannelSpacer(spacer.name))
                 this.bot.deleteChannel(spacer.cid);
+        });
+    }
+    getSpacerToDelete(channelList) {
+        const channelId = this.event.channelId;
+        let spacer;
+        // will be deleting first. remove spacer after when there are more channels
+        if (channelId === channelList[0].cid && channelList.length > 1) {
+            spacer = channelList[1];
         }
-        this.bot.deleteChannel(channel.cid);
+        else {
+            spacer = ChannelUtils_1.ChannelUtils.getChannelBefore(channelId, channelList);
+        }
+        return spacer;
     }
 }
 exports.ChannelInactiveDeleteHandler = ChannelInactiveDeleteHandler;

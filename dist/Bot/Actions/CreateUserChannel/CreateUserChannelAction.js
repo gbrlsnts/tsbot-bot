@@ -9,32 +9,35 @@ class CreateUserChannelAction {
         this.data = data;
         this.spacerFormat = '[*spacer%d]=';
     }
+    /**
+     * Execute the action
+     */
     async execute() {
-        const channels = await this.createChannelsHierarchy();
-        this.setUserChannelAdminGroup(channels);
-        return new CreateUserChannelActionResult_1.CreateUserChannelActionResult(channels);
+        const zoneChannels = await this.getUserChannelZone();
+        // zone is invalid
+        if (zoneChannels.isLeft()) {
+            throw new Error(zoneChannels.value.reason);
+        }
+        const userChannels = await this.createChannelsHierarchy(zoneChannels.value.channels.pop() || zoneChannels.value.start);
+        this.setUserChannelAdminGroup(userChannels);
+        return new CreateUserChannelActionResult_1.CreateUserChannelActionResult(userChannels);
     }
     /**
-     * Find the channel where the new channel will be placed after
+     * Get the channels in the zone to creat the user channel
      */
-    async getChannelToCreateAfter() {
+    async getUserChannelZone() {
         const channelList = await this.bot.getServer().channelList();
-        const startChannel = channelList.find(c => c.cid === this.data.userChannelStart);
-        const channelsInZone = ChannelUtils_1.ChannelUtils.getTopChannelsBetween(channelList, this.data.userChannelStart, this.data.userChannelEnd);
-        if (!channelsInZone.hasStart || !channelsInZone.hasEnd)
-            throw new Error('Start or End delimiter channels don\'t exist');
-        if (!startChannel && channelsInZone.channels.length === 0)
-            throw new Error('Unable to determine channel to create new channel after it');
-        // In practice will never go through due to the previous statement, but typescript hint won't detect it
-        if (!startChannel)
-            throw new Error('Unable to find start channel');
-        return channelsInZone.channels.pop() || startChannel;
+        return ChannelUtils_1.ChannelUtils.getZoneTopChannels(channelList, this.data.userChannelStart, this.data.userChannelEnd);
     }
-    async createChannelsHierarchy() {
+    /**
+     * Create a user channel hierarchy (top and subchannels)
+     * @param createAfterChannel The new channel will be placed after this channel
+     */
+    async createChannelsHierarchy(createAfterChannel) {
         let spacer = null, channels = [];
         try {
             const spacerName = this.getSpacerName();
-            let channelBefore = await this.getChannelToCreateAfter();
+            let channelBefore = createAfterChannel;
             if (channelBefore.cid !== this.data.userChannelStart) {
                 spacer = await this.bot.createSpacer(spacerName, channelBefore.cid);
                 channelBefore = spacer;
@@ -58,6 +61,10 @@ class CreateUserChannelAction {
         }
         return channels;
     }
+    /**
+     * Sets channel admin group for a user for the given channels
+     * @param channels Channels to apply the group
+     */
     setUserChannelAdminGroup(channels) {
         const owner = this.data.owner, group = this.data.channelGroupToAssign;
         if (!owner || !group) {
@@ -65,18 +72,24 @@ class CreateUserChannelAction {
         }
         channels.forEach(channel => {
             this.bot.setChannelGroupToClient(owner, channel.cid, group)
-                .catch(e => console.log('Warning! Could not set channel group of id ' + group));
+                .catch(e => console.warn('Warning! Could not set channel group of id ' + group));
         });
     }
+    /**
+     * Get the spacer name for the separator
+     */
     getSpacerName() {
         return this.spacerFormat.replace('%d', randomstring_1.generate(6));
     }
+    /**
+     * Clean up channels by deleting them
+     */
     cleanUpCreatedChannels(channels) {
         try {
             channels.forEach(c => this.bot.deleteChannel(c.cid, true));
         }
         catch (e) {
-            console.log(`Error cleaning up channels: ${e.message}`);
+            console.error(`Error cleaning up channels: ${e.message}`);
         }
     }
 }

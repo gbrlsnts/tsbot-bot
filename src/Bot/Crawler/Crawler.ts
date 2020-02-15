@@ -78,20 +78,23 @@ export class Crawler
             const emptyChannelList: ZoneCrawlResult[] = [];
 
             this.config.zones.forEach(zone => {
-                const channelsInZone = ChannelUtils.getTopChannelsBetween(channelList, zone.start, zone.end, !zone.spacerAsSeparator);
+                const channelsInZoneResult = ChannelUtils.getZoneTopChannels(channelList, zone.start, zone.end, !zone.spacerAsSeparator);
 
-                if(!channelsInZone.hasStart || !channelsInZone.hasEnd)
-                    throw new Error(`Unable to find start or end in zone ${zone.name}`);
+                if(channelsInZoneResult.isLeft()) {
+                    console.warn(zone.name, channelsInZoneResult.value.reason);
+                    return;
+                }
 
-                const zoneEmptyChannels = channelsInZone.channels.filter(channel => {
-                    return !ChannelUtils.isChannelSpacer(channel.name) &&
-                        ChannelUtils.countChannelTreeTotalClients(channel, channelList) === 0;
-                }).map(channel => channel.cid);
+                const zoneEmptyChannels = channelsInZoneResult.value.channels
+                    .filter(channel => {
+                        return !ChannelUtils.isChannelSpacer(channel.name) &&
+                            ChannelUtils.countChannelTreeTotalClients(channel, channelList) === 0;
+                    }).map(channel => channel.cid);
 
                 emptyChannelList.push({
                     zone: zone.name,
                     empty: zoneEmptyChannels,
-                    total: channelsInZone.channels.length
+                    total: channelsInZoneResult.value.channels.length
                 });
             });
 

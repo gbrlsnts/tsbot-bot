@@ -1,34 +1,38 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const Either_1 = require("../../Lib/Either");
+const Error_1 = require("../Error");
 class ChannelUtils {
     /**
-     * Get all top level channels that are between 2 channels
+     * Get all top level channels that are in a zone
      * @param start Start channel Id
      * @param end End channel Id
      */
-    static getTopChannelsBetween(allChannels, start, end, includeSpacers = true) {
-        let hasStart = false, hasEnd = false, channels = [];
+    static getZoneTopChannels(allChannels, start, end, includeSpacers = true) {
+        let startChannel, endChannel, channels = [];
         for (let channel of allChannels) {
             if (channel.pid !== 0) {
                 continue;
             }
             if (channel.cid === start) {
-                hasStart = true;
+                startChannel = channel;
             }
             if (channel.cid === end) {
-                hasEnd = true;
+                endChannel = channel;
                 break;
             }
-            if (hasStart && channel.cid !== start && channel.cid !== end &&
+            if (startChannel && channel.cid !== start && channel.cid !== end &&
                 (includeSpacers || (!includeSpacers && !this.isChannelSpacer(channel.name)))) {
                 channels.push(channel);
             }
         }
-        return {
-            hasStart,
-            hasEnd,
+        if (!startChannel || !endChannel)
+            return Either_1.left(Error_1.invalidZoneError());
+        return Either_1.right({
+            start: startChannel,
+            end: endChannel,
             channels
-        };
+        });
     }
     /**
      * Get all subchannels in a channel
