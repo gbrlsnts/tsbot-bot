@@ -32,7 +32,7 @@ class Api {
             console.log('Create user channel', req.body);
             createUserChannel.execute()
                 .then(result => {
-                result.applyOnRight(res.send);
+                result.applyOnRight(data => res.send(data));
                 // handling expected error
                 if (result.isLeft()) {
                     res.status(422).send(result.value);
