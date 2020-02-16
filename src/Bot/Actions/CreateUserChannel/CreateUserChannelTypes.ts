@@ -1,5 +1,3 @@
-import { UserChannelConfiguration } from "./UserChannelConfiguration";
-
 export interface CreateUserChannelData
 {
     /** Channel id where the intended user channel area starts */
@@ -12,4 +10,21 @@ export interface CreateUserChannelData
     owner?: number;
     /** Channel group to assign, if any. Owner must be defined */
     channelGroupToAssign?: number;
+}
+
+export interface UserChannelConfiguration
+{
+    /** The channel name */
+    name: string;
+    /** The channel password, optional */
+    password?: string;
+    /** Sub channels configurations to create for this channel */
+    channels: UserChannelConfiguration[];
+}
+
+export interface CreateUserChannelResultData {
+    /** Id of the newly created top channel */
+    channel: number;
+    /** Ids of channel's subchannels */
+    subchannels: number[];
 }

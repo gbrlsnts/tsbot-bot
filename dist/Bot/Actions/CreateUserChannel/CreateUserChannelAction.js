@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const randomstring_1 = require("randomstring");
-const CreateUserChannelActionResult_1 = require("./CreateUserChannelActionResult");
 const ChannelUtils_1 = require("../../Utils/ChannelUtils");
 class CreateUserChannelAction {
     constructor(bot, data) {
@@ -20,7 +19,7 @@ class CreateUserChannelAction {
         }
         const userChannels = await this.createChannelsHierarchy(zoneChannels.value.channels.pop() || zoneChannels.value.start);
         this.setUserChannelAdminGroup(userChannels);
-        return new CreateUserChannelActionResult_1.CreateUserChannelActionResult(userChannels);
+        return new CreateUserChannelActionResult(userChannels);
     }
     /**
      * Get the channels in the zone to creat the user channel
@@ -94,4 +93,18 @@ class CreateUserChannelAction {
     }
 }
 exports.CreateUserChannelAction = CreateUserChannelAction;
+class CreateUserChannelActionResult {
+    constructor(channelList) {
+        this.channelList = channelList;
+    }
+    getResultData() {
+        const channel = this.channelList[0].cid;
+        const subchannels = this.channelList.slice(1).map(c => c.cid);
+        return {
+            channel,
+            subchannels,
+        };
+    }
+}
+exports.CreateUserChannelActionResult = CreateUserChannelActionResult;
 //# sourceMappingURL=CreateUserChannelAction.js.map

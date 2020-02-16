@@ -1,13 +1,13 @@
 import { generate } from "randomstring";
 import { TeamSpeakChannel } from "ts3-nodejs-library";
 import { ActionInterface } from "../ActionInterface";
-import { CreateUserChannelData } from "./CreateUserChannelData";
 import { Bot } from "../../Bot";
-import { CreateUserChannelActionResult } from "./CreateUserChannelActionResult";
 import { ChannelUtils, ZoneChannelsResult } from "../../Utils/ChannelUtils";
 import { Either } from "../../../Lib/Either";
 import { Failure } from "../../../Lib/Failure";
 import { BotError } from "../../Error";
+import { CreateUserChannelData, CreateUserChannelResultData } from "./CreateUserChannelTypes";
+import { ActionResult } from "../ActionResult";
 
 export class CreateUserChannelAction implements ActionInterface
 {
@@ -143,5 +143,23 @@ export class CreateUserChannelAction implements ActionInterface
             console.error(`Error cleaning up channels: ${e.message}`);
         }
         
+    }
+}
+
+export class CreateUserChannelActionResult implements ActionResult
+{
+    constructor(readonly channelList: TeamSpeakChannel[])
+    {
+
+    }
+
+    getResultData(): CreateUserChannelResultData {
+        const channel = this.channelList[0].cid;
+        const subchannels = this.channelList.slice(1).map(c => c.cid);
+
+        return {
+            channel,
+            subchannels,
+        }
     }
 }
