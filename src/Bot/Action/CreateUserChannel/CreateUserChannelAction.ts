@@ -1,15 +1,14 @@
 import { generate } from "randomstring";
 import { TeamSpeakChannel } from "ts3-nodejs-library";
-import { ActionInterface } from "../ActionInterface";
+import { ActionInterface } from "../Action";
 import { Bot } from "../../Bot";
 import { ChannelUtils, ZoneChannelsResult } from "../../Utils/ChannelUtils";
-import { Either } from "../../../Lib/Either";
+import { Either, right, left } from "../../../Lib/Either";
 import { Failure } from "../../../Lib/Failure";
-import { BotError } from "../../Error";
+import { BotError, invalidZoneError } from "../../Error";
 import { CreateUserChannelData, CreateUserChannelResultData } from "./CreateUserChannelTypes";
-import { ActionResult } from "../ActionResult";
 
-export class CreateUserChannelAction implements ActionInterface
+export class CreateUserChannelAction implements ActionInterface<CreateUserChannelResultData>
 {
     readonly spacerFormat: string = '[*spacer%d]=';
 
@@ -21,12 +20,12 @@ export class CreateUserChannelAction implements ActionInterface
     /**
      * Execute the action
      */
-    async execute(): Promise<CreateUserChannelActionResult> {
+    async execute(): Promise<Either<Failure<BotError>, CreateUserChannelResultData>> {
         const zoneChannels = await this.getUserChannelZone();
 
         // zone is invalid
         if(zoneChannels.isLeft()) {
-            throw new Error(zoneChannels.value.reason);
+            return left(invalidZoneError());
         }
 
         const userChannels = await this.createChannelsHierarchy(
@@ -35,7 +34,7 @@ export class CreateUserChannelAction implements ActionInterface
 
         this.setUserChannelAdminGroup(userChannels);
 
-        return new CreateUserChannelActionResult(userChannels);
+        return this.getResultData(userChannels);
     }
 
     /**
@@ -144,22 +143,18 @@ export class CreateUserChannelAction implements ActionInterface
         }
         
     }
-}
 
-export class CreateUserChannelActionResult implements ActionResult
-{
-    constructor(readonly channelList: TeamSpeakChannel[])
+    /**
+     * Get the result data
+     */
+    private getResultData(channelList: TeamSpeakChannel[]): Either<Failure<BotError>, CreateUserChannelResultData>
     {
+        const channel = channelList[0].cid;
+        const subchannels = channelList.slice(1).map(c => c.cid);
 
-    }
-
-    getResultData(): CreateUserChannelResultData {
-        const channel = this.channelList[0].cid;
-        const subchannels = this.channelList.slice(1).map(c => c.cid);
-
-        return {
+        return right({
             channel,
             subchannels,
-        }
+        });
     }
 }

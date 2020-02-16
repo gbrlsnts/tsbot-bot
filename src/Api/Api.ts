@@ -1,6 +1,6 @@
 import express from "express";
 import * as bodyParser from "body-parser";
-import { CreateUserChannelAction } from "../Bot/Actions/CreateUserChannel/CreateUserChannelAction";
+import { CreateUserChannelAction } from "../Bot/Action/CreateUserChannel/CreateUserChannelAction";
 import { Bot } from "../Bot/Bot";
 
 export class Api
@@ -34,8 +34,12 @@ export class Api
         
             createUserChannel.execute()
                 .then(result => {
-                    console.log('Sending success response...');
-                    res.send(result.getResultData());
+                    result.applyOnRight(res.send);
+
+                    // handling expected error
+                    if(result.isLeft()) {
+                        res.status(422).send(result.value);
+                    }
                 })
                 .catch(e => {
                     console.log('Sending error response...', e.message);

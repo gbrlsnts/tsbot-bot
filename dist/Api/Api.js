@@ -12,7 +12,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const bodyParser = __importStar(require("body-parser"));
-const CreateUserChannelAction_1 = require("../Bot/Actions/CreateUserChannel/CreateUserChannelAction");
+const CreateUserChannelAction_1 = require("../Bot/Action/CreateUserChannel/CreateUserChannelAction");
 class Api {
     constructor(bot) {
         this.bot = bot;
@@ -32,8 +32,11 @@ class Api {
             console.log('Create user channel', req.body);
             createUserChannel.execute()
                 .then(result => {
-                console.log('Sending success response...');
-                res.send(result.getResultData());
+                result.applyOnRight(res.send);
+                // handling expected error
+                if (result.isLeft()) {
+                    res.status(422).send(result.value);
+                }
             })
                 .catch(e => {
                 console.log('Sending error response...', e.message);
