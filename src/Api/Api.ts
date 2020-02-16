@@ -2,6 +2,7 @@ import express from "express";
 import * as bodyParser from "body-parser";
 import { CreateUserChannelAction } from "../Bot/Action/CreateUserChannel/CreateUserChannelAction";
 import { Bot } from "../Bot/Bot";
+import { ServerGroup } from "./Routes/ServerGroup";
 
 export class Api
 {
@@ -28,24 +29,6 @@ export class Api
             res.send('awesome-teamspeak bot');
         });
         
-        this.app.post('/bot/server/createUserChannel', async (req, res) => {
-            const createUserChannel = new CreateUserChannelAction(this.bot, req.body);
-            console.log('Create user channel', req.body);
-        
-            createUserChannel.execute()
-                .then(result => {
-                    result.applyOnRight(data => res.send(data));
-
-                    // handling expected error
-                    if(result.isLeft()) {
-                        res.status(422).send(result.value);
-                    }
-                })
-                .catch(e => {
-                    console.log('Sending error response...', e.message);
-                    res.status(500).send(e.message);
-                });
-                
-        });
+        new ServerGroup(this.app, this.bot).register();
     }
 }
