@@ -22,9 +22,9 @@ class ChannelInactiveDeleteHandler {
         ChannelUtils_1.ChannelUtils
             .getZoneTopChannels(allChannelList, zone.start, zone.end, true)
             .applyOnRight(result => this.getSpacerToDelete(result.channels))
-            .applyOnRight(spacer => {
+            .applyOnRight(async (spacer) => {
             if (spacer && ChannelUtils_1.ChannelUtils.isChannelSpacer(spacer.name))
-                this.bot.deleteChannel(spacer.cid);
+                await this.bot.deleteChannel(spacer.cid);
         });
     }
     getSpacerToDelete(channelList) {
