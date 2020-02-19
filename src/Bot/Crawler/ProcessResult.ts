@@ -40,7 +40,7 @@ export class ProcessResult
         const newEmptyChannels = this.getNewEmptyChannels(prevCrawlChannels, emptyChannelIds);
         const finalEmptyChannelList = [...prevCrawlChannels, ...newEmptyChannels];
 
-        await this.repository.addPreviousCrawl({
+        await this.repository.addCrawl({
             runAt: new Date(),
             zones: this.result.map(zoneResult => {
                 return {

@@ -55,7 +55,7 @@ export class LocalRepository implements RepositoryInterface
      * Add a crawl
      * @param crawl The crawl info to add
      */
-    async addPreviousCrawl(crawl: CrawlInfo): Promise<void> {
+    async addCrawl(crawl: CrawlInfo): Promise<void> {
         const loader = await this.getFileLoader<CrawlInfo[]>(this.crawlsFilePath);
         const crawls = await loader.loadFileJson();
 

@@ -42,7 +42,7 @@ class LocalRepository {
      * Add a crawl
      * @param crawl The crawl info to add
      */
-    async addPreviousCrawl(crawl) {
+    async addCrawl(crawl) {
         const loader = await this.getFileLoader(this.crawlsFilePath);
         const crawls = await loader.loadFileJson();
         crawls.push(crawl);

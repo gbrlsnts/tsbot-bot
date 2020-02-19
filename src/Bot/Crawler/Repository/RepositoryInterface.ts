@@ -15,7 +15,7 @@ export interface RepositoryInterface {
      * Add a crawl
      * @param crawl The crawl info to add
      */
-    addPreviousCrawl(crawl: CrawlInfo): Promise<void>;
+    addCrawl(crawl: CrawlInfo): Promise<void>;
 
     /**
      * Get all empty channels
