@@ -1,8 +1,8 @@
 export interface CrawlerChannel {
     /** Server channel Id */
     channelId: number;
-    /** Time, in seconds, that this channel has been empty */
-    timeEmpty: number;
+    /** Time, in seconds, that this channel has been inactive */
+    timeInactive: number;
     /** True, if a notification was sent regarding inactivity */
     isNotified: boolean;
     /** Date of when the channel data was last updated */
@@ -19,8 +19,8 @@ export interface CrawlInfo {
 export interface CrawlZoneInfo {
     /** the crawled zone */
     zone: string;
-    /** number of empty channels */
-    emptyChannels: number;
+    /** number of inactive channels */
+    inactiveChannels: number;
     /** total channels */
     totalChannels: number;
 }
@@ -28,17 +28,21 @@ export interface CrawlZoneInfo {
 export interface ZoneCrawlResult {
     /** the crawled zone */
     zone: string;
-    /** empty channels id's */
-    empty: number[];
-    /** total number of channels, including non-empty */
+    /** inactive channels id's */
+    inactive: number[];
+    /** total number of channels, including active */
     total: number;
 }
 
 export interface ZoneProcessResult {
     /** the crawled zone */
     zone: string;
-    /** channels empty */
+    /** contains all, unfiltered, inactive channels in the zone */
     channels: CrawlerChannel[];
     /** channels that have returned to active but were previously notified */
     activeNotifiedChannels: CrawlerChannel[];
+    /** inactive channels that should be notified */
+    toNotify: CrawlerChannel[];
+    /** inactive channels that should be deleted */
+    toDelete: CrawlerChannel[];
 }

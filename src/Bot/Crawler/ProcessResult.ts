@@ -1,12 +1,15 @@
-import { CrawlerChannel, ZoneCrawlResult, ZoneProcessResult } from "./CrawlerTypes";
+import { CrawlerChannel, ZoneCrawlResult, ZoneProcessResult, CrawlInfo } from "./CrawlerTypes";
 import { RepositoryInterface } from "./Repository/RepositoryInterface";
 import { Factory } from "./Repository/Factory";
+import { CrawlZone, CrawlerConfiguration } from "../Configuration/Configuration";
+import { Crawl } from "./Crawl";
+import { CrawlCompare } from "./CrawlCompare";
 
 export class ProcessResult
 {
     private readonly repository: RepositoryInterface;
 
-    constructor(private readonly result: ZoneCrawlResult[], private readonly crawlInterval: number)
+    constructor(private readonly result: ZoneCrawlResult[], private readonly config: CrawlerConfiguration)
     {
         this.repository = new Factory().create();
     }
@@ -16,115 +19,59 @@ export class ProcessResult
      */
     async processResults(): Promise<ZoneProcessResult[]>
     {
-        const prevCrawl = await this.repository.getPreviousCrawl();
-        const emptyChannelIds: number[] = Array.prototype.concat.apply([], this.result.map(zoneResult => zoneResult.empty));
+        const [repoPrevCrawll, repoPrevChannels] = await Promise.all([
+            this.repository.getPreviousCrawl(),
+            this.repository.getCrawlerInactiveChannels(),
+        ]);
 
-        let prevCrawlChannels = await this.repository.getCrawlerEmptyChannels();
-        let prevCrawlActiveNotifiedChannels: CrawlerChannel[] = [];
+        const prevCrawl = repoPrevCrawll && repoPrevChannels ? new Crawl(repoPrevCrawll, repoPrevChannels) : Crawl.createNullCrawl();
+        const currCrawl = Crawl.fromNewCrawl(this.result);
+        const crawlCompare = new CrawlCompare(prevCrawl, currCrawl);
 
-        if(prevCrawl) {
-            const secondsFromPrevCrawl = Math.round((new Date().getTime() - prevCrawl.runAt.getTime()) / 1000);
-
-            // get channels now active again
-            prevCrawlActiveNotifiedChannels = this.getChannelsActiveNotified(prevCrawlChannels, emptyChannelIds);
-
-            // filter out channels no longer in the empty list and then add empty time
-            prevCrawlChannels = this.getChannelsStillEmpty(prevCrawlChannels, emptyChannelIds);
-
-            prevCrawlChannels.forEach(channel => {
-                channel.timeEmpty += secondsFromPrevCrawl;
-                channel.lastUpdated = new Date();
-            });    
-        }
-
-        const newEmptyChannels = this.getNewEmptyChannels(prevCrawlChannels, emptyChannelIds);
-        const finalEmptyChannelList = [...prevCrawlChannels, ...newEmptyChannels];
-
-        await this.repository.addCrawl({
-            runAt: new Date(),
-            zones: this.result.map(zoneResult => {
-                return {
-                    zone: zoneResult.zone,
-                    emptyChannels: zoneResult.empty.length,
-                    totalChannels: zoneResult.total
-                };
-            }),
-        });
+        const secondsFromPrevCrawl = Math.round((new Date().getTime() - prevCrawl.crawl.runAt.getTime()) / 1000);
+        const inactiveChannels = crawlCompare.getInactiveChannelsWithAddedTime(secondsFromPrevCrawl);
 
         // if for some reason the crawling hasnt ran for a while, reset the database so there aren't accidental deletions
-        if(prevCrawl && this.shouldResetDatabase(prevCrawl.runAt)) {
-            finalEmptyChannelList.forEach(channel => channel.timeEmpty = 0);
+        if(this.shouldResetDatabase(prevCrawl.crawl.runAt)) {
+            inactiveChannels.forEach(channel => channel.timeInactive = 0);
         }
         
-        await this.repository.setCrawlerEmptyChannels(finalEmptyChannelList);
+        await Promise.all([
+            this.repository.addCrawl(currCrawl.crawl),
+            this.repository.setCrawlerInactiveChannels(inactiveChannels),
+        ]);
 
-        return this.getProcessingResult(finalEmptyChannelList, prevCrawlActiveNotifiedChannels);
-    }
-
-    /**
-     * Get channels that are still empty from a previous crawl
-     * @param previousCrawlChannels Channels of the previous crawl
-     * @param currentCrawlIds Channel Ids on the current crawl
-     */
-    private getChannelsStillEmpty(previousCrawlChannels: CrawlerChannel[], currentCrawlIds: number[]): CrawlerChannel[]
-    {
-        // filter out channels no longer in the empty list
-        return previousCrawlChannels.filter(prev => {
-            return currentCrawlIds.find(id => id === prev.channelId);
-        });
-    }
-
-    /**
-     * Get channels that are now active and were notified previously
-     * @param previousCrawlChannels Channels of the previous crawl
-     * @param currentCrawlIds Channel Ids on the current crawl
-     */
-    private getChannelsActiveNotified(previousCrawlChannels: CrawlerChannel[], currentCrawlIds: number[]): CrawlerChannel[]
-    {
-        // filter channels no longer empty
-        return previousCrawlChannels.filter(prev => {
-            return prev.isNotified && currentCrawlIds.every(id => id !== prev.channelId);
-        });
-    }
-
-    /**
-     * Get new channels that are empty
-     * @param previousCrawlChannels Channels of the previous crawl
-     * @param currentCrawlIds Channel Ids on the current crawl
-     */
-    private getNewEmptyChannels(previousCrawlChannels: CrawlerChannel[], currentCrawlIds: number[]): CrawlerChannel[]
-    {
-        // filter out channels in previous crawls and initialize empty time
-        return currentCrawlIds.filter(emptyChannel => {
-                // id can't be in previous crawls
-                return previousCrawlChannels.every(prev => prev.channelId !== emptyChannel);
-            })
-            .map(channel => {
-                return {
-                    channelId: channel,
-                    timeEmpty: 0,
-                    isNotified: false,
-                    lastUpdated: new Date()
-                };
-            });
+        return this.getProcessingResult(inactiveChannels, crawlCompare.getBackToActive());
     }
 
     /**
      * Get the processed results of a crawl
      * @param inactiveList List of inactive channels
-     * @param activeNotifiedList List of active and notified channels
+     * @param activeNotifiedChannels List of active and notified channels
      */
-    private getProcessingResult(inactiveList: CrawlerChannel[], activeNotifiedList: CrawlerChannel[]): ZoneProcessResult[]
+    private getProcessingResult(inactiveList: CrawlerChannel[], activeNotifiedChannels: CrawlerChannel[]): ZoneProcessResult[]
     {
         return this.result.map(zone => {
             const channels = inactiveList.filter(channel => {
-                return zone.empty.find(id => id === channel.channelId);
+                return zone.inactive.find(id => id === channel.channelId);
             });
+
+            const config = this.config.zones.find(conf => conf.name === zone.zone);
+
+            let toNotify: CrawlerChannel[] = [],
+                toDelete: CrawlerChannel[] = [];
+
+            if(config) {
+                toNotify = channels.filter(channel => this.channelExceededNotifyTime(config, channel));
+                toDelete = channels.filter(channel => this.channelExceededMaxTime(config, channel));
+            }
 
             return {
                 zone: zone.zone,
-                activeNotifiedChannels: activeNotifiedList,
+                activeNotifiedChannels,
                 channels,
+                toNotify,
+                toDelete,
             }
         });
     }
@@ -138,6 +85,26 @@ export class ProcessResult
         const diff = new Date().getTime() - lastCrawl.getTime();
 
         // if the difference is bigger than 5 crawls then reset
-        return diff > this.crawlInterval * 5 * 1000;
+        return diff > this.config.interval * 5 * 1000;
+    }
+
+    /**
+     * Check if the channel has exceeded the notifytime
+     * @param zone The channel zone
+     * @param channel The channel
+     */
+    private channelExceededNotifyTime(zone: CrawlZone, channel: CrawlerChannel): boolean
+    {
+        return channel.timeInactive >= zone.timeInactiveNotify && channel.timeInactive < zone.timeInactiveMax;
+    }
+
+    /**
+     * Check if the channel exceeded the max inactive time
+     * @param zone The channel zone
+     * @param channel The channel
+     */
+    private channelExceededMaxTime(zone: CrawlZone, channel: CrawlerChannel): boolean
+    {
+        return channel.timeInactive >= zone.timeInactiveMax;
     }
 }

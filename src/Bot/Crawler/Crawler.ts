@@ -109,14 +109,14 @@ export class Crawler
 
                 emptyChannelList.push({
                     zone: zone.name,
-                    empty: zoneEmptyChannels,
+                    inactive: zoneEmptyChannels,
                     total: channelsInZoneResult.value.channels.length
                 });
             });
 
-            console.log('Empty channels list:', emptyChannelList.map(c=>c.empty));
+            console.log('Empty channels list:', emptyChannelList.map(c=>c.inactive));
 
-            const processResult = new ProcessResult(emptyChannelList, this.config.interval);
+            const processResult = new ProcessResult(emptyChannelList, this.config);
             const results = await processResult.processResults();
 
             this.raiseChannelEvents(results);
@@ -142,42 +142,15 @@ export class Crawler
     {
         const botEvents = this.bot.getBotEvents();
 
-        result.forEach(({ zone, channels, activeNotifiedChannels }) => {
+        result.forEach(({ zone, toNotify, toDelete, activeNotifiedChannels }) => {
             const config = this.config.zones.find(conf => conf.name === zone);
 
             if(!config)
                 return;
 
-            channels
-                .filter(channel => this.channelExceededNotifyTime(config, channel))
-                .forEach(channel => botEvents.raiseChannelInactiveNotify(channel.channelId, config.name, config.inactiveIcon));
-
-            channels
-                .filter(channel => this.channelExceededMaxTime(config, channel))
-                .forEach(channel => botEvents.raiseChannelInactiveDelete(channel.channelId, config.name));
-
-            activeNotifiedChannels
-                .forEach(channel => botEvents.raiseChannelNotInactiveNotify(channel.channelId));
+            toNotify.forEach(channel => botEvents.raiseChannelInactiveNotify(channel.channelId, config.name, config.inactiveIcon));
+            toDelete.forEach(channel => botEvents.raiseChannelInactiveDelete(channel.channelId, config.name));
+            activeNotifiedChannels.forEach(channel => botEvents.raiseChannelNotInactiveNotify(channel.channelId));
         });
-    }
-
-    /**
-     * Check if the channel has exceeded the notifytime
-     * @param zone The channel zone
-     * @param channel The channel
-     */
-    private channelExceededNotifyTime(zone: CrawlZone, channel: CrawlerChannel): boolean
-    {
-        return channel.timeEmpty >= zone.timeInactiveNotify && channel.timeEmpty < zone.timeInactiveMax;
-    }
-
-    /**
-     * Check if the channel exceeded the max inactive time
-     * @param zone The channel zone
-     * @param channel The channel
-     */
-    private channelExceededMaxTime(zone: CrawlZone, channel: CrawlerChannel): boolean
-    {
-        return channel.timeEmpty >= zone.timeInactiveMax;
     }
 }

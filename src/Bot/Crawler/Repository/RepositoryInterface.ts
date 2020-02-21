@@ -18,18 +18,18 @@ export interface RepositoryInterface {
     addCrawl(crawl: CrawlInfo): Promise<void>;
 
     /**
-     * Get all empty channels
+     * Get all inactive channels
      */
-    getCrawlerEmptyChannels(): Promise<CrawlerChannel[]>;
+    getCrawlerInactiveChannels(): Promise<CrawlerChannel[]>;
 
     /**
      * Save all channels of a crawl
      * @param channelList The channel list to save
      */
-    setCrawlerEmptyChannels(channelList: CrawlerChannel[]): Promise<void>;
+    setCrawlerInactiveChannels(channelList: CrawlerChannel[]): Promise<void>;
 
     /**
-     * Get an empty channel by Id
+     * Get an inactive channel by Id
      * @param channelId The channel Id
      */
     getChannelById(channelId: number): Promise<CrawlerChannel>;

@@ -9,7 +9,7 @@ class LocalRepository {
     constructor(databasePath) {
         this.databasePath = databasePath;
         this.crawlsFilePath = path_1.join(this.databasePath, 'crawls.json');
-        this.emptyChannelsFilePath = path_1.join(this.databasePath, 'emptychannels.json');
+        this.inactiveChannelsFilePath = path_1.join(this.databasePath, 'emptychannels.json');
     }
     /**
      * Get all crawls
@@ -49,10 +49,10 @@ class LocalRepository {
         loader.saveFileJson(crawls);
     }
     /**
-     * Get all empty channels
+     * Get all inactive channels
      */
-    async getCrawlerEmptyChannels() {
-        const loader = await this.getFileLoader(this.emptyChannelsFilePath);
+    async getCrawlerInactiveChannels() {
+        const loader = await this.getFileLoader(this.inactiveChannelsFilePath);
         const channels = await loader.loadFileJson();
         channels.forEach(channel => {
             channel.lastUpdated = new Date(channel.lastUpdated);
@@ -63,16 +63,16 @@ class LocalRepository {
      * Save all channels of a crawl
      * @param channelList The channel list to save
      */
-    async setCrawlerEmptyChannels(channelList) {
-        const loader = await this.getFileLoader(this.emptyChannelsFilePath);
+    async setCrawlerInactiveChannels(channelList) {
+        const loader = await this.getFileLoader(this.inactiveChannelsFilePath);
         return loader.saveFileJson(channelList);
     }
     /**
-     * Get an empty channel by Id
+     * Get an inactive channel by Id
      * @param channelId The channel Id
      */
     async getChannelById(channelId) {
-        const loader = await this.getFileLoader(this.emptyChannelsFilePath);
+        const loader = await this.getFileLoader(this.inactiveChannelsFilePath);
         const channels = await loader.loadFileJson();
         const channel = channels.find(channel => channel.channelId === channelId);
         if (!channel)
@@ -85,7 +85,7 @@ class LocalRepository {
      * @param notified The notified value
      */
     async setChannelNotified(channelId, notified) {
-        const loader = await this.getFileLoader(this.emptyChannelsFilePath);
+        const loader = await this.getFileLoader(this.inactiveChannelsFilePath);
         const channels = await loader.loadFileJson();
         const channelToUpdate = channels.find(channel => channel.channelId === channelId);
         if (!channelToUpdate)
