@@ -21,6 +21,8 @@ export interface CrawlZoneInfo {
     zone: string;
     /** number of inactive channels */
     inactiveChannels: number;
+    /** number of deleted channels (included in inactive channels count) */
+    deletedChannels: number;
     /** total channels */
     totalChannels: number;
 }

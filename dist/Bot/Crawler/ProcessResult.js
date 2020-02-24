@@ -26,11 +26,13 @@ class ProcessResult {
         if (this.shouldResetDatabase(prevCrawl.crawl.runAt)) {
             inactiveChannels.forEach(channel => channel.timeInactive = 0);
         }
+        const result = this.getProcessingResult(inactiveChannels, crawlCompare.getBackToActive());
+        result.forEach(zone => currCrawl.setDeletedChannels(zone.zone, zone.toDelete.length));
         await Promise.all([
             this.repository.addCrawl(currCrawl.crawl),
             this.repository.setCrawlerInactiveChannels(inactiveChannels),
         ]);
-        return this.getProcessingResult(inactiveChannels, crawlCompare.getBackToActive());
+        return result;
     }
     /**
      * Get the processed results of a crawl

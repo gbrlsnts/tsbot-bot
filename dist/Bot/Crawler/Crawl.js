@@ -7,6 +7,16 @@ class Crawl {
         this.active = active;
     }
     /**
+     * Set the number of deleted channels in a zone
+     * @param zone The zone to set the count
+     * @param count The number of deleted channels
+     */
+    setDeletedChannels(zone, count) {
+        const crawlZone = this.crawl.zones.find(z => z.zone === zone);
+        if (crawlZone)
+            crawlZone.deletedChannels = count;
+    }
+    /**
      * Create a crawl with empty values and run date as the current time
      */
     static createNullCrawl() {
@@ -24,6 +34,7 @@ class Crawl {
             return {
                 zone: result.zone,
                 inactiveChannels: result.inactive.length,
+                deletedChannels: 0,
                 totalChannels: result.total
             };
         });
