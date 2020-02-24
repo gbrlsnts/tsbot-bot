@@ -1,9 +1,10 @@
 import { Bot } from "../Bot";
-import { CrawlerConfiguration, CrawlZone } from "../Configuration/Configuration";
+import { CrawlerConfiguration } from "../Configuration/Configuration";
 import { clearTimeout } from "timers";
 import { ChannelUtils } from "../Utils/ChannelUtils";
-import { ZoneCrawlResult, CrawlerChannel, ZoneProcessResult } from "./CrawlerTypes";
+import { ZoneCrawlResult, ZoneProcessResult } from "./CrawlerTypes";
 import { ProcessResult } from "./ProcessResult";
+import { ChannelCleanup } from "./ChannelCleanup";
 
 export class Crawler
 {
@@ -116,10 +117,10 @@ export class Crawler
 
             console.log('Empty channels list:', emptyChannelList.map(c=>c.inactive));
 
-            const processResult = new ProcessResult(emptyChannelList, this.config);
-            const results = await processResult.processResults();
+            const results = await new ProcessResult(emptyChannelList, this.config).processResults();
+            const deletedChannels = await new ChannelCleanup(this.bot, this.config.zones, results).cleanupChannels();
 
-            this.raiseChannelEvents(results);
+            this.raiseChannelEvents(results, deletedChannels);
         } catch(e) {
             console.log(`Crawl error: ${e.message}`);
         } finally {
@@ -138,7 +139,7 @@ export class Crawler
      * Raise events for the processed results
      * @param result Crawl processing result
      */
-    private raiseChannelEvents(result: ZoneProcessResult[])
+    private raiseChannelEvents(result: ZoneProcessResult[], deletedChannels: number[])
     {
         const botEvents = this.bot.getBotEvents();
 
@@ -149,8 +150,12 @@ export class Crawler
                 return;
 
             toNotify.forEach(channel => botEvents.raiseChannelInactiveNotify(channel.channelId, config.name, config.inactiveIcon));
-            toDelete.forEach(channel => botEvents.raiseChannelInactiveDelete(channel.channelId, config.name));
             activeNotifiedChannels.forEach(channel => botEvents.raiseChannelNotInactiveNotify(channel.channelId));
+
+            // notify only with channels actually deleted from server
+            toDelete
+                .filter(toDel => deletedChannels.indexOf(toDel.channelId) >= 0)
+                .forEach(channel => botEvents.raiseChannelInactiveDelete(channel.channelId, config.name));
         });
     }
 }

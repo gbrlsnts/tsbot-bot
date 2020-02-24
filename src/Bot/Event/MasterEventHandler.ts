@@ -47,16 +47,7 @@ export class MasterEventHandler
         });
 
         botEvents.on(BotEventName.channelInactiveDeleteEvent, event => {
-            const config = this.container.resolve<Configuration>('config').crawler;
-
-            if(!config)
-                return;
-
-            this.handleBotEvent(new ChannelInactiveDeleteHandler(
-                this.bot,
-                config,
-                event
-            ));
+            this.handleBotEvent(new ChannelInactiveDeleteHandler(event));
         });
     }
 

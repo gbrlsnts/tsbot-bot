@@ -32,10 +32,7 @@ class MasterEventHandler {
             this.handleBotEvent(new ChannelInactiveNotifyHandler_1.ChannelInactiveNotifyHandler(this.bot, event));
         });
         botEvents.on(BotEvent_1.BotEventName.channelInactiveDeleteEvent, event => {
-            const config = this.container.resolve('config').crawler;
-            if (!config)
-                return;
-            this.handleBotEvent(new ChannelInactiveDeleteHandler_1.ChannelInactiveDeleteHandler(this.bot, config, event));
+            this.handleBotEvent(new ChannelInactiveDeleteHandler_1.ChannelInactiveDeleteHandler(event));
         });
     }
     handleBotEvent(event) {

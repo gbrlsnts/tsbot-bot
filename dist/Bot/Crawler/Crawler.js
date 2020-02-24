@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const timers_1 = require("timers");
 const ChannelUtils_1 = require("../Utils/ChannelUtils");
 const ProcessResult_1 = require("./ProcessResult");
+const ChannelCleanup_1 = require("./ChannelCleanup");
 class Crawler {
     constructor(bot, config) {
         this.bot = bot;
@@ -76,9 +77,9 @@ class Crawler {
                 });
             });
             console.log('Empty channels list:', emptyChannelList.map(c => c.inactive));
-            const processResult = new ProcessResult_1.ProcessResult(emptyChannelList, this.config);
-            const results = await processResult.processResults();
-            this.raiseChannelEvents(results);
+            const results = await new ProcessResult_1.ProcessResult(emptyChannelList, this.config).processResults();
+            const deletedChannels = await new ChannelCleanup_1.ChannelCleanup(this.bot, this.config.zones, results).cleanupChannels();
+            this.raiseChannelEvents(results, deletedChannels);
         }
         catch (e) {
             console.log(`Crawl error: ${e.message}`);
@@ -97,15 +98,18 @@ class Crawler {
      * Raise events for the processed results
      * @param result Crawl processing result
      */
-    raiseChannelEvents(result) {
+    raiseChannelEvents(result, deletedChannels) {
         const botEvents = this.bot.getBotEvents();
         result.forEach(({ zone, toNotify, toDelete, activeNotifiedChannels }) => {
             const config = this.config.zones.find(conf => conf.name === zone);
             if (!config)
                 return;
             toNotify.forEach(channel => botEvents.raiseChannelInactiveNotify(channel.channelId, config.name, config.inactiveIcon));
-            toDelete.forEach(channel => botEvents.raiseChannelInactiveDelete(channel.channelId, config.name));
             activeNotifiedChannels.forEach(channel => botEvents.raiseChannelNotInactiveNotify(channel.channelId));
+            // notify only with channels actually deleted from server
+            toDelete
+                .filter(toDel => deletedChannels.indexOf(toDel.channelId) >= 0)
+                .forEach(channel => botEvents.raiseChannelInactiveDelete(channel.channelId, config.name));
         });
     }
 }
