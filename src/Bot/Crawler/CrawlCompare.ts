@@ -12,12 +12,12 @@ export class CrawlCompare {
      */
     getNewInactiveChannels(): CrawlerChannel[]
     {
-        if(this.previous.channels.length === 0)
-            return [...this.current.channels];
+        if(this.previous.inactive.length === 0)
+            return [...this.current.inactive];
 
-        return this.current.channels.filter(curr => {
+        return this.current.inactive.filter(curr => {
             // id can't be in previous crawls
-            return this.previous.channels.every(prev => prev.channelId !== curr.channelId);
+            return this.previous.inactive.every(prev => prev.channelId !== curr.channelId);
         })
     }
 
@@ -26,11 +26,11 @@ export class CrawlCompare {
      */
     getRecurringInactive(): CrawlerChannel[]
     {
-        if(this.previous.channels.length === 0)
+        if(this.previous.inactive.length === 0)
             return [];
         
-        return this.previous.channels.filter(prev => {
-            return this.current.channels.find(curr => curr.channelId === prev.channelId);
+        return this.previous.inactive.filter(prev => {
+            return this.current.inactive.find(curr => curr.channelId === prev.channelId);
         });
     }
     
@@ -39,9 +39,11 @@ export class CrawlCompare {
      */
     getBackToActive(): CrawlerChannel[]
     {
-        return this.previous.channels.filter(prev => {
-            // notified and no longer in inactive list
-            return prev.isNotified && this.current.channels.every(curr => curr.channelId !== prev.channelId);
+        return this.previous.inactive.filter(prev => {
+            // notified and no longer in inactive list and still exists in the server
+            return prev.isNotified &&
+                this.current.inactive.every(curr => curr.channelId !== prev.channelId) &&
+                this.current.active.find(curr => curr === prev.channelId);
         });
     }
 

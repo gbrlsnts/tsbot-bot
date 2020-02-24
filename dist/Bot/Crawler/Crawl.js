@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Crawl {
-    constructor(crawl, channels) {
+    constructor(crawl, inactive, active = []) {
         this.crawl = crawl;
-        this.channels = channels;
+        this.inactive = inactive;
+        this.active = active;
     }
     /**
      * Create a crawl with empty values and run date as the current time
@@ -30,14 +31,15 @@ class Crawl {
             runAt: new Date(),
             zones,
         };
-        const channels = Array.prototype.concat.apply([], crawlResult.map(zoneResult => zoneResult.inactive));
-        const crawlerChannels = channels.map(channel => ({
+        const activeChannels = Array.prototype.concat.apply([], crawlResult.map(zoneResult => zoneResult.active));
+        const inactiveChannels = Array.prototype.concat.apply([], crawlResult.map(zoneResult => zoneResult.inactive));
+        const inactiveCrawlerChannels = inactiveChannels.map(channel => ({
             channelId: channel,
             timeInactive: 0,
             isNotified: false,
             lastUpdated: new Date(),
         }));
-        return new Crawl(crawl, crawlerChannels);
+        return new Crawl(crawl, inactiveCrawlerChannels, activeChannels);
     }
 }
 exports.Crawl = Crawl;

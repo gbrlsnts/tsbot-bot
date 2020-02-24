@@ -1,4 +1,4 @@
-import { CrawlerChannel, ZoneCrawlResult, ZoneProcessResult, CrawlInfo } from "./CrawlerTypes";
+import { CrawlerChannel, ZoneCrawlResult, ZoneProcessResult } from "./CrawlerTypes";
 import { RepositoryInterface } from "./Repository/RepositoryInterface";
 import { Factory } from "./Repository/Factory";
 import { CrawlZone, CrawlerConfiguration } from "../Configuration/Configuration";

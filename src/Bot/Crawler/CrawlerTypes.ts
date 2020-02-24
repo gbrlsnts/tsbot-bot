@@ -30,6 +30,8 @@ export interface ZoneCrawlResult {
     zone: string;
     /** inactive channels id's */
     inactive: number[];
+    /** active channels id's */
+    active: number[];
     /** total number of channels, including active */
     total: number;
 }

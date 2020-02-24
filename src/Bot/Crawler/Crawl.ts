@@ -2,7 +2,7 @@ import { CrawlInfo, CrawlZoneInfo, CrawlerChannel, ZoneCrawlResult } from "./Cra
 
 export class Crawl {
     
-    constructor(readonly crawl: CrawlInfo, readonly channels: CrawlerChannel[])
+    constructor(readonly crawl: CrawlInfo, readonly inactive: CrawlerChannel[], readonly active: number[] = [])
     {
 
     }
@@ -38,15 +38,17 @@ export class Crawl {
             zones,
         };
 
-        const channels = Array.prototype.concat.apply([], crawlResult.map(zoneResult => zoneResult.inactive));
-        const crawlerChannels: CrawlerChannel[] = channels.map(channel => ({
+        const activeChannels = Array.prototype.concat.apply([], crawlResult.map(zoneResult => zoneResult.active));
+        const inactiveChannels = Array.prototype.concat.apply([], crawlResult.map(zoneResult => zoneResult.inactive));
+
+        const inactiveCrawlerChannels: CrawlerChannel[] = inactiveChannels.map(channel => ({
             channelId: channel,
             timeInactive: 0,
             isNotified: false,
             lastUpdated: new Date(),
         }));
 
-        return new Crawl(crawl, crawlerChannels);
+        return new Crawl(crawl, inactiveCrawlerChannels, activeChannels);
     }
 
 

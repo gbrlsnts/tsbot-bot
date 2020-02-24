@@ -92,7 +92,7 @@ export class Crawler
 
         try {
             const channelList = await this.bot.getServer().channelList();
-            const emptyChannelList: ZoneCrawlResult[] = [];
+            const crawlResults: ZoneCrawlResult[] = [];
 
             this.config.zones.forEach(zone => {
                 const channelsInZoneResult = ChannelUtils.getZoneTopChannels(channelList, zone.start, zone.end, !zone.spacerAsSeparator);
@@ -102,22 +102,30 @@ export class Crawler
                     return;
                 }
 
-                const zoneEmptyChannels = channelsInZoneResult.value.channels
-                    .filter(channel => {
-                        return !ChannelUtils.isChannelSpacer(channel.name) &&
-                            ChannelUtils.countChannelTreeTotalClients(channel, channelList) === 0;
-                    }).map(channel => channel.cid);
+                const zoneInactiveChannels: number[] = [],
+                      zoneActiveChannels: number[] = [];
 
-                emptyChannelList.push({
+                channelsInZoneResult.value.channels.forEach(channel => {
+                    if(ChannelUtils.isChannelSpacer(channel.name))
+                        return;
+                    
+                    if(ChannelUtils.countChannelTreeTotalClients(channel, channelList) === 0)
+                        zoneInactiveChannels.push(channel.cid);
+                    else
+                        zoneActiveChannels.push(channel.cid);
+                });
+
+                crawlResults.push({
                     zone: zone.name,
-                    inactive: zoneEmptyChannels,
+                    inactive: zoneInactiveChannels,
+                    active: zoneActiveChannels,
                     total: channelsInZoneResult.value.channels.length
                 });
             });
 
-            console.log('Empty channels list:', emptyChannelList.map(c=>c.inactive));
+            console.log('Empty channels list:', crawlResults.map(c=>c.inactive));
 
-            const results = await new ProcessResult(emptyChannelList, this.config).processResults();
+            const results = await new ProcessResult(crawlResults, this.config).processResults();
             const deletedChannels = await new ChannelCleanup(this.bot, this.config.zones, results).cleanupChannels();
 
             this.raiseChannelEvents(results, deletedChannels);
