@@ -9,6 +9,7 @@ class CreateUserChannelAction {
         this.bot = bot;
         this.data = data;
         this.spacerFormat = '[*spacer%d]=';
+        this.createdChannels = [];
     }
     /**
      * Execute the action
@@ -28,46 +29,68 @@ class CreateUserChannelAction {
      */
     async getUserChannelZone() {
         const channelList = await this.bot.getServer().channelList();
-        return ChannelUtils_1.ChannelUtils.getZoneTopChannels(channelList, this.data.userChannelStart, this.data.userChannelEnd);
+        return ChannelUtils_1.ChannelUtils.getZoneTopChannels(channelList, this.data.zone.start, this.data.zone.end);
     }
     /**
      * Create a user channel hierarchy (top and subchannels)
      * @param createAfterChannel The new channel will be placed after this channel
      */
     async createChannelsHierarchy(createAfterChannel) {
-        let spacer = null, channels = [];
         try {
             const spacerName = this.getSpacerName();
             let channelBefore = createAfterChannel;
-            if (channelBefore.cid !== this.data.userChannelStart) {
-                spacer = await this.bot.createSpacer(spacerName, channelBefore.cid);
+            if (channelBefore.cid !== this.data.zone.start) {
+                const spacer = await this.bot.createSpacer(spacerName, channelBefore.cid);
+                this.createdChannels.push(spacer);
                 channelBefore = spacer;
             }
-            for (let createChannelData of this.data.channels) {
-                const channel = await this.bot.createChannel(createChannelData.name, createChannelData.password, undefined, channelBefore.cid);
-                channels.push(channel);
-                channelBefore = channel;
-                for (let createSubChannelData of createChannelData.channels) {
-                    const subChannel = await this.bot.createChannel(createSubChannelData.name, createSubChannelData.password, channel.cid);
-                    channels.push(subChannel);
-                }
+            for (let config of this.data.channels) {
+                const result = await this.createUserChannel({ config, after: channelBefore.cid });
+                channelBefore = result.channel;
             }
         }
         catch (e) {
-            const toDelete = channels;
-            if (spacer != null)
-                toDelete.push(spacer);
-            this.cleanUpCreatedChannels(toDelete);
+            this.cleanUpCreatedChannels(this.createdChannels);
             return Promise.reject(new Error(`Error while creating channels: ${e.message}`));
         }
-        return channels;
+        return this.createdChannels;
+    }
+    /**
+     * Create a channel, apply configurations and other options according to the parameters
+     * @param params Parameters to create the channel
+     */
+    async createUserChannel({ config, parent, after }) {
+        const subChannels = [];
+        const channel = await this.bot.createChannel(config.name, config.password, parent, after);
+        this.createdChannels.push(channel);
+        if (this.data.permissions || config.permissions)
+            await this.applyPermissions(channel, config.permissions);
+        if (config.channels) {
+            (await Promise.all(config.channels.map(c => this.createUserChannel({ config: c, parent: channel.cid }))))
+                .forEach(res => {
+                subChannels.push(res.channel, ...res.subChannels);
+            });
+        }
+        return {
+            channel,
+            subChannels
+        };
+    }
+    /**
+     * Applies a list of permissions to a channel. Merges with the permissions configured at the top level for all channels.
+     * @param channel The channel to apply permissions
+     * @param permissions The permissions list to apply
+     */
+    async applyPermissions(channel, permissions) {
+        // todo merge global with channel specific
+        await this.bot.setChannelPermissions(channel.cid, this.data.permissions || []);
     }
     /**
      * Sets channel admin group for a user for the given channels
      * @param channels Channels to apply the group
      */
     setUserChannelAdminGroup(channels) {
-        const owner = this.data.owner, group = this.data.channelGroupToAssign;
+        const owner = this.data.owner, group = this.data.group;
         if (!owner || !group) {
             return;
         }

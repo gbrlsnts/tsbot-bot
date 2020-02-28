@@ -1,7 +1,7 @@
 import { TeamSpeak, TextMessageTargetMode } from "ts3-nodejs-library";
 import { Context } from "./Context";
-import { MasterEventHandler } from "./Event/MasterEventHandler";
 import { BotEvent } from "./Event/BotEvent";
+import { ChannelPermission } from "./Types";
 
 export class Bot
 {
@@ -88,5 +88,15 @@ export class Bot
     async removeChannelIcon(channelId: number)
     {
         return await this.setChannelIcon(channelId, 0);
+    }
+
+    async setChannelPermissions(channelId: number, permissions: ChannelPermission[])
+    {
+        return await this.server.channelSetPerms(channelId, permissions.map(perm => {
+            return {
+                permsid: perm.permission,
+                permvalue: perm.value,
+            }
+        }));
     }
 }

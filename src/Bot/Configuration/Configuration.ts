@@ -1,4 +1,4 @@
-import { ConnectionProtocol } from "../ConnectionProtocol";
+import { ConnectionProtocol } from "../Types";
 
 export interface Configuration {
     /** Server connection configurations */

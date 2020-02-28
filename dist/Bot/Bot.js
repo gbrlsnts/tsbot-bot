@@ -59,6 +59,14 @@ class Bot {
     async removeChannelIcon(channelId) {
         return await this.setChannelIcon(channelId, 0);
     }
+    async setChannelPermissions(channelId, permissions) {
+        return await this.server.channelSetPerms(channelId, permissions.map(perm => {
+            return {
+                permsid: perm.permission,
+                permvalue: perm.value,
+            };
+        }));
+    }
 }
 exports.Bot = Bot;
 //# sourceMappingURL=Bot.js.map

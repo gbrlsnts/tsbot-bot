@@ -1,6 +1,6 @@
 import * as awilix from 'awilix';
 import { TeamSpeak, QueryProtocol } from 'ts3-nodejs-library';
-import { ConnectionProtocol } from './ConnectionProtocol';
+import { ConnectionProtocol } from './Types';
 import { Bot } from './Bot';
 import { MasterEventHandler } from './Event/MasterEventHandler';
 import { Context } from './Context';
