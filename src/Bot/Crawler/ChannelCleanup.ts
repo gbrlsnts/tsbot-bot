@@ -50,9 +50,9 @@ export class ChannelCleanup {
                         if(!zoneConfig.spacerAsSeparator)
                             return;
         
-                        const lastChannelNotDeleted = this.getLastChannelNotDeleted(toDelete, zoneChannels.channels);
+                        const lastChannelNotDeleted = this.getLastChannelNotDeleted(toDelete, zoneChannels.channels, serverChannels);
 
-                        this.getSpacersToDelete(channel.channelId, lastChannelNotDeleted, toDelete, zoneChannels.channels)
+                        this.getSpacersToDelete(channel.channelId, lastChannelNotDeleted, toDelete, zoneChannels.channels, serverChannels)
                             .forEach(spacer => deleteIds.push(spacer.cid));
                     });                    
                 });
@@ -64,41 +64,42 @@ export class ChannelCleanup {
     /**
      * Get the spacers associated to zone. Use only when spacer is configured as separator
      * @param channelId The channel id to find the associated spacer
-     * @param channelList The zone channel list
+     * @param zoneChannelList The zone channel list
      */
     private getSpacersToDelete(
             channelId: number,
             lastUndeletedChannel: TeamSpeakChannel | undefined,
             toDelete: CrawlerChannel[],
-            channelList: TeamSpeakChannel[]
+            zoneChannelList: TeamSpeakChannel[],
+            serverChannelList: TeamSpeakChannel[],
         ): TeamSpeakChannel[]
     {
         const spacers: TeamSpeakChannel[] = [];
 
-        if(channelList.length < 1)
+        if(zoneChannelList.length < 1)
             return spacers;
 
-        const channelPos = channelList.findIndex(channel => channel.cid === channelId);
+        const channelPos = zoneChannelList.findIndex(channel => channel.cid === channelId);
 
         if(channelPos < 0)
             return spacers;
 
         if(channelPos > 1) {
-            const previousChannel = channelList[channelPos - 2];
-            const previousSpacer =  channelList[channelPos - 1];
+            const previousChannel = zoneChannelList[channelPos - 2];
+            const previousSpacer =  zoneChannelList[channelPos - 1];
 
             // when previous is to not be deleted, add the spacer as well for the last undeleted channel
-            if(ChannelUtils.isChannelSpacer(previousSpacer.name) &&
-                !ChannelUtils.isChannelSpacer(previousChannel.name) &&
+            if(ChannelUtils.isChannelSeparator(previousSpacer, serverChannelList) &&
+                !ChannelUtils.isChannelSeparator(previousChannel, serverChannelList) &&
                 previousChannel.cid === lastUndeletedChannel?.cid &&
                 !toDelete.find(del => del.channelId === previousChannel.cid)) {
                 spacers.push(previousSpacer);
             }
         }
 
-        const nextSpacer =  channelList[channelPos + 1];
+        const nextSpacer =  zoneChannelList[channelPos + 1];
 
-        if(nextSpacer && ChannelUtils.isChannelSpacer(nextSpacer.name))
+        if(nextSpacer && ChannelUtils.isChannelSeparator(nextSpacer, serverChannelList))
             spacers.push(nextSpacer);
 
         return spacers;
@@ -107,14 +108,18 @@ export class ChannelCleanup {
     /**
      * Get the last channel in a zone that won't be deleted
      * @param toDelete The channels to be deleted
-     * @param channelList All channels in a zone
+     * @param zoneChannelList All channels in a zone
      */
-    private getLastChannelNotDeleted(toDelete: CrawlerChannel[], channelList: TeamSpeakChannel[]): TeamSpeakChannel | undefined
+    private getLastChannelNotDeleted(
+        toDelete: CrawlerChannel[],
+        zoneChannelList: TeamSpeakChannel[],
+        serverChannelList: TeamSpeakChannel[]
+    ): TeamSpeakChannel | undefined
     {
         let last: TeamSpeakChannel | undefined;
 
-        for(const channel of channelList) {
-            if(ChannelUtils.isChannelSpacer(channel.name))
+        for(const channel of zoneChannelList) {
+            if(ChannelUtils.isChannelSeparator(channel, serverChannelList))
                 continue;
 
             const del = toDelete.find(d => d.channelId === channel.cid);

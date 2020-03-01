@@ -63,7 +63,7 @@ export class CreateUserChannelAction implements ActionInterface<CreateUserChanne
             const spacerName = this.getSpacerName();
             let channelBefore = createAfterChannel;
 
-            if(channelBefore.cid !== this.data.zone.start) {
+            if(this.data.zone.separators && channelBefore.cid !== this.data.zone.start) {
                 const spacer = await this.bot.createSpacer(spacerName, channelBefore.cid);
                 this.createdChannels.push(spacer);
                 channelBefore = spacer;
@@ -79,7 +79,8 @@ export class CreateUserChannelAction implements ActionInterface<CreateUserChanne
             return Promise.reject(new Error(`Error while creating channels: ${e.message}`));
         }
 
-        return this.createdChannels;
+        // Remove the first when separators are enabled
+        return this.data.zone.separators ? this.createdChannels.slice(1) : this.createdChannels;
     }
 
     /**

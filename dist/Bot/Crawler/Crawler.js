@@ -67,7 +67,7 @@ class Crawler {
                 }
                 const zoneInactiveChannels = [], zoneActiveChannels = [];
                 channelsInZoneResult.value.channels.forEach(channel => {
-                    if (ChannelUtils_1.ChannelUtils.isChannelSpacer(channel.name))
+                    if (ChannelUtils_1.ChannelUtils.isChannelSeparator(channel, channelList))
                         return;
                     if (ChannelUtils_1.ChannelUtils.countChannelTreeTotalClients(channel, channelList) === 0)
                         zoneInactiveChannels.push(channel.cid);

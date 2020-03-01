@@ -106,7 +106,7 @@ export class Crawler
                       zoneActiveChannels: number[] = [];
 
                 channelsInZoneResult.value.channels.forEach(channel => {
-                    if(ChannelUtils.isChannelSpacer(channel.name))
+                    if(ChannelUtils.isChannelSeparator(channel, channelList))
                         return;
                     
                     if(ChannelUtils.countChannelTreeTotalClients(channel, channelList) === 0)

@@ -8,7 +8,7 @@ class ChannelUtils {
      * @param start Start channel Id
      * @param end End channel Id
      */
-    static getZoneTopChannels(allChannels, start, end, includeSpacers = true) {
+    static getZoneTopChannels(allChannels, start, end, includeSeparators = true) {
         let startChannel, endChannel, channels = [];
         for (let channel of allChannels) {
             if (channel.pid !== 0) {
@@ -22,7 +22,7 @@ class ChannelUtils {
                 break;
             }
             if (startChannel && channel.cid !== start && channel.cid !== end &&
-                (includeSpacers || (!includeSpacers && !this.isChannelSpacer(channel.name)))) {
+                (includeSeparators || (!includeSeparators && !this.isChannelSeparator(channel, allChannels)))) {
                 channels.push(channel);
             }
         }
@@ -66,6 +66,14 @@ class ChannelUtils {
      */
     static isChannelSpacer(channelName) {
         return this.spacerRegex.test(channelName);
+    }
+    /**
+     * Check if a given channel name is a separator (spacer + no subchannels)
+     * @param channel Channel to check
+     * @param channelList List with all server channels
+     */
+    static isChannelSeparator(channel, channelList) {
+        return this.isChannelSpacer(channel.name) && this.getAllSubchannels(channel, channelList).length === 0;
     }
     /**
      * Get the channel before the specified channel

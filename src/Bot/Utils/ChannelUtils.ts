@@ -13,7 +13,7 @@ export class ChannelUtils
      * @param start Start channel Id
      * @param end End channel Id
      */
-    static getZoneTopChannels(allChannels: TeamSpeakChannel[], start: number, end: number, includeSpacers: boolean = true): 
+    static getZoneTopChannels(allChannels: TeamSpeakChannel[], start: number, end: number, includeSeparators: boolean = true): 
         Either<Failure<BotError.InvalidZone>, ZoneChannelsResult>
     {
         let startChannel: TeamSpeakChannel | undefined,
@@ -35,7 +35,7 @@ export class ChannelUtils
             }
 
             if(startChannel && channel.cid !== start && channel.cid !== end &&
-                (includeSpacers || (!includeSpacers && !this.isChannelSpacer(channel.name)))
+                (includeSeparators || (!includeSeparators && !this.isChannelSeparator(channel, allChannels)))
                 ) {
                 channels.push(channel);
             }
@@ -92,6 +92,16 @@ export class ChannelUtils
     static isChannelSpacer(channelName: string): boolean
     {
         return this.spacerRegex.test(channelName);
+    }
+
+    /**
+     * Check if a given channel name is a separator (spacer + no subchannels)
+     * @param channel Channel to check
+     * @param channelList List with all server channels
+     */
+    static isChannelSeparator(channel: TeamSpeakChannel, channelList: TeamSpeakChannel[]): boolean
+    {
+        return this.isChannelSpacer(channel.name) && this.getAllSubchannels(channel, channelList).length === 0;
     }
 
     /**

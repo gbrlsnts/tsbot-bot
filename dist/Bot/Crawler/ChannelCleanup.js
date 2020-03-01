@@ -36,8 +36,8 @@ class ChannelCleanup {
                     deleteIds.push(channel.channelId);
                     if (!zoneConfig.spacerAsSeparator)
                         return;
-                    const lastChannelNotDeleted = this.getLastChannelNotDeleted(toDelete, zoneChannels.channels);
-                    this.getSpacersToDelete(channel.channelId, lastChannelNotDeleted, toDelete, zoneChannels.channels)
+                    const lastChannelNotDeleted = this.getLastChannelNotDeleted(toDelete, zoneChannels.channels, serverChannels);
+                    this.getSpacersToDelete(channel.channelId, lastChannelNotDeleted, toDelete, zoneChannels.channels, serverChannels)
                         .forEach(spacer => deleteIds.push(spacer.cid));
                 });
             });
@@ -47,41 +47,41 @@ class ChannelCleanup {
     /**
      * Get the spacers associated to zone. Use only when spacer is configured as separator
      * @param channelId The channel id to find the associated spacer
-     * @param channelList The zone channel list
+     * @param zoneChannelList The zone channel list
      */
-    getSpacersToDelete(channelId, lastUndeletedChannel, toDelete, channelList) {
+    getSpacersToDelete(channelId, lastUndeletedChannel, toDelete, zoneChannelList, serverChannelList) {
         var _a;
         const spacers = [];
-        if (channelList.length < 1)
+        if (zoneChannelList.length < 1)
             return spacers;
-        const channelPos = channelList.findIndex(channel => channel.cid === channelId);
+        const channelPos = zoneChannelList.findIndex(channel => channel.cid === channelId);
         if (channelPos < 0)
             return spacers;
         if (channelPos > 1) {
-            const previousChannel = channelList[channelPos - 2];
-            const previousSpacer = channelList[channelPos - 1];
+            const previousChannel = zoneChannelList[channelPos - 2];
+            const previousSpacer = zoneChannelList[channelPos - 1];
             // when previous is to not be deleted, add the spacer as well for the last undeleted channel
-            if (ChannelUtils_1.ChannelUtils.isChannelSpacer(previousSpacer.name) &&
-                !ChannelUtils_1.ChannelUtils.isChannelSpacer(previousChannel.name) &&
+            if (ChannelUtils_1.ChannelUtils.isChannelSeparator(previousSpacer, serverChannelList) &&
+                !ChannelUtils_1.ChannelUtils.isChannelSeparator(previousChannel, serverChannelList) &&
                 previousChannel.cid === ((_a = lastUndeletedChannel) === null || _a === void 0 ? void 0 : _a.cid) &&
                 !toDelete.find(del => del.channelId === previousChannel.cid)) {
                 spacers.push(previousSpacer);
             }
         }
-        const nextSpacer = channelList[channelPos + 1];
-        if (nextSpacer && ChannelUtils_1.ChannelUtils.isChannelSpacer(nextSpacer.name))
+        const nextSpacer = zoneChannelList[channelPos + 1];
+        if (nextSpacer && ChannelUtils_1.ChannelUtils.isChannelSeparator(nextSpacer, serverChannelList))
             spacers.push(nextSpacer);
         return spacers;
     }
     /**
      * Get the last channel in a zone that won't be deleted
      * @param toDelete The channels to be deleted
-     * @param channelList All channels in a zone
+     * @param zoneChannelList All channels in a zone
      */
-    getLastChannelNotDeleted(toDelete, channelList) {
+    getLastChannelNotDeleted(toDelete, zoneChannelList, serverChannelList) {
         let last;
-        for (const channel of channelList) {
-            if (ChannelUtils_1.ChannelUtils.isChannelSpacer(channel.name))
+        for (const channel of zoneChannelList) {
+            if (ChannelUtils_1.ChannelUtils.isChannelSeparator(channel, serverChannelList))
                 continue;
             const del = toDelete.find(d => d.channelId === channel.cid);
             if (!del)

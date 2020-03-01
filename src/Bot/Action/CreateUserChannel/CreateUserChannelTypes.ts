@@ -49,6 +49,8 @@ export interface Zone
     start: number;
     /** Channel id where the zone ends */
     end: number;
+    /** If channel separators are enabled for this zone */
+    separators: boolean;
 }
 
 export interface CreateUserChannelResultData {
