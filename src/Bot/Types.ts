@@ -4,10 +4,10 @@ export enum ConnectionProtocol
     SSH = 'ssh'
 }
 
-export enum Codec
+export enum BotCodec
 {
-    music = "music",
-    voice = "voice",
+    voice = "voice", // opus voice = 4
+    music = "music", // opus music = 5
 }
 
 export interface ChannelPermission

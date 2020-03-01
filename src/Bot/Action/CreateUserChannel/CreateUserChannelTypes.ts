@@ -1,4 +1,4 @@
-import { Codec, ChannelPermission } from "../../Types";
+import { BotCodec, ChannelPermission } from "../../Types";
 
 export interface CreateUserChannelData
 {
@@ -32,13 +32,13 @@ export interface UserChannelConfiguration
 export interface ChannelProperties
 {
     /** Audio quality */
-    audio: AudioQuality;
+    audio?: AudioQuality;
 }
 
 export interface AudioQuality
 {
     /** Codec to set */
-    codec: Codec;
+    codec: BotCodec;
     /** Quality, 0 to 10 */
     quality: number;
 }

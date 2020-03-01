@@ -5,9 +5,9 @@ var ConnectionProtocol;
     ConnectionProtocol["RAW"] = "raw";
     ConnectionProtocol["SSH"] = "ssh";
 })(ConnectionProtocol = exports.ConnectionProtocol || (exports.ConnectionProtocol = {}));
-var Codec;
-(function (Codec) {
-    Codec["music"] = "music";
-    Codec["voice"] = "voice";
-})(Codec = exports.Codec || (exports.Codec = {}));
+var BotCodec;
+(function (BotCodec) {
+    BotCodec["voice"] = "voice";
+    BotCodec["music"] = "music";
+})(BotCodec = exports.BotCodec || (exports.BotCodec = {}));
 //# sourceMappingURL=Types.js.map

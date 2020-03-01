@@ -1,7 +1,7 @@
-import { TeamSpeak, TextMessageTargetMode } from "ts3-nodejs-library";
+import { TeamSpeak, TextMessageTargetMode, Codec } from "ts3-nodejs-library";
 import { Context } from "./Context";
 import { BotEvent } from "./Event/BotEvent";
-import { ChannelPermission } from "./Types";
+import { ChannelPermission, BotCodec } from "./Types";
 
 export class Bot
 {
@@ -40,13 +40,26 @@ export class Bot
         }
     }
 
-    async createChannel(name: string, password?: string, parent?: number, afterChannel?: number)
+    async createChannel({ name, password, parent, afterChannel, codec, codec_quality }: CreateChannelProperties)
     {
+        let serverCodec;
+
+        switch(codec) {
+            case BotCodec.voice:
+                serverCodec = 4;
+                break;
+            case BotCodec.music:
+                serverCodec = 5;
+                break;
+        }
+
         return await this.server.channelCreate(name, {
             channel_password: password,
             channel_flag_permanent: 1,
             channel_order: afterChannel,
             cpid: parent,
+            channel_codec: serverCodec,
+            channel_codec_quality: codec_quality
         });
     }
 
@@ -99,4 +112,13 @@ export class Bot
             }
         }));
     }
+}
+
+export interface CreateChannelProperties {
+    name: string;
+    password?: string;
+    parent?: number;
+    afterChannel?: number;
+    codec?: BotCodec;
+    codec_quality?: number;
 }

@@ -6,7 +6,7 @@ import { ChannelUtils, ZoneChannelsResult } from "../../Utils/ChannelUtils";
 import { Either, right, left } from "../../../Lib/Either";
 import { Failure } from "../../../Lib/Failure";
 import { BotError, invalidZoneError } from "../../Error";
-import { CreateUserChannelData, CreateUserChannelResultData, UserChannelConfiguration } from "./CreateUserChannelTypes";
+import { CreateUserChannelData, CreateUserChannelResultData, UserChannelConfiguration, ChannelProperties } from "./CreateUserChannelTypes";
 import { ChannelPermission } from "../../Types";
 
 export class CreateUserChannelAction implements ActionInterface<CreateUserChannelResultData>
@@ -89,18 +89,21 @@ export class CreateUserChannelAction implements ActionInterface<CreateUserChanne
     private async createUserChannel({ config, parent, after }: CreateChannelParameters): Promise<CreateChannelRecursiveResult>
     {
         const subChannels: TeamSpeakChannel[] = [];
-        const channel = await this.bot.createChannel(
-            config.name,
-            config.password,
+        const props = this.getProperties(config.properties);
+
+        const channel = await this.bot.createChannel({
+            name: config.name,
+            password: config.password,
             parent,
-            after
-        );
+            afterChannel: after,
+            codec: props.audio?.codec,
+            codec_quality: props.audio?.quality
+        });
 
         this.createdChannels.push(channel);
 
         if(this.data.permissions || config.permissions)
             await this.applyPermissions(channel, config.permissions);
-
 
         if(config.channels) {
             (await Promise.all(config.channels.map(c => this.createUserChannel({ config: c, parent: channel.cid }))))
@@ -108,7 +111,7 @@ export class CreateUserChannelAction implements ActionInterface<CreateUserChanne
                     subChannels.push(res.channel, ...res.subChannels);
                 });
         }
-        
+
         return {
             channel,
             subChannels
@@ -126,6 +129,18 @@ export class CreateUserChannelAction implements ActionInterface<CreateUserChanne
         const localPerms = permissions || [];
 
         await this.bot.setChannelPermissions(channel.cid, [...globalPerms, ...localPerms]);
+    }
+
+    /**
+     * Get a list of properties to apply in a channel. Merges with the properties configured at the top level for all channels.
+     * @param properties The properties of the channel
+     */
+    private getProperties(properties?: ChannelProperties): ChannelProperties
+    {
+        const globalProps = this.data.properties || {};
+        const localProps = properties || {};
+
+        return {...globalProps, ...localProps};
     }
     
     /**

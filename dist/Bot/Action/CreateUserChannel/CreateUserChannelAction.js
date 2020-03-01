@@ -60,8 +60,17 @@ class CreateUserChannelAction {
      * @param params Parameters to create the channel
      */
     async createUserChannel({ config, parent, after }) {
+        var _a, _b;
         const subChannels = [];
-        const channel = await this.bot.createChannel(config.name, config.password, parent, after);
+        const props = this.getProperties(config.properties);
+        const channel = await this.bot.createChannel({
+            name: config.name,
+            password: config.password,
+            parent,
+            afterChannel: after,
+            codec: (_a = props.audio) === null || _a === void 0 ? void 0 : _a.codec,
+            codec_quality: (_b = props.audio) === null || _b === void 0 ? void 0 : _b.quality
+        });
         this.createdChannels.push(channel);
         if (this.data.permissions || config.permissions)
             await this.applyPermissions(channel, config.permissions);
@@ -85,6 +94,15 @@ class CreateUserChannelAction {
         const globalPerms = this.data.permissions || [];
         const localPerms = permissions || [];
         await this.bot.setChannelPermissions(channel.cid, [...globalPerms, ...localPerms]);
+    }
+    /**
+     * Get a list of properties to apply in a channel. Merges with the properties configured at the top level for all channels.
+     * @param properties The properties of the channel
+     */
+    getProperties(properties) {
+        const globalProps = this.data.properties || {};
+        const localProps = properties || {};
+        return { ...globalProps, ...localProps };
     }
     /**
      * Sets channel admin group for a user for the given channels

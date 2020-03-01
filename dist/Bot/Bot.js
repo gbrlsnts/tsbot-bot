@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const ts3_nodejs_library_1 = require("ts3-nodejs-library");
 const BotEvent_1 = require("./Event/BotEvent");
+const Types_1 = require("./Types");
 class Bot {
     constructor(server, context) {
         this.server = server;
@@ -25,12 +26,23 @@ class Bot {
             console.log('Got error', error);
         }
     }
-    async createChannel(name, password, parent, afterChannel) {
+    async createChannel({ name, password, parent, afterChannel, codec, codec_quality }) {
+        let serverCodec;
+        switch (codec) {
+            case Types_1.BotCodec.voice:
+                serverCodec = 4;
+                break;
+            case Types_1.BotCodec.music:
+                serverCodec = 5;
+                break;
+        }
         return await this.server.channelCreate(name, {
             channel_password: password,
             channel_flag_permanent: 1,
             channel_order: afterChannel,
             cpid: parent,
+            channel_codec: serverCodec,
+            channel_codec_quality: codec_quality
         });
     }
     async createSpacer(name, afterChannel) {
