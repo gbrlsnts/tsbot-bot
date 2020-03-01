@@ -122,9 +122,10 @@ export class CreateUserChannelAction implements ActionInterface<CreateUserChanne
      */
     private async applyPermissions(channel: TeamSpeakChannel, permissions?: ChannelPermission[]): Promise<void>
     {
-       // todo merge global with channel specific
+        const globalPerms = this.data.permissions || [];
+        const localPerms = permissions || [];
 
-        await this.bot.setChannelPermissions(channel.cid, this.data.permissions || []);
+        await this.bot.setChannelPermissions(channel.cid, [...globalPerms, ...localPerms]);
     }
     
     /**
@@ -133,8 +134,7 @@ export class CreateUserChannelAction implements ActionInterface<CreateUserChanne
      */
     private setUserChannelAdminGroup(channels: TeamSpeakChannel[])
     {
-        const owner = this.data.owner,
-            group = this.data.group;
+        const { owner, group } = this.data;
 
         if(!owner || !group) {
             return;

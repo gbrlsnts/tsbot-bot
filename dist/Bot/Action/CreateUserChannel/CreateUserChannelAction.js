@@ -82,15 +82,16 @@ class CreateUserChannelAction {
      * @param permissions The permissions list to apply
      */
     async applyPermissions(channel, permissions) {
-        // todo merge global with channel specific
-        await this.bot.setChannelPermissions(channel.cid, this.data.permissions || []);
+        const globalPerms = this.data.permissions || [];
+        const localPerms = permissions || [];
+        await this.bot.setChannelPermissions(channel.cid, [...globalPerms, ...localPerms]);
     }
     /**
      * Sets channel admin group for a user for the given channels
      * @param channels Channels to apply the group
      */
     setUserChannelAdminGroup(channels) {
-        const owner = this.data.owner, group = this.data.group;
+        const { owner, group } = this.data;
         if (!owner || !group) {
             return;
         }
