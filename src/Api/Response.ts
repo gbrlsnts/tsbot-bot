@@ -38,12 +38,12 @@ export class Response {
 
     /**
      * Set the error for the response
-     * @param short Short name
-     * @param description Error description
+     * @param title Title
+     * @param detail Error description
      */
-    error(short: string, description: string): this
+    error(title: string, detail: string): this
     {
-        this.errors.push({ short, description });
+        this.errors.push({ title, detail });
         this.isError = true;
 
         return this;
@@ -53,9 +53,12 @@ export class Response {
      * Add multiple errors to a response
      * @param errors Errors to add
      */
-    addErrors(errors: ApiError[])
+    addErrors(errors: ApiError[]): this
     {
         this.errors.push(...errors);
+        this.isError = true;
+
+        return this;
     }
 
     /**
@@ -116,7 +119,16 @@ export interface ApiResponse {
 
 export interface ApiError {
     /** Error short name */
-    short: string,
+    title: string,
     /** Error description */
-    description: string
+    detail: string,
+    /** Points to the error source in the object */
+    source?: ApiSourceError,
+}
+
+export interface ApiSourceError {
+    /** path to the json field */
+    pointer: string;
+    /** Which URI parameter caused the error */
+    parameter?: string;
 }

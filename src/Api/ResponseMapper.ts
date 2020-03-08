@@ -1,7 +1,9 @@
+import { ValidationError } from "@hapi/joi";
 import { Response as ExpressResponse } from "express";
 import { Either } from "../Lib/Either";
 import { Failure } from "../Lib/Failure";
 import { Response } from "./Response";
+import { Context } from "../Bot/Context";
 
 export class ResponseMapper {
     constructor(private response: ExpressResponse)
@@ -32,13 +34,34 @@ export class ResponseMapper {
      */
     fromException(exception: any): Response
     {
-        const res = this.getResponseObject().status(500);
-
-        if(exception instanceof Error) {
-            return res.error(exception.name, exception.message);
+        if(!(exception instanceof Error)) {
+            return this.getResponseObject()
+                .status(500)
+                .error('Unknown error', 'Unknown error');            
         }
 
-        return res.error('Unknown error', 'Unknown error');
+        if(this.isValidationException(exception)) {
+            return new Response(this.response)
+                .status(422)
+                .addErrors(exception.details.map(error => {
+                    return {
+                        title: 'Field failed validation: ' + error.type,
+                        detail: error.message,
+                        source: {
+                            pointer: error.context?.label || '',
+                        }
+                    };
+                }));
+        }
+
+        return this.getResponseObject()
+            .status(500)
+            .error(exception.name, exception.message);
+    }
+
+    private isValidationException(exception: Error): exception is ValidationError
+    {
+        return 'isJoi' in exception;
     }
 
     private getResponseObject(): Response

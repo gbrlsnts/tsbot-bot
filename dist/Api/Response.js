@@ -28,11 +28,11 @@ class Response {
     }
     /**
      * Set the error for the response
-     * @param short Short name
-     * @param description Error description
+     * @param title Title
+     * @param detail Error description
      */
-    error(short, description) {
-        this.errors.push({ short, description });
+    error(title, detail) {
+        this.errors.push({ title, detail });
         this.isError = true;
         return this;
     }
@@ -42,6 +42,8 @@ class Response {
      */
     addErrors(errors) {
         this.errors.push(...errors);
+        this.isError = true;
+        return this;
     }
     /**
      * Send the response
