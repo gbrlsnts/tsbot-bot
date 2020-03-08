@@ -1,8 +1,14 @@
+import { TeamSpeakChannel } from "ts3-nodejs-library";
 import { BotCodec, ChannelPermission } from "../../Types";
 
-export interface CreateUserChannelData
+export interface ZoneChannel
 {
+    /** The zone where channel is/will be located */
     zone: Zone;
+}
+
+export interface CreateChannelData extends ZoneChannel
+{
     /** The channels configuration which will be created for the user */
     channels: UserChannelConfiguration[];
     /** Channels' owner database Id */
@@ -13,6 +19,23 @@ export interface CreateUserChannelData
     permissions?: ChannelPermission[];
     /** Properties to apply to all channels created by the action */
     properties?: ChannelProperties;
+}
+
+export interface CreateUserChannelData extends CreateChannelData
+{
+
+}
+
+export interface CreateSubChannelData extends CreateChannelData
+{
+    /** Parent to create sub channel */
+    channelId: number;
+}
+
+export interface DeleteChannelData extends ZoneChannel
+{
+    /** Channel to delete */
+    channelId: number;
 }
 
 export interface UserChannelConfiguration
@@ -53,9 +76,34 @@ export interface Zone
     separators: boolean;
 }
 
-export interface CreateUserChannelResultData {
+export interface CreateUserChannelResultData
+{
     /** Id of the newly created top channel */
     channel: number;
     /** Ids of channel's subchannels */
     subchannels: number[];
+}
+
+export interface CreateUserSubChannelResultData
+{
+    /** The created channels id */
+    channels: number[];
+}
+
+export interface CreateChannelParameters
+{
+    /** Channel configuration */
+    config: UserChannelConfiguration;
+    /** Parent channel */
+    parent?: number;
+    /** Create new channel after this channel */
+    after?: number;
+}
+
+export interface CreateChannelRecursiveResult
+{
+    /** The created parent channel */
+    channel: TeamSpeakChannel;
+    /** The created subchannels */
+    subChannels: TeamSpeakChannel[];
 }

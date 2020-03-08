@@ -18,6 +18,9 @@ class Bot {
     getBotEvents() {
         return this.botEvents;
     }
+    async getChannelById(channelId) {
+        return this.server.getChannelByID(channelId);
+    }
     async sendServerMessage(message) {
         try {
             await this.server.sendTextMessage(0, ts3_nodejs_library_1.TextMessageTargetMode.SERVER, message);

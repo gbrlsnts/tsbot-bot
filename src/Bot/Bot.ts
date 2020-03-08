@@ -27,6 +27,11 @@ export class Bot
         return this.botEvents;
     }
 
+    async getChannelById(channelId: number)
+    {
+        return this.server.getChannelByID(channelId);
+    }
+
     async sendServerMessage(message: string)
     {
         try {

@@ -1,6 +1,5 @@
 import express from "express";
 import * as bodyParser from "body-parser";
-import { CreateUserChannelAction } from "../Bot/Action/CreateUserChannel/CreateUserChannelAction";
 import { Bot } from "../Bot/Bot";
 import { ServerGroup } from "./Routes/ServerGroup";
 

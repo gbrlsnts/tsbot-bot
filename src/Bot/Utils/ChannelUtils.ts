@@ -72,6 +72,24 @@ export class ChannelUtils
     }
 
     /**
+     * Find the root/top channel of a given subchannel
+     * @param channel The subchannel
+     * @param channelList The server channellist
+     */
+    static getRootChannelBySubChannel(channel: TeamSpeakChannel, channelList: TeamSpeakChannel[]): TeamSpeakChannel
+    {
+        if(channel.pid === 0)
+            return channel;
+
+        const parent = channelList.find(c => c.cid === channel.pid);
+
+        if(!parent)
+            throw new Error('Unable to find parent in channel list');
+
+        return this.getRootChannelBySubChannel(parent, channelList);
+    }
+
+    /**
      * Counts the total clients for a given channel and subchannels
      * @param channel Channel to count clients
      * @param channelList List with all server channels
@@ -83,6 +101,15 @@ export class ChannelUtils
                     .reduce((accumulator, current) => accumulator + current);
 
         return channel.totalClients + subTotalClients;
+    }
+
+    /**
+     * Check is a root/top channel
+     * @param ChannelId The channel name to check
+     */
+    static isRootChannel(channel: TeamSpeakChannel): boolean
+    {
+        return channel.pid === 0;
     }
 
     /**

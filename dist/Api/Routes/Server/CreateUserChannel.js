@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const CreateUserChannelAction_1 = require("../../../Bot/Action/CreateUserChannel/CreateUserChannelAction");
+const CreateUserChannelAction_1 = require("../../../Bot/Action/UserChannel/CreateUserChannel/CreateUserChannelAction");
 const ApiRoute_1 = require("../../ApiRoute");
 class CreateUserChannel extends ApiRoute_1.ApiRoute {
     constructor(app, bot) {
