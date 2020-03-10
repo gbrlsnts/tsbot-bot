@@ -2,7 +2,7 @@ import express from "express";
 import * as bodyParser from "body-parser";
 import { Bot } from "../Bot/Bot";
 import { ServerGroup } from "./Routes/Bot/Server/ServerGroup";
-import { BotGroup } from "./Routes/BotGroup";
+import { BotGroup } from "./Routes/Bot/BotGroup";
 
 export class Api
 {

@@ -12,7 +12,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const bodyParser = __importStar(require("body-parser"));
-const BotGroup_1 = require("./Routes/BotGroup");
+const BotGroup_1 = require("./Routes/Bot/BotGroup");
 class Api {
     constructor(bot) {
         this.bot = bot;
