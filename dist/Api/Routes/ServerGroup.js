@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const CreateUserChannel_1 = require("./Server/CreateUserChannel");
-const CreateUserSubChannel_1 = require("./Server/CreateUserSubChannel");
-const DeleteUserChannel_1 = require("./Server/DeleteUserChannel");
+const CreateUserChannel_1 = require("./Server/UserChannel/CreateUserChannel");
+const CreateUserSubChannel_1 = require("./Server/UserChannel/CreateUserSubChannel");
+const DeleteUserChannel_1 = require("./Server/UserChannel/DeleteUserChannel");
 class ServerGroup {
     constructor(app, bot) {
         this.app = app;

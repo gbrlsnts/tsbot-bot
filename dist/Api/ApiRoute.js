@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const ResponseMapper_1 = require("./ResponseMapper");
-class ApiRoute {
+const PrefixedRoute_1 = require("./PrefixedRoute");
+class ApiRoute extends PrefixedRoute_1.PrefixedRoute {
     /**
      * Map a request result to a response
      * @param result The result to map

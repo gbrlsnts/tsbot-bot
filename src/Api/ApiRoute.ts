@@ -3,8 +3,9 @@ import { Response } from "./Response";
 import { Either } from "../Lib/Either";
 import { Failure } from "../Lib/Failure";
 import { ResponseMapper } from "./ResponseMapper";
+import { PrefixedRoute } from "./PrefixedRoute";
 
-export abstract class ApiRoute {
+export abstract class ApiRoute extends PrefixedRoute {
 
     /**
      * Map a request result to a response
