@@ -1,11 +1,17 @@
 import { Failure } from "../Lib/Failure";
 
 export enum BotError {
+    GenericBotError = "GenericBotError",
     InvalidConfiguration = "InvalidConfiguration",
     InvalidZone = "InvalidZone",
     InvalidChannel = "InvalidChannel",
     InvalidChannelZone = "InvalidChannelZone",
 }
+
+export const genericBotError = (): Failure<BotError.GenericBotError> => ({
+    type: BotError.GenericBotError,
+    reason: 'An unexpected error has ocurred',
+});
 
 export const invalidZoneError = (): Failure<BotError.InvalidZone> => ({
     type: BotError.InvalidZone,

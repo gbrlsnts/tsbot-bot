@@ -5,6 +5,8 @@ import { CreateUserChannel } from "./UserChannel/CreateUserChannel";
 import { CreateUserSubChannel } from "./UserChannel/CreateUserSubChannel";
 import { DeleteUserChannel } from "./UserChannel/DeleteUserChannel";
 import { PrefixedRoute } from "../../../PrefixedRoute";
+import GetClientList from "./Getters/GetClientList";
+import VerifyUser from "./VerifyUser/VerifyUser";
 
 export class ServerGroup extends PrefixedRoute implements Route
 {
@@ -16,9 +18,15 @@ export class ServerGroup extends PrefixedRoute implements Route
 
     register(): this
     {
-        new CreateUserChannel(this.app, this.bot).setPrefix(this.prefix).register();
-        new CreateUserSubChannel(this.app, this.bot).setPrefix(this.prefix).register();
-        new DeleteUserChannel(this.app, this.bot).setPrefix(this.prefix).register();
+        const routes: Route[] = [
+            new CreateUserChannel(this.app, this.bot),
+            new CreateUserSubChannel(this.app, this.bot),
+            new DeleteUserChannel(this.app, this.bot),
+            new GetClientList(this.app, this.bot),
+            new VerifyUser(this.app, this.bot),
+        ];
+
+        routes.forEach(route => route.setPrefix(this.prefix).register());
 
         return this;
     }

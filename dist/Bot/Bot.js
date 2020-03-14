@@ -22,12 +22,13 @@ class Bot {
         return this.server.getChannelByID(channelId);
     }
     async sendServerMessage(message) {
-        try {
-            await this.server.sendTextMessage(0, ts3_nodejs_library_1.TextMessageTargetMode.SERVER, message);
-        }
-        catch (error) {
-            console.log('Got error', error);
-        }
+        return this.server.sendTextMessage(0, ts3_nodejs_library_1.TextMessageTargetMode.SERVER, message);
+    }
+    async sendChannelMessage(channelId, message) {
+        return this.server.sendTextMessage(channelId, ts3_nodejs_library_1.TextMessageTargetMode.CHANNEL, message);
+    }
+    async sendClientMessage(clientId, message) {
+        return this.server.sendTextMessage(clientId, ts3_nodejs_library_1.TextMessageTargetMode.CLIENT, message);
     }
     async createChannel({ name, password, parent, afterChannel, codec, codec_quality }) {
         let serverCodec;

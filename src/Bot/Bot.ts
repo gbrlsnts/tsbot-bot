@@ -34,15 +34,29 @@ export class Bot
 
     async sendServerMessage(message: string)
     {
-        try {
-            await this.server.sendTextMessage(
+        return this.server.sendTextMessage(
                 0,
                 TextMessageTargetMode.SERVER,
                 message
             );
-        } catch(error) {
-            console.log('Got error', error);
-        }
+    }
+
+    async sendChannelMessage(channelId: number, message: string)
+    {
+        return this.server.sendTextMessage(
+                channelId,
+                TextMessageTargetMode.CHANNEL,
+                message
+            );
+    }
+
+    async sendClientMessage(clientId: number, message: string)
+    {
+        return this.server.sendTextMessage(
+                clientId,
+                TextMessageTargetMode.CLIENT,
+                message
+            );
     }
 
     async createChannel({ name, password, parent, afterChannel, codec, codec_quality }: CreateChannelProperties)

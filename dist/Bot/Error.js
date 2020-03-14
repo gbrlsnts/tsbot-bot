@@ -2,11 +2,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var BotError;
 (function (BotError) {
+    BotError["GenericBotError"] = "GenericBotError";
     BotError["InvalidConfiguration"] = "InvalidConfiguration";
     BotError["InvalidZone"] = "InvalidZone";
     BotError["InvalidChannel"] = "InvalidChannel";
     BotError["InvalidChannelZone"] = "InvalidChannelZone";
 })(BotError = exports.BotError || (exports.BotError = {}));
+exports.genericBotError = () => ({
+    type: BotError.GenericBotError,
+    reason: 'An unexpected error has ocurred',
+});
 exports.invalidZoneError = () => ({
     type: BotError.InvalidZone,
     reason: 'The start or end channels doesn\'t exist',

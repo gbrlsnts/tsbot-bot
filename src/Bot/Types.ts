@@ -10,6 +10,12 @@ export enum BotCodec
     music = "music", // opus music = 5
 }
 
+export enum ClientType
+{
+    normal = "normal",
+    query = "query",
+}
+
 export interface ChannelPermission
 {
     /** The permission id */
