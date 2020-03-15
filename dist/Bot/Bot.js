@@ -1,8 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const ts3_nodejs_library_1 = require("ts3-nodejs-library");
 const BotEvent_1 = require("./Event/BotEvent");
 const Types_1 = require("./Types");
+const File_1 = __importDefault(require("../Lib/File"));
 class Bot {
     constructor(server, context) {
         this.server = server;
@@ -82,6 +86,13 @@ class Bot {
                 permvalue: perm.value,
             };
         }));
+    }
+    async uploadIcon(data) {
+        const iconId = File_1.default.calculateNumberChecksum(data);
+        return this.server.uploadFile(`/icon_${iconId}`, data);
+    }
+    async deleteIcon(iconId) {
+        return this.server.ftDeleteFile(0, `/icon_${iconId}`, '');
     }
 }
 exports.Bot = Bot;

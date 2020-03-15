@@ -2,6 +2,7 @@ import { TeamSpeak, TextMessageTargetMode, Codec } from "ts3-nodejs-library";
 import { Context } from "./Context";
 import { BotEvent } from "./Event/BotEvent";
 import { ChannelPermission, BotCodec } from "./Types";
+import File from "../Lib/File";
 
 export class Bot
 {
@@ -130,6 +131,18 @@ export class Bot
                 permvalue: perm.value,
             }
         }));
+    }
+
+    async uploadIcon(data: Buffer)
+    {
+        const iconId = File.calculateNumberChecksum(data);
+
+        return this.server.uploadFile(`/icon_${iconId}`, data);
+    }
+
+    async deleteIcon(iconId: number)
+    {
+        return this.server.ftDeleteFile(0, `/icon_${iconId}`, '');
     }
 }
 

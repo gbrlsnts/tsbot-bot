@@ -31,6 +31,7 @@
     "awilix": "^4.2.3",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
+    "farmhash": "^3.0.0",
     "randomstring": "^1.1.5",
     "ts3-nodejs-library": "^2.3.3"
   },
