@@ -91,6 +91,9 @@ export class Crawler
         this.isRunning = true;
 
         try {
+            if(!this.bot.isConnected)
+                throw new Error('Bot not connected to server');
+
             const channelList = await this.bot.getServer().channelList();
             const crawlResults: ZoneCrawlResult[] = [];
 

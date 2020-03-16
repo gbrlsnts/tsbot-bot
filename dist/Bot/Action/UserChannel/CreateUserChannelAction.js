@@ -15,6 +15,8 @@ class CreateUserChannelAction extends CreateChannelAction_1.CreateChannelAction 
      * Execute the action
      */
     async execute() {
+        if (!this.bot.isConnected)
+            return Either_1.left(Error_1.notConnectedError());
         const zoneChannels = await this.getUserChannelZone(await this.getChannelList());
         // zone is invalid
         if (zoneChannels.isLeft()) {

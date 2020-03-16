@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Library_1 = require("../../../Lib/Library");
+const Error_1 = require("../../Error");
 const ChannelAction_1 = require("./ChannelAction");
 const ChannelUtils_1 = require("../../Utils/ChannelUtils");
 class DeleteUserChannelAction extends ChannelAction_1.ChannelAction {
@@ -13,6 +14,8 @@ class DeleteUserChannelAction extends ChannelAction_1.ChannelAction {
      * Delete the channel
      */
     async execute() {
+        if (!this.bot.isConnected)
+            return Library_1.left(Error_1.notConnectedError());
         const failure = await this.validateChannel(this.data.channelId);
         if (failure)
             return Library_1.left(failure);

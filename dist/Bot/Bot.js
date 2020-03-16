@@ -13,6 +13,7 @@ class Bot {
         this.server = server;
         this.self = self;
         this.name = name;
+        this._isConnected = true;
         this.botEvents = new BotEvent_1.BotEvent();
         this.setupConnectionLostHandler(-1, 1000);
     }
@@ -46,11 +47,19 @@ class Bot {
     setupConnectionLostHandler(attempts, waitMs) {
         this.server.on('close', async () => {
             console.warn(`Disconnected from ${this.name}. Retrying...`);
+            this._isConnected = false;
             this.server.reconnect(attempts, waitMs)
                 .then(() => this.self.issueRefresh())
+                .then(() => this._isConnected = true)
                 .then(() => console.log(`Reconnected to ${this.name}!`))
                 .catch((e) => console.error('Error while reconnecting', e));
         });
+    }
+    /**
+     * Get the bot connection status
+     */
+    get isConnected() {
+        return this._isConnected;
     }
     async getChannelById(channelId) {
         return this.server.getChannelByID(channelId);

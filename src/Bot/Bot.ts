@@ -6,6 +6,7 @@ import File from "../Lib/File";
 
 export class Bot
 {
+    private _isConnected = true;
     private readonly botEvents: BotEvent;
 
     constructor(private readonly server: TeamSpeak, readonly self: SelfInfo, readonly name: string)
@@ -53,12 +54,22 @@ export class Bot
     {
         this.server.on('close', async () => {
             console.warn(`Disconnected from ${this.name}. Retrying...`);
+            this._isConnected = false;
 
             this.server.reconnect(attempts, waitMs)
                 .then(() => this.self.issueRefresh())
+                .then(() => this._isConnected = true)
                 .then(() => console.log(`Reconnected to ${this.name}!`))
                 .catch((e) => console.error('Error while reconnecting', e));
         });
+    }
+
+    /**
+     * Get the bot connection status
+     */
+    get isConnected(): boolean
+    {
+        return this._isConnected;
     }
 
     async getChannelById(channelId: number)

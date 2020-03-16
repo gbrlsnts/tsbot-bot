@@ -1,6 +1,6 @@
 import { TeamSpeakChannel } from "ts3-nodejs-library";
 import { ActionInterface } from "../Action";
-import { BotError } from "../../Error";
+import { BotError, notConnectedError } from "../../Error";
 import { Either, Failure, right, left } from "../../../Lib/Library";
 import { CreateUserSubChannelResultData, CreateSubChannelData, CreateChannelData } from "./UserChannelTypes";
 import { Bot } from "../../Bot";
@@ -18,6 +18,9 @@ export class CreateUserSubChannelAction extends CreateChannelAction implements A
      */
     async execute(): Promise<Either<Failure<BotError>, CreateUserSubChannelResultData>>
     {
+        if(!this.bot.isConnected)
+            return left(notConnectedError());
+
         const failure = await this.validateChannel(this.data.channelId);
 
         if(failure)

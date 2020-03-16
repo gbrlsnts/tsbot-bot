@@ -4,7 +4,7 @@ import { ActionInterface } from "../Action";
 import { Bot } from "../../Bot";
 import { Either, right, left } from "../../../Lib/Either";
 import { Failure } from "../../../Lib/Failure";
-import { BotError, invalidZoneError } from "../../Error";
+import { BotError, invalidZoneError, notConnectedError } from "../../Error";
 import { CreateUserChannelData, CreateUserChannelResultData, CreateChannelData } from "./UserChannelTypes";
 import { CreateChannelAction } from "./CreateChannelAction";
 
@@ -21,7 +21,11 @@ export class CreateUserChannelAction extends CreateChannelAction implements Acti
     /**
      * Execute the action
      */
-    async execute(): Promise<Either<Failure<BotError>, CreateUserChannelResultData>> {
+    async execute(): Promise<Either<Failure<BotError>, CreateUserChannelResultData>>
+    {
+        if(!this.bot.isConnected)
+            return left(notConnectedError());
+
         const zoneChannels = await this.getUserChannelZone(await this.getChannelList());
 
         // zone is invalid

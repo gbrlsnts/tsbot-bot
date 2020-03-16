@@ -1,6 +1,6 @@
 import { ActionInterface } from "../Action";
-import { Either, Failure, right } from "../../../Lib/Library";
-import { BotError } from "../../Error";
+import { Either, Failure, right, left } from "../../../Lib/Library";
+import { BotError, notConnectedError } from "../../Error";
 import { Bot } from "../../Bot";
 import { IconDeleteData } from "./IconActionTypes";
 
@@ -14,7 +14,11 @@ export default class IconDeleteAction implements ActionInterface<boolean>
     /**
      * Execute the action
      */
-    async execute(): Promise<Either<Failure<BotError>, boolean>> {
+    async execute(): Promise<Either<Failure<BotError>, boolean>>
+    {
+        if(!this.bot.isConnected)
+            return left(notConnectedError());
+
         await this.bot.deleteIcon(this.data.iconId);
 
         return right(true);

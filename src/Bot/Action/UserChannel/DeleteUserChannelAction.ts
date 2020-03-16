@@ -1,7 +1,7 @@
 import { TeamSpeakChannel } from "ts3-nodejs-library";
 import { ActionInterface } from "../Action";
 import { Either, Failure, right, left } from "../../../Lib/Library";
-import { BotError } from "../../Error";
+import { BotError, notConnectedError } from "../../Error";
 import { Bot } from "../../Bot";
 import { DeleteChannelData, ZoneChannel } from "./UserChannelTypes";
 import { ChannelAction } from "./ChannelAction";
@@ -21,6 +21,9 @@ export class DeleteUserChannelAction extends ChannelAction implements ActionInte
      */
     async execute(): Promise<Either<Failure<BotError>, boolean>>
     {
+        if(!this.bot.isConnected)
+            return left(notConnectedError());
+
         const failure = await this.validateChannel(this.data.channelId);
 
         if(failure)

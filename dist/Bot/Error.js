@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var BotError;
 (function (BotError) {
     BotError["GenericBotError"] = "GenericBotError";
+    BotError["NotConnected"] = "NotConnected";
     BotError["InvalidConfiguration"] = "InvalidConfiguration";
     BotError["InvalidZone"] = "InvalidZone";
     BotError["InvalidChannel"] = "InvalidChannel";
@@ -13,6 +14,10 @@ var BotError;
 exports.genericBotError = () => ({
     type: BotError.GenericBotError,
     reason: 'An unexpected error has ocurred',
+});
+exports.notConnectedError = () => ({
+    type: BotError.NotConnected,
+    reason: 'The bot has lost server connection',
 });
 exports.invalidZoneError = () => ({
     type: BotError.InvalidZone,

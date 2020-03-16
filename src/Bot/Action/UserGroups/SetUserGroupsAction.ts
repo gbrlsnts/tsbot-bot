@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { ActionInterface } from "../Action";
 import { Either, Failure, left, right } from "../../../Lib/Library";
-import { BotError, invalidServerGroupError, invalidClientError } from "../../Error";
+import { BotError, invalidServerGroupError, invalidClientError, notConnectedError } from "../../Error";
 import { Bot } from "../../Bot";
 import { SetUserGroupsData } from "./SetUserGroupsTypes";
 import { Factory } from "./Repository/Factory";
@@ -19,7 +19,11 @@ export default class SetUserGroupsAction implements ActionInterface<boolean>
     /**
      * Execute the action
      */
-    async execute(): Promise<Either<Failure<BotError>, boolean>> {
+    async execute(): Promise<Either<Failure<BotError>, boolean>>
+    {
+        if(!this.bot.isConnected)
+            return left(notConnectedError());
+
         const allowedGroups = await this.repository.getUserGroups();
 
         if(!this.validateGroups(allowedGroups))

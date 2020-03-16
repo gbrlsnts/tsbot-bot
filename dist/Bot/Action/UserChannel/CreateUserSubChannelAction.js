@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const Error_1 = require("../../Error");
 const Library_1 = require("../../../Lib/Library");
 const CreateChannelAction_1 = require("./CreateChannelAction");
 class CreateUserSubChannelAction extends CreateChannelAction_1.CreateChannelAction {
@@ -12,6 +13,8 @@ class CreateUserSubChannelAction extends CreateChannelAction_1.CreateChannelActi
      * Create the user sub channel
      */
     async execute() {
+        if (!this.bot.isConnected)
+            return Library_1.left(Error_1.notConnectedError());
         const failure = await this.validateChannel(this.data.channelId);
         if (failure)
             return Library_1.left(failure);

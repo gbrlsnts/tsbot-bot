@@ -11,6 +11,8 @@ class VerifyUserAction {
      * Execute the action
      */
     async execute() {
+        if (!this.bot.isConnected)
+            return Either_1.left(Error_1.notConnectedError());
         try {
             await Promise.all(this.data.targets.map(target => this.bot.sendClientMessage(target.clientId, this.formatClientMessage(target.token))));
         }

@@ -17,6 +17,8 @@ class SetUserGroupsAction {
      * Execute the action
      */
     async execute() {
+        if (!this.bot.isConnected)
+            return Library_1.left(Error_1.notConnectedError());
         const allowedGroups = await this.repository.getUserGroups();
         if (!this.validateGroups(allowedGroups))
             return Library_1.left(Error_1.invalidServerGroupError());

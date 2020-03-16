@@ -2,6 +2,7 @@ import { Failure } from "../Lib/Failure";
 
 export enum BotError {
     GenericBotError = "GenericBotError",
+    NotConnected = "NotConnected",
     InvalidConfiguration = "InvalidConfiguration",
     InvalidZone = "InvalidZone",
     InvalidChannel = "InvalidChannel",
@@ -13,6 +14,11 @@ export enum BotError {
 export const genericBotError = (): Failure<BotError.GenericBotError> => ({
     type: BotError.GenericBotError,
     reason: 'An unexpected error has ocurred',
+});
+
+export const notConnectedError = (): Failure<BotError.NotConnected> => ({
+    type: BotError.NotConnected,
+    reason: 'The bot has lost server connection',
 });
 
 export const invalidZoneError = (): Failure<BotError.InvalidZone> => ({

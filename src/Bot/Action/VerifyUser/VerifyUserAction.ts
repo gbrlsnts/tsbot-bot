@@ -1,7 +1,7 @@
 import { ActionInterface } from "../Action";
 import { Either, right, left } from "../../../Lib/Either";
 import { Failure } from "../../../Lib/Failure";
-import { BotError, genericBotError } from "../../Error";
+import { BotError, genericBotError, notConnectedError } from "../../Error";
 import { Bot } from "../../Bot";
 import { VerifyUserData } from "./VerifyUserTypes";
 
@@ -15,7 +15,10 @@ export default class VerifyUserAction implements ActionInterface<boolean>
     /**
      * Execute the action
      */
-    async execute(): Promise<Either<Failure<BotError>, boolean>> {
+    async execute(): Promise<Either<Failure<BotError>, boolean>>
+    {
+        if(!this.bot.isConnected)
+            return left(notConnectedError());
 
         try {
             await Promise.all(
