@@ -25,6 +25,11 @@ class Factory {
             ...configuration.connection,
             protocol: configuration.connection.protocol === Types_1.ConnectionProtocol.RAW ? ts3_nodejs_library_1.QueryProtocol.RAW : ts3_nodejs_library_1.QueryProtocol.SSH,
         });
+        ts3server.on('close', async () => {
+            console.warn(`Disconnected from ${server}. Retrying...`);
+            await ts3server.reconnect(-1, 1000);
+            console.log(`Reconnected to ${server}!`);
+        });
         const whoami = await ts3server.whoami();
         const context = new Context_1.Context(whoami.client_database_id, whoami.client_id, whoami.client_unique_identifier, whoami.virtualserver_id, whoami.virtualserver_unique_identifier);
         const bot = new Bot_1.Bot(ts3server, context);

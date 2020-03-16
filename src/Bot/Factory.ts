@@ -23,6 +23,12 @@ export class Factory
             protocol: configuration.connection.protocol === ConnectionProtocol.RAW ? QueryProtocol.RAW : QueryProtocol.SSH,
         });
 
+        ts3server.on('close', async () => {
+            console.warn(`Disconnected from ${server}. Retrying...`);
+            await ts3server.reconnect(-1, 1000);
+            console.log(`Reconnected to ${server}!`);
+        });
+
         const whoami = await ts3server.whoami();
 
         const context = new Context(
