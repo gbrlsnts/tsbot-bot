@@ -1,7 +1,7 @@
+import { Express } from "express";
 import Joi from "@hapi/joi";
 import { Route } from "../../../../ApiTypes";
-import { Express } from "express";
-import { CreateUserChannelAction } from "../../../../../Bot/Action/UserChannel/CreateUserChannel/CreateUserChannelAction";
+import { CreateUserChannelAction } from "../../../../../Bot/Action/UserChannel/CreateUserChannelAction";
 import { Bot } from "../../../../../Bot/Bot";
 import { ApiRoute } from "../../../../ApiRoute";
 import { createChannel } from "./ValidationRules";

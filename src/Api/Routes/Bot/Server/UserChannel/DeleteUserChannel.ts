@@ -2,7 +2,7 @@ import { Route } from "../../../../ApiTypes";
 import { Express } from "express";
 import { Bot } from "../../../../../Bot/Bot";
 import { ApiRoute } from "../../../../ApiRoute";
-import { DeleteUserChannelAction } from "../../../../../Bot/Action/UserChannel/DeleteUserChannel/DeleteUserChannelAction";
+import { DeleteUserChannelAction } from "../../../../../Bot/Action/UserChannel/DeleteUserChannelAction";
 import Joi = require("@hapi/joi");
 import { deleteChannel } from "./ValidationRules";
 import Validator from "../../../../Validator";

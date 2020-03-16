@@ -1,9 +1,9 @@
-import { Route } from "../../../../ApiTypes";
 import { Express } from "express";
+import Joi = require("@hapi/joi");
+import { Route } from "../../../../ApiTypes";
 import { Bot } from "../../../../../Bot/Bot";
 import { ApiRoute } from "../../../../ApiRoute";
-import { CreateUserSubChannelAction } from "../../../../../Bot/Action/UserChannel/CreateUserSubChannel/CreateUserSubChannelAction";
-import Joi = require("@hapi/joi");
+import { CreateUserSubChannelAction } from "../../../../../Bot/Action/UserChannel/CreateUserSubChannelAction";
 import { createSubChannel } from "./ValidationRules";
 import Validator from "../../../../Validator";
 

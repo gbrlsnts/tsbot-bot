@@ -1,13 +1,12 @@
 import { generate } from "randomstring";
 import { TeamSpeakChannel } from "ts3-nodejs-library";
-import { ActionInterface } from "../../Action";
-import { Bot } from "../../../Bot";
-import { ChannelUtils, ZoneChannelsResult } from "../../../Utils/ChannelUtils";
-import { Either, right, left } from "../../../../Lib/Either";
-import { Failure } from "../../../../Lib/Failure";
-import { BotError, invalidZoneError } from "../../../Error";
-import { CreateUserChannelData, CreateUserChannelResultData, UserChannelConfiguration, ChannelProperties, CreateChannelData } from "../UserChannelTypes";
-import { CreateChannelAction } from "../CreateChannelAction";
+import { ActionInterface } from "../Action";
+import { Bot } from "../../Bot";
+import { Either, right, left } from "../../../Lib/Either";
+import { Failure } from "../../../Lib/Failure";
+import { BotError, invalidZoneError } from "../../Error";
+import { CreateUserChannelData, CreateUserChannelResultData, CreateChannelData } from "./UserChannelTypes";
+import { CreateChannelAction } from "./CreateChannelAction";
 
 export class CreateUserChannelAction extends CreateChannelAction implements ActionInterface<CreateUserChannelResultData>
 {

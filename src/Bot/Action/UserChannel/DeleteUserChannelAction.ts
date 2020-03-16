@@ -1,11 +1,11 @@
-import { ActionInterface } from "../../Action";
-import { Either, Failure, right, left } from "../../../../Lib/Library";
-import { BotError } from "../../../Error";
-import { Bot } from "../../../Bot";
-import { DeleteChannelData, ZoneChannel } from "../UserChannelTypes";
-import { ChannelAction } from "../ChannelAction";
 import { TeamSpeakChannel } from "ts3-nodejs-library";
-import { ChannelUtils } from "../../../Utils/ChannelUtils";
+import { ActionInterface } from "../Action";
+import { Either, Failure, right, left } from "../../../Lib/Library";
+import { BotError } from "../../Error";
+import { Bot } from "../../Bot";
+import { DeleteChannelData, ZoneChannel } from "./UserChannelTypes";
+import { ChannelAction } from "./ChannelAction";
+import { ChannelUtils } from "../../Utils/ChannelUtils";
 
 export class DeleteUserChannelAction extends ChannelAction implements ActionInterface<boolean>
 {

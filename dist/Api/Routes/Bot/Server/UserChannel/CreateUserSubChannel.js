@@ -3,9 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const ApiRoute_1 = require("../../../../ApiRoute");
-const CreateUserSubChannelAction_1 = require("../../../../../Bot/Action/UserChannel/CreateUserSubChannel/CreateUserSubChannelAction");
 const Joi = require("@hapi/joi");
+const ApiRoute_1 = require("../../../../ApiRoute");
+const CreateUserSubChannelAction_1 = require("../../../../../Bot/Action/UserChannel/CreateUserSubChannelAction");
 const ValidationRules_1 = require("./ValidationRules");
 const Validator_1 = __importDefault(require("../../../../Validator"));
 class CreateUserSubChannel extends ApiRoute_1.ApiRoute {
