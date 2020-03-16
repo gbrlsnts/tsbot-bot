@@ -6,6 +6,8 @@ export enum BotError {
     InvalidZone = "InvalidZone",
     InvalidChannel = "InvalidChannel",
     InvalidChannelZone = "InvalidChannelZone",
+    InvalidServerGroup = "InvalidServerGroup",
+    InvalidClient = "InvalidClient",
 }
 
 export const genericBotError = (): Failure<BotError.GenericBotError> => ({
@@ -31,4 +33,14 @@ export const invalidChannelError = (): Failure<BotError.InvalidChannel> => ({
 export const invalidChannelZoneError = (): Failure<BotError.InvalidChannelZone> => ({
     type: BotError.InvalidChannelZone,
     reason: 'The channel does not exist in the zone',
+});
+
+export const invalidServerGroupError = (): Failure<BotError.InvalidServerGroup> => ({
+    type: BotError.InvalidServerGroup,
+    reason: 'The provided server groups are invalid',
+});
+
+export const invalidClientError = (): Failure<BotError.InvalidClient> => ({
+    type: BotError.InvalidClient,
+    reason: 'The client does not exist',
 });

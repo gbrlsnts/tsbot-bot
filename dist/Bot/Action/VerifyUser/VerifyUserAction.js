@@ -7,6 +7,9 @@ class VerifyUserAction {
         this.bot = bot;
         this.data = data;
     }
+    /**
+     * Execute the action
+     */
     async execute() {
         try {
             await Promise.all(this.data.targets.map(target => this.bot.sendClientMessage(target.clientId, this.formatClientMessage(target.token))));
@@ -16,6 +19,10 @@ class VerifyUserAction {
         }
         return Either_1.right(true);
     }
+    /**
+     * Format the message to send to the client
+     * @param token Token to add to the message
+     */
     formatClientMessage(token) {
         return '\n[color=green][b]Verification Token[/b][/color]\n\n' +
             'Please use this token to get [b]verified[/b] in our website:\n---------\n' +

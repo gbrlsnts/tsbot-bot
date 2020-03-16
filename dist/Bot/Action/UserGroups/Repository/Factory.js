@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const path_1 = require("path");
 const LocalRepository_1 = require("./LocalRepository");
+const path_1 = require("path");
 class Factory {
     /**
      * Create the repository object

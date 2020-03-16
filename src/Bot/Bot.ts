@@ -33,6 +33,11 @@ export class Bot
         return this.server.getChannelByID(channelId);
     }
 
+    async getClientByDatabaseId(clientDatabaseId: number)
+    {
+        return this.server.getClientByDBID(clientDatabaseId);
+    }
+
     async sendServerMessage(message: string)
     {
         return this.server.sendTextMessage(
@@ -143,6 +148,22 @@ export class Bot
     async deleteIcon(iconId: number)
     {
         return this.server.ftDeleteFile(0, `/icon_${iconId}`, '');
+    }
+
+    async clientAddServerGroups(clientDatabaseId: number, groups: number[])
+    {
+        if(groups.length === 0)
+            return;
+
+        return this.server.clientAddServerGroup(clientDatabaseId, groups);
+    }
+
+    async clientRemoveServerGroups(clientDatabaseId: number, groups: number[])
+    {
+        if(groups.length === 0)
+            return;
+
+            return this.server.clientDelServerGroup(clientDatabaseId, groups);
     }
 }
 

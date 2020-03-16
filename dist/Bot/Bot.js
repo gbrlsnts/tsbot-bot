@@ -25,6 +25,9 @@ class Bot {
     async getChannelById(channelId) {
         return this.server.getChannelByID(channelId);
     }
+    async getClientByDatabaseId(clientDatabaseId) {
+        return this.server.getClientByDBID(clientDatabaseId);
+    }
     async sendServerMessage(message) {
         return this.server.sendTextMessage(0, ts3_nodejs_library_1.TextMessageTargetMode.SERVER, message);
     }
@@ -93,6 +96,16 @@ class Bot {
     }
     async deleteIcon(iconId) {
         return this.server.ftDeleteFile(0, `/icon_${iconId}`, '');
+    }
+    async clientAddServerGroups(clientDatabaseId, groups) {
+        if (groups.length === 0)
+            return;
+        return this.server.clientAddServerGroup(clientDatabaseId, groups);
+    }
+    async clientRemoveServerGroups(clientDatabaseId, groups) {
+        if (groups.length === 0)
+            return;
+        return this.server.clientDelServerGroup(clientDatabaseId, groups);
     }
 }
 exports.Bot = Bot;

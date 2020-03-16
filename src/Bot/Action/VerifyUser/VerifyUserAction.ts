@@ -12,6 +12,9 @@ export default class VerifyUserAction implements ActionInterface<boolean>
 
     }
 
+    /**
+     * Execute the action
+     */
     async execute(): Promise<Either<Failure<BotError>, boolean>> {
 
         try {
@@ -25,6 +28,10 @@ export default class VerifyUserAction implements ActionInterface<boolean>
         return right(true);
     }
 
+    /**
+     * Format the message to send to the client
+     * @param token Token to add to the message
+     */
     private formatClientMessage(token: string): string
     {
         return '\n[color=green][b]Verification Token[/b][/color]\n\n' +

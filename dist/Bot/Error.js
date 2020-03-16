@@ -7,6 +7,8 @@ var BotError;
     BotError["InvalidZone"] = "InvalidZone";
     BotError["InvalidChannel"] = "InvalidChannel";
     BotError["InvalidChannelZone"] = "InvalidChannelZone";
+    BotError["InvalidServerGroup"] = "InvalidServerGroup";
+    BotError["InvalidClient"] = "InvalidClient";
 })(BotError = exports.BotError || (exports.BotError = {}));
 exports.genericBotError = () => ({
     type: BotError.GenericBotError,
@@ -27,5 +29,13 @@ exports.invalidChannelError = () => ({
 exports.invalidChannelZoneError = () => ({
     type: BotError.InvalidChannelZone,
     reason: 'The channel does not exist in the zone',
+});
+exports.invalidServerGroupError = () => ({
+    type: BotError.InvalidServerGroup,
+    reason: 'The provided server groups are invalid',
+});
+exports.invalidClientError = () => ({
+    type: BotError.InvalidClient,
+    reason: 'The client does not exist',
 });
 //# sourceMappingURL=Error.js.map

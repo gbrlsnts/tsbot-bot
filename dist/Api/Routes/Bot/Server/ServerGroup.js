@@ -11,6 +11,7 @@ const GetClientList_1 = __importDefault(require("./Getters/GetClientList"));
 const VerifyUser_1 = __importDefault(require("./VerifyUser/VerifyUser"));
 const IconUpload_1 = __importDefault(require("./Icon/IconUpload"));
 const IconDelete_1 = __importDefault(require("./Icon/IconDelete"));
+const SetUserGroups_1 = __importDefault(require("./UserGroups/SetUserGroups"));
 class ServerGroup extends PrefixedRoute_1.PrefixedRoute {
     constructor(app, bot) {
         super();
@@ -29,6 +30,7 @@ class ServerGroup extends PrefixedRoute_1.PrefixedRoute {
             new VerifyUser_1.default(this.app, this.bot),
             new IconUpload_1.default(this.app, this.bot),
             new IconDelete_1.default(this.app, this.bot),
+            new SetUserGroups_1.default(this.app, this.bot),
         ];
         routes.forEach(route => route.setPrefix(this.prefix).register());
         return this;

@@ -9,6 +9,7 @@ import GetClientList from "./Getters/GetClientList";
 import VerifyUser from "./VerifyUser/VerifyUser";
 import IconUpload from "./Icon/IconUpload";
 import IconDelete from "./Icon/IconDelete";
+import SetUserGroups from "./UserGroups/SetUserGroups";
 
 export class ServerGroup extends PrefixedRoute implements Route
 {
@@ -31,6 +32,7 @@ export class ServerGroup extends PrefixedRoute implements Route
             new VerifyUser(this.app, this.bot),
             new IconUpload(this.app, this.bot),
             new IconDelete(this.app, this.bot),
+            new SetUserGroups(this.app, this.bot),
         ];
 
         routes.forEach(route => route.setPrefix(this.prefix).register());
