@@ -4,23 +4,53 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const ts3_nodejs_library_1 = require("ts3-nodejs-library");
+const SelfInfo_1 = __importDefault(require("./SelfInfo"));
 const BotEvent_1 = require("./Event/BotEvent");
 const Types_1 = require("./Types");
 const File_1 = __importDefault(require("../Lib/File"));
 class Bot {
-    constructor(server, context) {
+    constructor(server, self, name) {
         this.server = server;
-        this.context = context;
+        this.self = self;
+        this.name = name;
         this.botEvents = new BotEvent_1.BotEvent();
+        this.setupConnectionLostHandler(-1, 1000);
     }
+    /**
+     * Initialize the bot
+     * @param server The Teamspeak server instance
+     * @param name Configuration name
+     */
+    static async initialize(name, config) {
+        const ts3server = await ts3_nodejs_library_1.TeamSpeak.connect(config);
+        const self = await SelfInfo_1.default.initialize(ts3server);
+        return new Bot(ts3server, self, name);
+    }
+    /**
+     * Get the server instance
+     */
     getServer() {
         return this.server;
     }
-    getContext() {
-        return this.context;
-    }
+    /**
+     * Get the bot events
+     */
     getBotEvents() {
         return this.botEvents;
+    }
+    /**
+     * Setup the handler to reconnect after losing connection to the server
+     * @param attempts Attempts before exiting. -1 for infinite
+     * @param waitMs Time to wait between retries
+     */
+    setupConnectionLostHandler(attempts, waitMs) {
+        this.server.on('close', async () => {
+            console.warn(`Disconnected from ${this.name}. Retrying...`);
+            this.server.reconnect(attempts, waitMs)
+                .then(() => this.self.issueRefresh())
+                .then(() => console.log(`Reconnected to ${this.name}!`))
+                .catch((e) => console.error('Error while reconnecting', e));
+        });
     }
     async getChannelById(channelId) {
         return this.server.getChannelByID(channelId);

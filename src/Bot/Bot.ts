@@ -1,5 +1,5 @@
-import { TeamSpeak, TextMessageTargetMode, Codec } from "ts3-nodejs-library";
-import { Context } from "./Context";
+import { TeamSpeak, TextMessageTargetMode, Codec, ConnectionParams } from "ts3-nodejs-library";
+import SelfInfo from "./SelfInfo";
 import { BotEvent } from "./Event/BotEvent";
 import { ChannelPermission, BotCodec } from "./Types";
 import File from "../Lib/File";
@@ -8,24 +8,57 @@ export class Bot
 {
     private readonly botEvents: BotEvent;
 
-    constructor(private server: TeamSpeak, private context: Context)
+    constructor(private readonly server: TeamSpeak, readonly self: SelfInfo, readonly name: string)
     {
         this.botEvents = new BotEvent();
+
+        this.setupConnectionLostHandler(-1, 1000);
     }
 
+    /**
+     * Initialize the bot
+     * @param server The Teamspeak server instance
+     * @param name Configuration name
+     */
+    static async initialize(name: string, config: Partial<ConnectionParams>): Promise<Bot>
+    {
+        const ts3server = await TeamSpeak.connect(config);
+        const self = await SelfInfo.initialize(ts3server);
+
+        return new Bot(ts3server, self, name);
+    }
+
+    /**
+     * Get the server instance
+     */
     getServer(): TeamSpeak
     {
         return this.server;
     }
 
-    getContext(): Context
-    {
-        return this.context;
-    }
-
+    /**
+     * Get the bot events
+     */
     getBotEvents(): BotEvent
     {
         return this.botEvents;
+    }
+
+    /**
+     * Setup the handler to reconnect after losing connection to the server
+     * @param attempts Attempts before exiting. -1 for infinite
+     * @param waitMs Time to wait between retries
+     */
+    private setupConnectionLostHandler(attempts: number, waitMs: number)
+    {
+        this.server.on('close', async () => {
+            console.warn(`Disconnected from ${this.name}. Retrying...`);
+
+            this.server.reconnect(attempts, waitMs)
+                .then(() => this.self.issueRefresh())
+                .then(() => console.log(`Reconnected to ${this.name}!`))
+                .catch((e) => console.error('Error while reconnecting', e));
+        });
     }
 
     async getChannelById(channelId: number)

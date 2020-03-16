@@ -12,7 +12,6 @@ const ts3_nodejs_library_1 = require("ts3-nodejs-library");
 const Types_1 = require("./Types");
 const Bot_1 = require("./Bot");
 const MasterEventHandler_1 = require("./Event/MasterEventHandler");
-const Context_1 = require("./Context");
 const Factory_1 = require("./Configuration/Factory");
 const Crawler_1 = require("./Crawler/Crawler");
 class Factory {
@@ -21,18 +20,10 @@ class Factory {
             injectionMode: "CLASSIC"
         });
         const configuration = await new Factory_1.Factory().create().loadConfiguration(server);
-        const ts3server = await ts3_nodejs_library_1.TeamSpeak.connect({
+        const bot = await Bot_1.Bot.initialize(server, {
             ...configuration.connection,
             protocol: configuration.connection.protocol === Types_1.ConnectionProtocol.RAW ? ts3_nodejs_library_1.QueryProtocol.RAW : ts3_nodejs_library_1.QueryProtocol.SSH,
         });
-        ts3server.on('close', async () => {
-            console.warn(`Disconnected from ${server}. Retrying...`);
-            await ts3server.reconnect(-1, 1000);
-            console.log(`Reconnected to ${server}!`);
-        });
-        const whoami = await ts3server.whoami();
-        const context = new Context_1.Context(whoami.client_database_id, whoami.client_id, whoami.client_unique_identifier, whoami.virtualserver_id, whoami.virtualserver_unique_identifier);
-        const bot = new Bot_1.Bot(ts3server, context);
         // todo: improve container registrations
         container.register({
             config: awilix.asValue(configuration),

@@ -3,7 +3,6 @@ import { Response as ExpressResponse } from "express";
 import { Either } from "../Lib/Either";
 import { Failure } from "../Lib/Failure";
 import { Response } from "./Response";
-import { Context } from "../Bot/Context";
 
 export class ResponseMapper {
     constructor(private response: ExpressResponse)

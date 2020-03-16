@@ -23,3 +23,17 @@ export interface ChannelPermission
     /** The permission value */
     value: number;
 }
+
+export interface SelfInfoData
+{
+    /** self client Id */
+    clientId: number;
+    /** self database Id */
+    databaseId: number;
+    /** self unique Id */
+    clientUniqueId: string;
+    /** connected to this server Id */
+    serverId: number;
+    /** connected to this server unique Id */
+    uniqueServerId: string;
+}
