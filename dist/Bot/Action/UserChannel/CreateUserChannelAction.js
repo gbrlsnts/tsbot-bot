@@ -6,8 +6,7 @@ const Error_1 = require("../../Error");
 const CreateChannelAction_1 = require("./CreateChannelAction");
 class CreateUserChannelAction extends CreateChannelAction_1.CreateChannelAction {
     constructor(bot, data) {
-        super();
-        this.bot = bot;
+        super(bot);
         this.data = data;
         this.spacerFormat = '[*spacer%d]=';
     }
@@ -17,6 +16,9 @@ class CreateUserChannelAction extends CreateChannelAction_1.CreateChannelAction 
     async execute() {
         if (!this.bot.isConnected)
             return Either_1.left(Error_1.notConnectedError());
+        const failure = await this.validateAction();
+        if (failure)
+            return Either_1.left(failure);
         const zoneChannels = await this.getUserChannelZone(await this.getChannelList());
         // zone is invalid
         if (zoneChannels.isLeft()) {
@@ -66,21 +68,6 @@ class CreateUserChannelAction extends CreateChannelAction_1.CreateChannelAction 
             channel,
             subchannels,
         });
-    }
-    /**
-     * Get the channels in the server
-     */
-    async getChannelList() {
-        if (this.channelList)
-            return this.channelList;
-        this.channelList = await this.getBot().getServer().channelList();
-        return this.channelList;
-    }
-    /**
-     * Get the server bot instance
-     */
-    getBot() {
-        return this.bot;
     }
     /**
      * Get the action data

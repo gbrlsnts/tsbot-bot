@@ -7,6 +7,13 @@ import { TeamSpeakChannel } from "ts3-nodejs-library";
 
 export abstract class ChannelAction
 {
+    private channelList?: TeamSpeakChannel[];
+
+    constructor(protected readonly bot: Bot)
+    {
+
+    }
+
     /**
      * Get the channels in the zone to creat the user channel
      */
@@ -50,12 +57,15 @@ export abstract class ChannelAction
     /**
      * Get the channels in the server
      */
-    abstract getChannelList(): Promise<TeamSpeakChannel[]>;
+    async getChannelList(): Promise<TeamSpeakChannel[]>
+    {
+        if(this.channelList)
+            return this.channelList;
 
-    /**
-     * Get the server bot instance
-     */
-    abstract getBot(): Bot;
+        this.channelList = await this.bot.getServer().channelList();
+
+        return this.channelList;
+    }
 
     /**
      * Get the action data

@@ -1,7 +1,7 @@
 import { TeamSpeakChannel } from "ts3-nodejs-library";
 import { ActionInterface } from "../Action";
 import { Either, Failure, right, left } from "../../../Lib/Library";
-import { BotError, notConnectedError } from "../../Error";
+import { BotError, notConnectedError, invalidChannelError, onlyOneSubchannelError } from "../../Error";
 import { Bot } from "../../Bot";
 import { DeleteChannelData, ZoneChannel } from "./UserChannelTypes";
 import { ChannelAction } from "./ChannelAction";
@@ -9,11 +9,9 @@ import { ChannelUtils } from "../../Utils/ChannelUtils";
 
 export class DeleteUserChannelAction extends ChannelAction implements ActionInterface<boolean>
 {
-    private channelList?: TeamSpeakChannel[];
-
-    constructor(private readonly bot: Bot, private readonly data: DeleteChannelData)
+    constructor(bot: Bot, private readonly data: DeleteChannelData)
     {
-        super();
+        super(bot);
     }
 
     /**
@@ -74,16 +72,30 @@ export class DeleteUserChannelAction extends ChannelAction implements ActionInte
     }
 
     /**
-     * Get the channels in the server
+     * Run aditional validations to delete a channel
+     * @param channelId The channel to validate
      */
-    async getChannelList(): Promise<TeamSpeakChannel[]>
+    async validateChannel(channelId: number): Promise<Failure<BotError> | undefined>
     {
-        if(this.channelList)
-            return this.channelList;
+        const failure = await super.validateChannel(channelId);
+        
+        if(failure)
+            return failure;
 
-        this.channelList = await this.getBot().getServer().channelList();
+        const channelList = await this.getChannelList();
+        const channel = channelList.find(c => c.cid === channelId);
 
-        return this.channelList;
+        // Shouldn't happen has it has been validated by the parent method
+        if(!channel)
+            return invalidChannelError();
+
+        if(channel.pid !== 0) {
+            const root = ChannelUtils.getRootChannelBySubChannel(channel, channelList);
+
+            if(channel.pid === root.cid && ChannelUtils.getAllSubchannels(root, channelList).length === 1)
+                return onlyOneSubchannelError();
+        }
+
     }
 
     /**

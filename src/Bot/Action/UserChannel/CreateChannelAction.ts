@@ -2,6 +2,8 @@ import { TeamSpeakChannel } from "ts3-nodejs-library";
 import { CreateChannelParameters, CreateChannelRecursiveResult, ChannelProperties, CreateChannelData } from "./UserChannelTypes";
 import { ChannelPermission } from "../../Types";
 import { ChannelAction } from "./ChannelAction";
+import { BotError, channelNameExistsError } from "../../Error";
+import { Failure } from "../../../Lib/Library";
 
 export abstract class CreateChannelAction extends ChannelAction
 {
@@ -16,7 +18,7 @@ export abstract class CreateChannelAction extends ChannelAction
         const subChannels: TeamSpeakChannel[] = [];
         const props = this.getProperties(config.properties);
 
-        const channel = await this.getBot().createChannel({
+        const channel = await this.bot.createChannel({
             name: config.name,
             password: config.password,
             parent,
@@ -44,6 +46,29 @@ export abstract class CreateChannelAction extends ChannelAction
     }
 
     /**
+     * Validates the action data
+     * @param parentId Parent channel for the new channel
+     */
+    protected async validateAction(parentId = 0): Promise<Failure<BotError> | undefined>
+    {
+        const data = this.getData();
+        const existingNames: string[] = [];
+
+        const depthChannelList = (await this.getChannelList())
+            .filter(channel => channel.pid === parentId);
+
+        data.channels.forEach(channel => {
+            const index = depthChannelList.findIndex(c => c.name === channel.name);
+
+            if(index >= 0)
+            existingNames.push(channel.name);
+        });
+
+        if(existingNames.length > 0)
+            return channelNameExistsError(existingNames.join('; '));
+    }
+
+    /**
      * Applies a list of permissions to a channel. Merges with the permissions configured at the top level for all channels.
      * @param channel The channel to apply permissions
      * @param permissions The permissions list to apply
@@ -53,7 +78,7 @@ export abstract class CreateChannelAction extends ChannelAction
         const globalPerms = this.getData().permissions || [];
         const localPerms = permissions || [];
 
-        await this.getBot().setChannelPermissions(channel.cid, [...globalPerms, ...localPerms]);
+        await this.bot.setChannelPermissions(channel.cid, [...globalPerms, ...localPerms]);
     }
 
     /**
@@ -81,7 +106,7 @@ export abstract class CreateChannelAction extends ChannelAction
         }
 
         channels.forEach(channel => {
-            this.getBot().setChannelGroupToClient(owner, channel.cid, group)
+            this.bot.setChannelGroupToClient(owner, channel.cid, group)
                 .catch(e => console.warn('Warning! Could not set channel group of id ' + group));
         });
     }
@@ -92,7 +117,7 @@ export abstract class CreateChannelAction extends ChannelAction
     protected cleanUpCreatedChannels(channels: TeamSpeakChannel[])
     {
         try {
-            channels.forEach(c => this.getBot().deleteChannel(c.cid, true));
+            channels.forEach(c => this.bot.deleteChannel(c.cid, true));
         } catch (e) {
             console.error(`Error cleaning up channels: ${e.message}`);
         }

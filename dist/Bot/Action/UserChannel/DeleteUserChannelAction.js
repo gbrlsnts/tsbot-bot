@@ -6,8 +6,7 @@ const ChannelAction_1 = require("./ChannelAction");
 const ChannelUtils_1 = require("../../Utils/ChannelUtils");
 class DeleteUserChannelAction extends ChannelAction_1.ChannelAction {
     constructor(bot, data) {
-        super();
-        this.bot = bot;
+        super(bot);
         this.data = data;
     }
     /**
@@ -48,13 +47,23 @@ class DeleteUserChannelAction extends ChannelAction_1.ChannelAction {
         await this.bot.deleteChannel(result.value.channels[posInZone - 1].cid, true);
     }
     /**
-     * Get the channels in the server
+     * Run aditional validations to delete a channel
+     * @param channelId The channel to validate
      */
-    async getChannelList() {
-        if (this.channelList)
-            return this.channelList;
-        this.channelList = await this.getBot().getServer().channelList();
-        return this.channelList;
+    async validateChannel(channelId) {
+        const failure = await super.validateChannel(channelId);
+        if (failure)
+            return failure;
+        const channelList = await this.getChannelList();
+        const channel = channelList.find(c => c.cid === channelId);
+        // Shouldn't happen has it has been validated by the parent method
+        if (!channel)
+            return Error_1.invalidChannelError();
+        if (channel.pid !== 0) {
+            const root = ChannelUtils_1.ChannelUtils.getRootChannelBySubChannel(channel, channelList);
+            if (channel.pid === root.cid && ChannelUtils_1.ChannelUtils.getAllSubchannels(root, channelList).length === 1)
+                return Error_1.onlyOneSubchannelError();
+        }
     }
     /**
      * Get the server bot instance

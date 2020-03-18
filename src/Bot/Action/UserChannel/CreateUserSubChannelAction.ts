@@ -8,9 +8,9 @@ import { CreateChannelAction } from "./CreateChannelAction";
 
 export class CreateUserSubChannelAction extends CreateChannelAction implements ActionInterface<CreateUserSubChannelResultData>
 {
-    constructor(private readonly bot: Bot, private readonly data: CreateSubChannelData)
+    constructor(bot: Bot, private readonly data: CreateSubChannelData)
     {
-        super();
+        super(bot);
     }
 
     /**
@@ -21,7 +21,7 @@ export class CreateUserSubChannelAction extends CreateChannelAction implements A
         if(!this.bot.isConnected)
             return left(notConnectedError());
 
-        const failure = await this.validateChannel(this.data.channelId);
+        const failure = await this.validateAction(this.data.channelId) || await this.validateChannel(this.data.channelId);
 
         if(failure)
             return left(failure);
@@ -48,14 +48,6 @@ export class CreateUserSubChannelAction extends CreateChannelAction implements A
             
             return Promise.reject(new Error(`Error while creating channels: ${e.message}`));
         }
-    }
-
-    /**
-     * Get the channels in the server
-     */
-    async getChannelList(): Promise<TeamSpeakChannel[]>
-    {
-        return this.getBot().getServer().channelList();
     }
 
     /**

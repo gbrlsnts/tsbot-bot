@@ -3,6 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Error_1 = require("../../Error");
 const ChannelUtils_1 = require("../../Utils/ChannelUtils");
 class ChannelAction {
+    constructor(bot) {
+        this.bot = bot;
+    }
     /**
      * Get the channels in the zone to creat the user channel
      */
@@ -28,6 +31,15 @@ class ChannelAction {
         // channel doesnt exist in zone
         if (zoneIndex.value < 0)
             return Error_1.invalidChannelZoneError();
+    }
+    /**
+     * Get the channels in the server
+     */
+    async getChannelList() {
+        if (this.channelList)
+            return this.channelList;
+        this.channelList = await this.bot.getServer().channelList();
+        return this.channelList;
     }
 }
 exports.ChannelAction = ChannelAction;

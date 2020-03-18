@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const ChannelAction_1 = require("./ChannelAction");
+const Error_1 = require("../../Error");
 class CreateChannelAction extends ChannelAction_1.ChannelAction {
     constructor() {
         super(...arguments);
@@ -14,7 +15,7 @@ class CreateChannelAction extends ChannelAction_1.ChannelAction {
         var _a, _b;
         const subChannels = [];
         const props = this.getProperties(config.properties);
-        const channel = await this.getBot().createChannel({
+        const channel = await this.bot.createChannel({
             name: config.name,
             password: config.password,
             parent,
@@ -37,6 +38,23 @@ class CreateChannelAction extends ChannelAction_1.ChannelAction {
         };
     }
     /**
+     * Validates the action data
+     * @param parentId Parent channel for the new channel
+     */
+    async validateAction(parentId = 0) {
+        const data = this.getData();
+        const existingNames = [];
+        const depthChannelList = (await this.getChannelList())
+            .filter(channel => channel.pid === parentId);
+        data.channels.forEach(channel => {
+            const index = depthChannelList.findIndex(c => c.name === channel.name);
+            if (index >= 0)
+                existingNames.push(channel.name);
+        });
+        if (existingNames.length > 0)
+            return Error_1.channelNameExistsError(existingNames.join('; '));
+    }
+    /**
      * Applies a list of permissions to a channel. Merges with the permissions configured at the top level for all channels.
      * @param channel The channel to apply permissions
      * @param permissions The permissions list to apply
@@ -44,7 +62,7 @@ class CreateChannelAction extends ChannelAction_1.ChannelAction {
     async applyPermissions(channel, permissions) {
         const globalPerms = this.getData().permissions || [];
         const localPerms = permissions || [];
-        await this.getBot().setChannelPermissions(channel.cid, [...globalPerms, ...localPerms]);
+        await this.bot.setChannelPermissions(channel.cid, [...globalPerms, ...localPerms]);
     }
     /**
      * Get a list of properties to apply in a channel. Merges with the properties configured at the top level for all channels.
@@ -65,7 +83,7 @@ class CreateChannelAction extends ChannelAction_1.ChannelAction {
             return;
         }
         channels.forEach(channel => {
-            this.getBot().setChannelGroupToClient(owner, channel.cid, group)
+            this.bot.setChannelGroupToClient(owner, channel.cid, group)
                 .catch(e => console.warn('Warning! Could not set channel group of id ' + group));
         });
     }
@@ -74,7 +92,7 @@ class CreateChannelAction extends ChannelAction_1.ChannelAction {
      */
     cleanUpCreatedChannels(channels) {
         try {
-            channels.forEach(c => this.getBot().deleteChannel(c.cid, true));
+            channels.forEach(c => this.bot.deleteChannel(c.cid, true));
         }
         catch (e) {
             console.error(`Error cleaning up channels: ${e.message}`);

@@ -10,12 +10,11 @@ import { CreateChannelAction } from "./CreateChannelAction";
 
 export class CreateUserChannelAction extends CreateChannelAction implements ActionInterface<CreateUserChannelResultData>
 {
-    private channelList?: TeamSpeakChannel[];
     readonly spacerFormat: string = '[*spacer%d]=';
     
-    constructor(private bot: Bot, readonly data: CreateUserChannelData)
+    constructor(bot: Bot, readonly data: CreateUserChannelData)
     {
-        super();
+        super(bot);
     }
 
     /**
@@ -25,6 +24,11 @@ export class CreateUserChannelAction extends CreateChannelAction implements Acti
     {
         if(!this.bot.isConnected)
             return left(notConnectedError());
+
+        const failure = await this.validateAction();
+
+        if(failure)
+            return left(failure);
 
         const zoneChannels = await this.getUserChannelZone(await this.getChannelList());
 
@@ -92,26 +96,6 @@ export class CreateUserChannelAction extends CreateChannelAction implements Acti
             channel,
             subchannels,
         });
-    }
-
-    /**
-     * Get the channels in the server
-     */
-    async getChannelList(): Promise<TeamSpeakChannel[]>
-    {
-        if(this.channelList)
-            return this.channelList;
-
-        this.channelList = await this.getBot().getServer().channelList();
-
-        return this.channelList;
-    }
-
-    /**
-     * Get the server bot instance
-     */
-    getBot(): Bot {
-        return this.bot;
     }
 
     /**

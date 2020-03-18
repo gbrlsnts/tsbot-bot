@@ -3,12 +3,16 @@ import { Failure } from "../Lib/Failure";
 export enum BotError {
     GenericBotError = "GenericBotError",
     NotConnected = "NotConnected",
+
     InvalidConfiguration = "InvalidConfiguration",
     InvalidZone = "InvalidZone",
     InvalidChannel = "InvalidChannel",
     InvalidChannelZone = "InvalidChannelZone",
     InvalidServerGroup = "InvalidServerGroup",
     InvalidClient = "InvalidClient",
+
+    ChannelNameExists = "ChannelNameExists",
+    CannotDeleteOnlyOneSubchannel = "CannotDeleteOnlyOneSubchannel",
 }
 
 export const genericBotError = (): Failure<BotError.GenericBotError> => ({
@@ -49,4 +53,14 @@ export const invalidServerGroupError = (): Failure<BotError.InvalidServerGroup> 
 export const invalidClientError = (): Failure<BotError.InvalidClient> => ({
     type: BotError.InvalidClient,
     reason: 'The client does not exist',
+});
+
+export const channelNameExistsError = (name: string): Failure<BotError.ChannelNameExists> => ({
+    type: BotError.ChannelNameExists,
+    reason: `A channel with this name (${name}) already exists at the same depth`,
+});
+
+export const onlyOneSubchannelError = (): Failure<BotError.CannotDeleteOnlyOneSubchannel> => ({
+    type: BotError.CannotDeleteOnlyOneSubchannel,
+    reason: 'Can not delete channel since there is only one subchannel',
 });

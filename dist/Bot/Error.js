@@ -10,6 +10,8 @@ var BotError;
     BotError["InvalidChannelZone"] = "InvalidChannelZone";
     BotError["InvalidServerGroup"] = "InvalidServerGroup";
     BotError["InvalidClient"] = "InvalidClient";
+    BotError["ChannelNameExists"] = "ChannelNameExists";
+    BotError["CannotDeleteOnlyOneSubchannel"] = "CannotDeleteOnlyOneSubchannel";
 })(BotError = exports.BotError || (exports.BotError = {}));
 exports.genericBotError = () => ({
     type: BotError.GenericBotError,
@@ -42,5 +44,13 @@ exports.invalidServerGroupError = () => ({
 exports.invalidClientError = () => ({
     type: BotError.InvalidClient,
     reason: 'The client does not exist',
+});
+exports.channelNameExistsError = (name) => ({
+    type: BotError.ChannelNameExists,
+    reason: `A channel with this name (${name}) already exists at the same depth`,
+});
+exports.onlyOneSubchannelError = () => ({
+    type: BotError.CannotDeleteOnlyOneSubchannel,
+    reason: 'Can not delete channel since there is only one subchannel',
 });
 //# sourceMappingURL=Error.js.map

@@ -5,8 +5,7 @@ const Library_1 = require("../../../Lib/Library");
 const CreateChannelAction_1 = require("./CreateChannelAction");
 class CreateUserSubChannelAction extends CreateChannelAction_1.CreateChannelAction {
     constructor(bot, data) {
-        super();
-        this.bot = bot;
+        super(bot);
         this.data = data;
     }
     /**
@@ -15,7 +14,7 @@ class CreateUserSubChannelAction extends CreateChannelAction_1.CreateChannelActi
     async execute() {
         if (!this.bot.isConnected)
             return Library_1.left(Error_1.notConnectedError());
-        const failure = await this.validateChannel(this.data.channelId);
+        const failure = await this.validateAction(this.data.channelId) || await this.validateChannel(this.data.channelId);
         if (failure)
             return Library_1.left(failure);
         await this.createSubChannel();
@@ -37,12 +36,6 @@ class CreateUserSubChannelAction extends CreateChannelAction_1.CreateChannelActi
             this.cleanUpCreatedChannels(this.getCreatedChannels());
             return Promise.reject(new Error(`Error while creating channels: ${e.message}`));
         }
-    }
-    /**
-     * Get the channels in the server
-     */
-    async getChannelList() {
-        return this.getBot().getServer().channelList();
     }
     /**
      * Get the server bot instance
