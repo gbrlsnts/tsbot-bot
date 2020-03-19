@@ -5,8 +5,6 @@ const botFactory = new Factory();
 
 botFactory.create('testserver')
     .then(bot => {
-        bot.sendServerMessage('Hello all!');
-
         new Api(bot).boot();
     })
     .catch(error => {

@@ -1,10 +1,9 @@
+import { AwilixContainer } from "awilix";
 import { Bot } from "../Bot";
 import { BotEventName } from "./BotEvent";
 import { ChannelInactiveNotifyHandler } from "./Handler/ChannelInactiveNotifyHandler";
 import { ChannelInactiveDeleteHandler } from "./Handler/ChannelInactiveDeleteHandler";
 import { EventHandlerInterface } from "./EventHandlerInterface";
-import { AwilixContainer } from "awilix";
-import { Configuration } from "../Configuration/Configuration";
 import { ChannelNotInactiveHandler } from "./Handler/ChannelNotInactiveHandler";
 
 export class MasterEventHandler
@@ -28,10 +27,8 @@ export class MasterEventHandler
             server.registerEvent("textserver"),
             server.registerEvent("textchannel"),
             server.registerEvent("textprivate")
-          ]);
-
-          this.registerClientConnectHandler();
-          this.registerTextMessageHandler();
+          ])
+          .catch(e => console.error('Error registering server event', e));
     }
 
     private registerBotEvents()
@@ -55,19 +52,5 @@ export class MasterEventHandler
     {
         event.handle()
             .catch(e => console.log('Error handling event:', e));
-    }
-
-    private registerClientConnectHandler()
-    {
-        this.bot.getServer().on('clientconnect', event => {
-            console.log('Client Connect', event);
-        });
-    }
-
-    private registerTextMessageHandler()
-    {
-        this.bot.getServer().on('textmessage', event => {
-            console.log('Server Event', event);
-        });
     }
 }

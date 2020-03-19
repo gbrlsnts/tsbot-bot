@@ -19,9 +19,8 @@ class MasterEventHandler {
             server.registerEvent("textserver"),
             server.registerEvent("textchannel"),
             server.registerEvent("textprivate")
-        ]);
-        this.registerClientConnectHandler();
-        this.registerTextMessageHandler();
+        ])
+            .catch(e => console.error('Error registering server event', e));
     }
     registerBotEvents() {
         const botEvents = this.bot.getBotEvents();
@@ -38,16 +37,6 @@ class MasterEventHandler {
     handleBotEvent(event) {
         event.handle()
             .catch(e => console.log('Error handling event:', e));
-    }
-    registerClientConnectHandler() {
-        this.bot.getServer().on('clientconnect', event => {
-            console.log('Client Connect', event);
-        });
-    }
-    registerTextMessageHandler() {
-        this.bot.getServer().on('textmessage', event => {
-            console.log('Server Event', event);
-        });
     }
 }
 exports.MasterEventHandler = MasterEventHandler;
