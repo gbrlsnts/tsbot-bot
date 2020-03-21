@@ -5,7 +5,7 @@ import { CreateUserChannel } from "./UserChannel/CreateUserChannel";
 import { CreateUserSubChannel } from "./UserChannel/CreateUserSubChannel";
 import { DeleteUserChannel } from "./UserChannel/DeleteUserChannel";
 import { PrefixedRoute } from "../../../PrefixedRoute";
-import GetClientList from "./Getters/GetClientList";
+import GetClientList from "./Getters/AllInfo";
 import VerifyUser from "./VerifyUser/VerifyUser";
 import IconUpload from "./Icon/IconUpload";
 import IconDelete from "./Icon/IconDelete";
