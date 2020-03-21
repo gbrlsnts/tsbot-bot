@@ -12,10 +12,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const bodyParser = __importStar(require("body-parser"));
-const BotGroup_1 = require("./Routes/Bot/BotGroup");
+const BotGroup_1 = __importDefault(require("./Routes/Bot/BotGroup"));
 class Api {
-    constructor(bot) {
-        this.bot = bot;
+    constructor(manager) {
+        this.manager = manager;
         this.app = express_1.default();
     }
     boot() {
@@ -27,7 +27,7 @@ class Api {
         this.app.get('/', (req, res) => {
             res.send('awesome-teamspeak bot');
         });
-        new BotGroup_1.BotGroup(this.app, this.bot).setPrefix('/bot').register();
+        new BotGroup_1.default(this.app, this.manager).setPrefix('/bot').register();
     }
 }
 exports.Api = Api;

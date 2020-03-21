@@ -21,7 +21,8 @@ scoped.register({
 container.resolve('botFactory')
     .create(scoped.resolve('serverName'))
     .then(manager => {
-    new Api_1.Api(manager.bot).boot();
+    scoped.register('bot', awilix.asValue(manager.bot));
+    new Api_1.Api(manager).boot();
 })
     .catch(error => {
     console.log('Got error', error);

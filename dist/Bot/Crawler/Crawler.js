@@ -22,6 +22,19 @@ class Crawler {
         this.isBooted = true;
     }
     /**
+     * Stop the crawler
+     */
+    stop() {
+        this.onCrawlEnd = () => {
+            if (this.timer)
+                timers_1.clearTimeout(this.timer);
+        };
+        if (!this.isRunning) {
+            this.onCrawlEnd();
+            return;
+        }
+    }
+    /**
      * Reload the crawler config
      * @param config the config to apply
      */

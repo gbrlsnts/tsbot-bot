@@ -1,11 +1,12 @@
 import { Bot } from "./Bot";
 import { MasterEventHandler } from "./Event/MasterEventHandler";
 import { Crawler } from "./Crawler/Crawler";
+import { CrawlerConfiguration } from "./Configuration/Configuration";
 
 export default class Manager
 {
 
-    constructor(readonly components: Components)
+    constructor(private components: Components)
     {
 
     }
@@ -23,6 +24,29 @@ export default class Manager
     get crawler(): Crawler | undefined
     {
         return this.components.crawler;
+    }
+
+    /**
+     * Disables the crawler
+     */
+    disableCrawler(): void
+    {
+        this.crawler?.stop();
+        this.components.crawler = undefined;
+    }
+
+    /**
+     * Set the crawler configuration. If disabled, a crawler will be created.
+     * @param config The configuration object
+     */
+    setCrawlerConfig(config: CrawlerConfiguration): void
+    {
+        if(!this.crawler) {
+            this.components.crawler = new Crawler(this.bot, config);
+            this.components.crawler.boot();
+        } else {
+            this.crawler.reload(config);
+        }
     }
 }
 

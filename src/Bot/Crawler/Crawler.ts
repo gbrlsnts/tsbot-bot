@@ -39,6 +39,23 @@ export class Crawler
     }
 
     /**
+     * Stop the crawler
+     */
+    stop()
+    {
+        this.onCrawlEnd = () => {
+            if(this.timer)
+                clearTimeout(this.timer);
+        };
+
+        if(!this.isRunning) {
+            this.onCrawlEnd();
+
+            return;
+        }
+    }
+
+    /**
      * Reload the crawler config
      * @param config the config to apply
      */

@@ -1,14 +1,13 @@
 import express from "express";
 import * as bodyParser from "body-parser";
-import { Bot } from "../Bot/Bot";
-import { ServerGroup } from "./Routes/Bot/Server/ServerGroup";
-import { BotGroup } from "./Routes/Bot/BotGroup";
+import BotGroup from "./Routes/Bot/BotGroup";
+import Manager from "../Bot/Manager";
 
 export class Api
 {
     private readonly app: express.Express;
 
-    constructor(private bot: Bot)
+    constructor(private manager: Manager)
     {
         this.app = express();
         
@@ -29,6 +28,6 @@ export class Api
             res.send('awesome-teamspeak bot');
         });
         
-        new BotGroup(this.app, this.bot).setPrefix('/bot').register();
+        new BotGroup(this.app, this.manager).setPrefix('/bot').register();
     }
 }
