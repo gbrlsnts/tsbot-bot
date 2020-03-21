@@ -1,4 +1,3 @@
-import { AwilixContainer } from "awilix";
 import { Bot } from "../Bot";
 import { BotEventName } from "./BotEvent";
 import { ChannelInactiveNotifyHandler } from "./Handler/ChannelInactiveNotifyHandler";
@@ -8,11 +7,8 @@ import { ChannelNotInactiveHandler } from "./Handler/ChannelNotInactiveHandler";
 
 export class MasterEventHandler
 {
-    private readonly bot: Bot;
-
-    constructor(private readonly container: AwilixContainer)
+    constructor(private readonly bot: Bot)
     {
-        this.bot = container.resolve('bot');
         this.registerServerEvents();
         this.registerBotEvents();
     }

@@ -5,9 +5,8 @@ const ChannelInactiveNotifyHandler_1 = require("./Handler/ChannelInactiveNotifyH
 const ChannelInactiveDeleteHandler_1 = require("./Handler/ChannelInactiveDeleteHandler");
 const ChannelNotInactiveHandler_1 = require("./Handler/ChannelNotInactiveHandler");
 class MasterEventHandler {
-    constructor(container) {
-        this.container = container;
-        this.bot = container.resolve('bot');
+    constructor(bot) {
+        this.bot = bot;
         this.registerServerEvents();
         this.registerBotEvents();
     }

@@ -1,6 +1,5 @@
 import { Configuration } from "./Configuration";
 import { LoaderInterface } from "./LoaderInterface";
-import { readdir, readFile } from "fs";
 import { join as pathJoin } from "path";
 import FileJson from "../../File/FileJson";
 

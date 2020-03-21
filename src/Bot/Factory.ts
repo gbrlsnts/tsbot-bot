@@ -1,39 +1,39 @@
-import * as awilix from 'awilix';
 import { QueryProtocol } from 'ts3-nodejs-library';
 import { ConnectionProtocol } from './Types';
 import { Bot } from './Bot';
 import { MasterEventHandler } from './Event/MasterEventHandler';
-import { Factory as LoaderFactory } from './Configuration/Factory';
 import { Crawler } from './Crawler/Crawler';
-import { Configuration } from './Configuration/Configuration';
+import Manager from './Manager';
+import { LoaderInterface } from './Configuration/LoaderInterface';
 
-export class Factory
+export default class Factory
 {
-    async create(server: string): Promise<Bot>
+    constructor(private readonly configLoader: LoaderInterface)
     {
-        const container = awilix.createContainer({
-            injectionMode: "CLASSIC"
+
+    }
+
+    async create(serverName: string): Promise<Manager>
+    {
+        const config = await this.configLoader.loadConfiguration(serverName);
+
+        const bot = await Bot.initialize(serverName, {
+            ...config.connection,
+            protocol: config.connection.protocol === ConnectionProtocol.RAW ? QueryProtocol.RAW : QueryProtocol.SSH,
         });
 
-        const configuration = await new LoaderFactory().create().loadConfiguration(server);
+        const eventHandler = new MasterEventHandler(bot);
 
-        const bot = await Bot.initialize(server, {
-            ...configuration.connection,
-            protocol: configuration.connection.protocol === ConnectionProtocol.RAW ? QueryProtocol.RAW : QueryProtocol.SSH,
-        });
-
-        // todo: improve container registrations
-        container.register({
-            config: awilix.asValue<Configuration>(configuration),
-            bot: awilix.asValue<Bot>(bot)
-        });
-
-        const eventHandler = new MasterEventHandler(container);
-
-        if(configuration.crawler) {
-            new Crawler(bot, configuration.crawler).boot();
+        let crawler: Crawler | undefined;        
+        if(config.crawler) {
+            crawler = new Crawler(bot, config.crawler);
+            crawler.boot();
         }
 
-        return bot;
+        return new Manager({
+            bot,
+            eventHandler,
+            crawler,
+        });
     }
 }

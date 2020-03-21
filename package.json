@@ -2,13 +2,13 @@
   "name": "awesome-teamspeak",
   "version": "0.0.1",
   "description": "A bot that brings awesomeness to teamspeak servers",
-  "main": "dist/index.js",
+  "main": "dist/init.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "rimraf dist && tsc",
-    "start": "rimraf dist && tsc && node dist/index.js",
-    "dev": "node_modules/.bin/tsnd src/index.ts",
-    "prod": "node dist/index.js",
+    "start": "rimraf dist && tsc && node dist/init.js",
+    "dev": "node_modules/.bin/tsnd src/init.ts",
+    "prod": "node dist/init.js",
     "eslint": "eslint src --ext ts"
   },
   "repository": {
