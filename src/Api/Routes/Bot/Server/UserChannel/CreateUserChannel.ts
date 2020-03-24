@@ -6,11 +6,12 @@ import { Bot } from "../../../../../Bot/Bot";
 import { ApiRoute } from "../../../../ApiRoute";
 import { createChannel } from "./ValidationRules";
 import Validator from "../../../../Validator";
+import Logger from "../../../../../Log/Logger";
 
 export class CreateUserChannel extends ApiRoute implements Route {
-    constructor(private readonly app: Express, private readonly bot: Bot)
+    constructor(private readonly app: Express, private readonly bot: Bot, logger: Logger)
     {
-        super();
+        super(logger);
     }
 
     /**

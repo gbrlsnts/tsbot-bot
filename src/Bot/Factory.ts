@@ -5,10 +5,11 @@ import { MasterEventHandler } from './Event/MasterEventHandler';
 import { Crawler } from './Crawler/Crawler';
 import Manager from './Manager';
 import { LoaderInterface } from './Configuration/LoaderInterface';
+import Logger from '../Log/Logger';
 
 export default class Factory
 {
-    constructor(private readonly configLoader: LoaderInterface)
+    constructor(private readonly configLoader: LoaderInterface, private readonly logger: Logger)
     {
 
     }
@@ -16,6 +17,10 @@ export default class Factory
     async create(serverName: string): Promise<Manager>
     {
         const config = await this.configLoader.loadConfiguration(serverName);
+
+        const botLogger = this.logger.scoped({
+            server: serverName,
+        });
 
         const bot = await Bot.initialize(serverName, {
             ...config.connection,
@@ -26,7 +31,7 @@ export default class Factory
 
         let crawler: Crawler | undefined;        
         if(config.crawler) {
-            crawler = new Crawler(bot, config.crawler);
+            crawler = new Crawler(bot, botLogger, config.crawler);
             crawler.boot();
         }
 
@@ -34,6 +39,7 @@ export default class Factory
             bot,
             eventHandler,
             crawler,
+            logger: botLogger,
         });
     }
 }

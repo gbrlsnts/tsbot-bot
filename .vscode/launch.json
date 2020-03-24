@@ -15,7 +15,8 @@
             "program": "${workspaceFolder}\\dist\\init.js",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
-            ]
+            ],
+            "outputCapture": "std",
         }
     ]
 }

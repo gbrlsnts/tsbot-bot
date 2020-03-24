@@ -5,12 +5,13 @@ import { ApiRoute } from "../../../../ApiRoute";
 import { Bot } from "../../../../../Bot/Bot";
 import VerifyUserAction from "../../../../../Bot/Action/VerifyUser/VerifyUserAction";
 import Validator from "../../../../Validator";
+import Logger from "../../../../../Log/Logger";
 
 export default class VerifyUser extends ApiRoute implements Route
 {
-    constructor(private readonly app: Express, private readonly bot: Bot)
+    constructor(private readonly app: Express, private readonly bot: Bot, logger: Logger)
     {
-        super();
+        super(logger);
     }
 
     /**

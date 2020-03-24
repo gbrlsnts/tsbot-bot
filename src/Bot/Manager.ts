@@ -2,6 +2,7 @@ import { Bot } from "./Bot";
 import { MasterEventHandler } from "./Event/MasterEventHandler";
 import { Crawler } from "./Crawler/Crawler";
 import { CrawlerConfiguration } from "./Configuration/Configuration";
+import Logger from "../Log/Logger";
 
 export default class Manager
 {
@@ -26,6 +27,11 @@ export default class Manager
         return this.components.crawler;
     }
 
+    get logger(): Logger
+    {
+        return this.components.logger;
+    }
+
     /**
      * Disables the crawler
      */
@@ -42,7 +48,7 @@ export default class Manager
     setCrawlerConfig(config: CrawlerConfiguration): void
     {
         if(!this.crawler) {
-            this.components.crawler = new Crawler(this.bot, config);
+            this.components.crawler = new Crawler(this.bot, this.logger, config);
             this.components.crawler.boot();
         } else {
             this.crawler.reload(config);
@@ -55,4 +61,5 @@ export interface Components
     bot: Bot;
     eventHandler: MasterEventHandler,
     crawler?: Crawler,
+    logger: Logger,
 }

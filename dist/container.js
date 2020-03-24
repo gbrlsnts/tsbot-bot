@@ -14,11 +14,13 @@ const awilix = __importStar(require("awilix"));
 const path_1 = require("path");
 const Factory_1 = require("./Bot/Configuration/Factory");
 const Factory_2 = __importDefault(require("./Bot/Factory"));
+const Logger_1 = __importDefault(require("./Log/Logger"));
 function configureContainer() {
     const container = awilix.createContainer({
         injectionMode: "CLASSIC",
     });
     container.register({
+        logger: awilix.asValue(new Logger_1.default({ level: 'debug' })),
         configLoader: awilix.asValue(configurationLoader()),
         botFactory: awilix.asClass(Factory_2.default).singleton(),
     });

@@ -8,8 +8,8 @@ const ApiRoute_1 = require("../../../ApiRoute");
 const Validator_1 = __importDefault(require("../../../Validator"));
 const Either_1 = require("../../../../Lib/Either");
 class SetConfig extends ApiRoute_1.ApiRoute {
-    constructor(app, manager) {
-        super();
+    constructor(app, manager, logger) {
+        super(logger);
         this.app = app;
         this.manager = manager;
     }

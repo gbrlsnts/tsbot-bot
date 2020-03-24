@@ -3,6 +3,7 @@ import { resolve as pathResolve } from 'path';
 import { Factory as LoaderFactory } from './Bot/Configuration/Factory';
 import { LoaderInterface } from './Bot/Configuration/LoaderInterface';
 import Factory from './Bot/Factory';
+import Logger from './Log/Logger';
 
 export default function configureContainer(): awilix.AwilixContainer {
     const container = awilix.createContainer({
@@ -10,6 +11,7 @@ export default function configureContainer(): awilix.AwilixContainer {
     });
 
     container.register({
+        logger: awilix.asValue(new Logger({ level: 'debug' })),
         configLoader: awilix.asValue<LoaderInterface>(configurationLoader()),
         botFactory: awilix.asClass(Factory).singleton(),
     });

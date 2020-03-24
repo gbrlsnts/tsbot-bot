@@ -5,8 +5,9 @@ const ChannelUtils_1 = require("../Utils/ChannelUtils");
 const ProcessResult_1 = require("./ProcessResult");
 const ChannelCleanup_1 = require("./ChannelCleanup");
 class Crawler {
-    constructor(bot, config) {
+    constructor(bot, logger, config) {
         this.bot = bot;
+        this.logger = logger;
         this.config = config;
         this.bootTimer = 30;
         this.isBooted = false;
@@ -53,7 +54,7 @@ class Crawler {
             timers_1.clearTimeout(this.timer);
         const interval = this.getTimerInterval();
         this.timer = setTimeout(this.crawl.bind(this), interval);
-        console.log(`Next crawl to run in ${interval / 1000} seconds`);
+        this.logger.debug(`Next crawl to run in ${interval / 1000} seconds`);
     }
     /**
      * Get the interval to run the crawl timer
@@ -67,7 +68,7 @@ class Crawler {
      * Do a crawl
      */
     async crawl() {
-        console.log('starting crawl...');
+        this.logger.debug('Starting crawl');
         this.isRunning = true;
         try {
             if (!this.bot.isConnected)
@@ -77,7 +78,12 @@ class Crawler {
             this.config.zones.forEach(zone => {
                 const channelsInZoneResult = ChannelUtils_1.ChannelUtils.getZoneTopChannels(channelList, zone.start, zone.end, !zone.spacerAsSeparator);
                 if (channelsInZoneResult.isLeft()) {
-                    console.warn(zone.name, channelsInZoneResult.value.reason);
+                    this.logger.warn(channelsInZoneResult.value.reason, {
+                        context: {
+                            zone: zone.name,
+                        },
+                        canShare: true,
+                    });
                     return;
                 }
                 const zoneInactiveChannels = [], zoneActiveChannels = [];
@@ -96,17 +102,19 @@ class Crawler {
                     total: channelsInZoneResult.value.channels.length
                 });
             });
-            console.log('Empty channels list:', crawlResults.map(c => c.inactive));
+            this.logger.debug('Got inactive channels list', {
+                context: crawlResults.map(c => c.inactive),
+            });
             const results = await new ProcessResult_1.ProcessResult(crawlResults, this.config).processResults();
             const deletedChannels = await new ChannelCleanup_1.ChannelCleanup(this.bot, this.config.zones, results).cleanupChannels();
             this.raiseChannelEvents(results, deletedChannels);
         }
         catch (e) {
-            console.log(`Crawl error: ${e.message}`);
+            this.logger.error('Crawl error', { error: e });
         }
         finally {
             this.startTimer();
-            console.log('crawl ended');
+            this.logger.debug('Crawl ended');
             this.isRunning = false;
             if (this.onCrawlEnd) {
                 this.onCrawlEnd();

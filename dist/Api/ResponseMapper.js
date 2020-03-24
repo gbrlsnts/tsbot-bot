@@ -2,15 +2,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const Response_1 = require("./Response");
 class ResponseMapper {
-    constructor(response) {
-        this.response = response;
+    constructor(logger) {
+        this.logger = logger;
     }
     /**
      * Map a response from a domain result
+     * @param response The express response
      * @param domainResult The domain result
      */
-    fromDomain(domainResult) {
-        const res = this.getResponseObject();
+    fromDomain(response, domainResult) {
+        const res = new Response_1.Response(response);
         if (domainResult.isLeft()) {
             return res
                 .status(422)
@@ -20,16 +21,17 @@ class ResponseMapper {
     }
     /**
      * Map a response from an exception
+     * @param response The express response
      * @param domainResult The domain result
      */
-    fromException(exception) {
+    fromException(response, exception) {
         if (!(exception instanceof Error)) {
-            return this.getResponseObject()
+            return new Response_1.Response(response)
                 .status(500)
                 .error('Unknown error', 'Unknown error');
         }
         if (this.isValidationException(exception)) {
-            return new Response_1.Response(this.response)
+            return new Response_1.Response(response)
                 .status(422)
                 .addErrors(exception.details.map(error => {
                 var _a;
@@ -42,15 +44,19 @@ class ResponseMapper {
                 };
             }));
         }
-        return this.getResponseObject()
+        this.logger.error('Api exception', {
+            error: exception
+        });
+        return new Response_1.Response(response)
             .status(500)
             .error(exception.name, exception.message);
     }
+    /**
+     * Check if the exception is from validations
+     * @param exception Exception to check
+     */
     isValidationException(exception) {
         return 'isJoi' in exception;
-    }
-    getResponseObject() {
-        return new Response_1.Response(this.response);
     }
 }
 exports.ResponseMapper = ResponseMapper;

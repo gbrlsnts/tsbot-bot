@@ -6,12 +6,13 @@ import { Bot } from "../../../../../Bot/Bot";
 import Validator from "../../../../Validator";
 import IconUploadAction from "../../../../../Bot/Action/Icon/IconUploadAction";
 import { IconUploadData } from "../../../../../Bot/Action/Icon/IconActionTypes";
+import Logger from "../../../../../Log/Logger";
 
 export default class IconUpload extends ApiRoute implements Route
 {
-    constructor(private readonly app: Express, private readonly bot: Bot)
+    constructor(private readonly app: Express, private readonly bot: Bot, logger: Logger)
     {
-        super();
+        super(logger);
     }
 
     /**

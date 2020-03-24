@@ -5,6 +5,7 @@ import { ChannelUtils } from "../Utils/ChannelUtils";
 import { ZoneCrawlResult, ZoneProcessResult } from "./CrawlerTypes";
 import { ProcessResult } from "./ProcessResult";
 import { ChannelCleanup } from "./ChannelCleanup";
+import Logger from "../../Log/Logger";
 
 export class Crawler
 {
@@ -18,7 +19,8 @@ export class Crawler
     private onCrawlEnd?: CallableFunction;
 
     constructor(
-        private bot: Bot,
+        private readonly bot: Bot,
+        private readonly logger: Logger,
         private config: CrawlerConfiguration
     )
     {
@@ -85,7 +87,7 @@ export class Crawler
             interval
         );
 
-        console.log(`Next crawl to run in ${interval/1000} seconds`);
+        this.logger.debug(`Next crawl to run in ${interval/1000} seconds`);
     }
 
     /**
@@ -104,7 +106,7 @@ export class Crawler
      */
     private async crawl()
     {
-        console.log('starting crawl...');
+        this.logger.debug('Starting crawl');
         this.isRunning = true;
 
         try {
@@ -118,7 +120,13 @@ export class Crawler
                 const channelsInZoneResult = ChannelUtils.getZoneTopChannels(channelList, zone.start, zone.end, !zone.spacerAsSeparator);
 
                 if(channelsInZoneResult.isLeft()) {
-                    console.warn(zone.name, channelsInZoneResult.value.reason);
+                    this.logger.warn(channelsInZoneResult.value.reason, {
+                        context: {
+                            zone: zone.name,
+                        },
+                        canShare: true,
+                    });
+                    
                     return;
                 }
 
@@ -143,17 +151,19 @@ export class Crawler
                 });
             });
 
-            console.log('Empty channels list:', crawlResults.map(c=>c.inactive));
+            this.logger.debug('Got inactive channels list', {
+                context: crawlResults.map(c => c.inactive),
+            });
 
             const results = await new ProcessResult(crawlResults, this.config).processResults();
             const deletedChannels = await new ChannelCleanup(this.bot, this.config.zones, results).cleanupChannels();
 
             this.raiseChannelEvents(results, deletedChannels);
         } catch(e) {
-            console.log(`Crawl error: ${e.message}`);
+            this.logger.error('Crawl error', { error: e });
         } finally {
             this.startTimer();
-            console.log('crawl ended');
+            this.logger.debug('Crawl ended');
             this.isRunning = false;
 
             if(this.onCrawlEnd) {

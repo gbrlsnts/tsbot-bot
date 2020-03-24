@@ -14,6 +14,9 @@ class Manager {
     get crawler() {
         return this.components.crawler;
     }
+    get logger() {
+        return this.components.logger;
+    }
     /**
      * Disables the crawler
      */
@@ -28,7 +31,7 @@ class Manager {
      */
     setCrawlerConfig(config) {
         if (!this.crawler) {
-            this.components.crawler = new Crawler_1.Crawler(this.bot, config);
+            this.components.crawler = new Crawler_1.Crawler(this.bot, this.logger, config);
             this.components.crawler.boot();
         }
         else {

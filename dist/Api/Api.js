@@ -11,23 +11,28 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const express_pino_logger_1 = __importDefault(require("express-pino-logger"));
 const bodyParser = __importStar(require("body-parser"));
 const BotGroup_1 = __importDefault(require("./Routes/Bot/BotGroup"));
 class Api {
-    constructor(manager) {
+    constructor(manager, logger) {
         this.manager = manager;
+        this.logger = logger;
         this.app = express_1.default();
+        this.app.use(express_pino_logger_1.default({
+            logger: logger.logger
+        }));
     }
     boot() {
         this.app.use(bodyParser.json());
         this.registerRoutes();
-        this.app.listen(3000, () => console.log('Api waiting for requests...'));
+        this.app.listen(3000, () => this.logger.info('Api waiting for requests...'));
     }
     registerRoutes() {
         this.app.get('/', (req, res) => {
             res.send('awesome-teamspeak bot');
         });
-        new BotGroup_1.default(this.app, this.manager).setPrefix('/bot').register();
+        new BotGroup_1.default(this.app, this.manager, this.logger).setPrefix('/bot').register();
     }
 }
 exports.Api = Api;

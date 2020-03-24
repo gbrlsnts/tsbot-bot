@@ -1,4 +1,4 @@
-import { TeamSpeakClient, ClientType, TeamSpeakChannel } from "ts3-nodejs-library";
+import { ClientType } from "ts3-nodejs-library";
 import { Express } from "express";
 import { Route } from "../../../../ApiTypes";
 import { ApiRoute } from "../../../../ApiRoute";
@@ -7,12 +7,13 @@ import { Either, right, left } from "../../../../../Lib/Either";
 import { Failure } from "../../../../../Lib/Failure";
 import { BotError, genericBotError } from "../../../../../Bot/Error";
 import { AllInfoResponse, ClientResponse, ChannelResponse, ServerResponse, ServerGroupResponse } from "../../../../Responses";
+import Logger from "../../../../../Log/Logger";
 
 export default class GetClientList extends ApiRoute implements Route
 {
-    constructor(private readonly app: Express, private readonly bot: Bot)
+    constructor(private readonly app: Express, private readonly bot: Bot, logger: Logger)
     {
-        super();
+        super(logger);
     }
 
     /**

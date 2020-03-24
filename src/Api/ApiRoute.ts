@@ -4,8 +4,18 @@ import { Either } from "../Lib/Either";
 import { Failure } from "../Lib/Failure";
 import { ResponseMapper } from "./ResponseMapper";
 import { PrefixedRoute } from "./PrefixedRoute";
+import Logger from "../Log/Logger";
 
 export abstract class ApiRoute extends PrefixedRoute {
+
+    protected readonly mapper: ResponseMapper;
+
+    constructor(logger: Logger)
+    {
+        super();
+
+        this.mapper = new ResponseMapper(logger);
+    }
 
     /**
      * Map a request result to a response
@@ -13,7 +23,7 @@ export abstract class ApiRoute extends PrefixedRoute {
      */
     mapToResponse(response: ExpressResponse, result: Either<Failure<any>, any>): Response
     {
-        return new ResponseMapper(response).fromDomain(result);
+        return this.mapper.fromDomain(response, result);
     }
 
     /**
@@ -22,6 +32,6 @@ export abstract class ApiRoute extends PrefixedRoute {
      */
     mapToExceptionResponse(response: ExpressResponse, exception: any): Response
     {
-        return new ResponseMapper(response).fromException(exception);
+        return this.mapper.fromException(response, exception);
     }
 }

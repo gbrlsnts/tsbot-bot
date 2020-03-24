@@ -1,16 +1,21 @@
 import express from "express";
+import pinoExpress from "express-pino-logger";
 import * as bodyParser from "body-parser";
 import BotGroup from "./Routes/Bot/BotGroup";
 import Manager from "../Bot/Manager";
+import Logger from "../Log/Logger";
 
 export class Api
 {
     private readonly app: express.Express;
 
-    constructor(private manager: Manager)
+    constructor(private readonly manager: Manager, private readonly logger: Logger)
     {
         this.app = express();
-        
+
+        this.app.use(pinoExpress({
+            logger: logger.logger
+        }));
     }
 
     boot()
@@ -19,7 +24,7 @@ export class Api
 
         this.registerRoutes();
         
-        this.app.listen(3000, () => console.log('Api waiting for requests...'));
+        this.app.listen(3000, () => this.logger.info('Api waiting for requests...'));
     }
 
     private registerRoutes()
@@ -28,6 +33,6 @@ export class Api
             res.send('awesome-teamspeak bot');
         });
         
-        new BotGroup(this.app, this.manager).setPrefix('/bot').register();
+        new BotGroup(this.app, this.manager, this.logger).setPrefix('/bot').register();
     }
 }

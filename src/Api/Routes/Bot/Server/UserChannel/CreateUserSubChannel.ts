@@ -6,11 +6,12 @@ import { ApiRoute } from "../../../../ApiRoute";
 import { CreateUserSubChannelAction } from "../../../../../Bot/Action/UserChannel/CreateUserSubChannelAction";
 import { createSubChannel } from "./ValidationRules";
 import Validator from "../../../../Validator";
+import Logger from "../../../../../Log/Logger";
 
 export class CreateUserSubChannel extends ApiRoute implements Route {
-    constructor(private readonly app: Express, private readonly bot: Bot)
+    constructor(private readonly app: Express, private readonly bot: Bot, logger: Logger)
     {
-        super();
+        super(logger);
     }
 
     /**

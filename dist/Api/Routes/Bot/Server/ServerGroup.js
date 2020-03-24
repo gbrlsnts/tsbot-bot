@@ -13,24 +13,25 @@ const IconUpload_1 = __importDefault(require("./Icon/IconUpload"));
 const IconDelete_1 = __importDefault(require("./Icon/IconDelete"));
 const SetUserGroups_1 = __importDefault(require("./UserGroups/SetUserGroups"));
 class ServerGroup extends PrefixedRoute_1.PrefixedRoute {
-    constructor(app, bot) {
+    constructor(app, bot, logger) {
         super();
         this.app = app;
         this.bot = bot;
+        this.logger = logger;
     }
     /**
      * Register the route
      */
     register() {
         const routes = [
-            new CreateUserChannel_1.CreateUserChannel(this.app, this.bot),
-            new CreateUserSubChannel_1.CreateUserSubChannel(this.app, this.bot),
-            new DeleteUserChannel_1.DeleteUserChannel(this.app, this.bot),
-            new AllInfo_1.default(this.app, this.bot),
-            new VerifyUser_1.default(this.app, this.bot),
-            new IconUpload_1.default(this.app, this.bot),
-            new IconDelete_1.default(this.app, this.bot),
-            new SetUserGroups_1.default(this.app, this.bot),
+            new CreateUserChannel_1.CreateUserChannel(this.app, this.bot, this.logger),
+            new CreateUserSubChannel_1.CreateUserSubChannel(this.app, this.bot, this.logger),
+            new DeleteUserChannel_1.DeleteUserChannel(this.app, this.bot, this.logger),
+            new AllInfo_1.default(this.app, this.bot, this.logger),
+            new VerifyUser_1.default(this.app, this.bot, this.logger),
+            new IconUpload_1.default(this.app, this.bot, this.logger),
+            new IconDelete_1.default(this.app, this.bot, this.logger),
+            new SetUserGroups_1.default(this.app, this.bot, this.logger),
         ];
         routes.forEach(route => route.setPrefix(this.prefix).register());
         return this;

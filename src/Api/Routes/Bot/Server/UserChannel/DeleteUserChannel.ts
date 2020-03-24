@@ -6,11 +6,12 @@ import { DeleteUserChannelAction } from "../../../../../Bot/Action/UserChannel/D
 import Joi = require("@hapi/joi");
 import { deleteChannel } from "./ValidationRules";
 import Validator from "../../../../Validator";
+import Logger from "../../../../../Log/Logger";
 
 export class DeleteUserChannel extends ApiRoute implements Route {
-    constructor(private readonly app: Express, private readonly bot: Bot)
+    constructor(private readonly app: Express, private readonly bot: Bot, logger: Logger)
     {
-        super();
+        super(logger);
     }
 
     /**

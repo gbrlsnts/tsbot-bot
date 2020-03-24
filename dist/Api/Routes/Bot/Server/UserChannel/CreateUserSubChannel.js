@@ -9,8 +9,8 @@ const CreateUserSubChannelAction_1 = require("../../../../../Bot/Action/UserChan
 const ValidationRules_1 = require("./ValidationRules");
 const Validator_1 = __importDefault(require("../../../../Validator"));
 class CreateUserSubChannel extends ApiRoute_1.ApiRoute {
-    constructor(app, bot) {
-        super();
+    constructor(app, bot, logger) {
+        super(logger);
         this.app = app;
         this.bot = bot;
     }

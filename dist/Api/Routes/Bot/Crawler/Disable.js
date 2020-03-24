@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const ApiRoute_1 = require("../../../ApiRoute");
 const Either_1 = require("../../../../Lib/Either");
 class Disable extends ApiRoute_1.ApiRoute {
-    constructor(app, manager) {
-        super();
+    constructor(app, manager, logger) {
+        super(logger);
         this.app = app;
         this.manager = manager;
     }

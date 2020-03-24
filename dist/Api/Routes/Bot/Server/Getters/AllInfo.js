@@ -5,8 +5,8 @@ const ApiRoute_1 = require("../../../../ApiRoute");
 const Either_1 = require("../../../../../Lib/Either");
 const Error_1 = require("../../../../../Bot/Error");
 class GetClientList extends ApiRoute_1.ApiRoute {
-    constructor(app, bot) {
-        super();
+    constructor(app, bot, logger) {
+        super(logger);
         this.app = app;
         this.bot = bot;
     }

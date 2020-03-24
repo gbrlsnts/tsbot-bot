@@ -5,12 +5,13 @@ import { Route } from "../../../ApiTypes";
 import Validator from "../../../Validator";
 import Manager from "../../../../Bot/Manager";
 import { right } from "../../../../Lib/Either";
+import Logger from "../../../../Log/Logger";
 
 export default class SetConfig extends ApiRoute implements Route
 {
-    constructor(private readonly app: Express, private readonly manager: Manager)
+    constructor(private readonly app: Express, private readonly manager: Manager, logger: Logger)
     {
-        super();
+        super(logger);
     }
 
     /**

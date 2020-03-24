@@ -5,12 +5,13 @@ import { ApiRoute } from "../../../../ApiRoute";
 import { Bot } from "../../../../../Bot/Bot";
 import Validator from "../../../../Validator";
 import IconDeleteAction from "../../../../../Bot/Action/Icon/IconDeleteAction";
+import Logger from "../../../../../Log/Logger";
 
 export default class IconDelete extends ApiRoute implements Route
 {
-    constructor(private readonly app: Express, private readonly bot: Bot)
+    constructor(private readonly app: Express, private readonly bot: Bot, logger: Logger)
     {
-        super();
+        super(logger);
     }
 
     /**

@@ -10,11 +10,15 @@ const MasterEventHandler_1 = require("./Event/MasterEventHandler");
 const Crawler_1 = require("./Crawler/Crawler");
 const Manager_1 = __importDefault(require("./Manager"));
 class Factory {
-    constructor(configLoader) {
+    constructor(configLoader, logger) {
         this.configLoader = configLoader;
+        this.logger = logger;
     }
     async create(serverName) {
         const config = await this.configLoader.loadConfiguration(serverName);
+        const botLogger = this.logger.scoped({
+            server: serverName,
+        });
         const bot = await Bot_1.Bot.initialize(serverName, {
             ...config.connection,
             protocol: config.connection.protocol === Types_1.ConnectionProtocol.RAW ? ts3_nodejs_library_1.QueryProtocol.RAW : ts3_nodejs_library_1.QueryProtocol.SSH,
@@ -22,13 +26,14 @@ class Factory {
         const eventHandler = new MasterEventHandler_1.MasterEventHandler(bot);
         let crawler;
         if (config.crawler) {
-            crawler = new Crawler_1.Crawler(bot, config.crawler);
+            crawler = new Crawler_1.Crawler(bot, botLogger, config.crawler);
             crawler.boot();
         }
         return new Manager_1.default({
             bot,
             eventHandler,
             crawler,
+            logger: botLogger,
         });
     }
 }

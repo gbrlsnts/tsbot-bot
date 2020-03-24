@@ -15,16 +15,22 @@ const Api_1 = require("./Api/Api");
 const container_1 = __importDefault(require("./container"));
 const container = container_1.default();
 const scoped = container.createScope();
+const logger = scoped.resolve('logger');
 scoped.register({
-    serverName: awilix.asValue('testserver'),
+    serverName: awilix.asValue('testserver_crawl'),
 });
+logger.debug('Initializing instance');
 container.resolve('botFactory')
     .create(scoped.resolve('serverName'))
     .then(manager => {
-    scoped.register('bot', awilix.asValue(manager.bot));
-    new Api_1.Api(manager).boot();
+    scoped.register({
+        manager: awilix.asValue(manager),
+        bot: awilix.asValue(manager.bot),
+        logger: awilix.asValue(manager.logger),
+    });
+    new Api_1.Api(manager, logger).boot();
 })
     .catch(error => {
-    console.log('Got error', error);
+    logger.error('Error initializing bot', { error });
 });
 //# sourceMappingURL=init.js.map
