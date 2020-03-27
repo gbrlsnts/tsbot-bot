@@ -10,7 +10,7 @@ import Logger from "../../../Log/Logger";
 export default class BotGroup extends PrefixedRoute implements Route
 {
     
-    constructor(private readonly app: Express, private readonly manager: Manager, private readonly logger: Logger)
+    constructor(private readonly app: Express, private readonly manager: Manager, private readonly globalLogger: Logger)
     {
         super();
     }
@@ -18,8 +18,8 @@ export default class BotGroup extends PrefixedRoute implements Route
     register(): this
     {
         const groups: Route[] = [
-            new ServerGroup(this.app, this.manager.bot, this.logger).setPrefix(this.getWithPrefix('/server')),
-            new CrawlerGroup(this.app, this.manager, this.logger).setPrefix(this.getWithPrefix('/crawler')),
+            new ServerGroup(this.app, this.manager, this.globalLogger).setPrefix(this.getWithPrefix('/server')),
+            new CrawlerGroup(this.app, this.manager, this.globalLogger).setPrefix(this.getWithPrefix('/crawler')),
         ];
 
         groups.forEach(group => group.register());

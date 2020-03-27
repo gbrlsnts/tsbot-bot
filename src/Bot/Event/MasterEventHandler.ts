@@ -4,10 +4,11 @@ import { ChannelInactiveNotifyHandler } from "./Handler/ChannelInactiveNotifyHan
 import { ChannelInactiveDeleteHandler } from "./Handler/ChannelInactiveDeleteHandler";
 import { EventHandlerInterface } from "./EventHandlerInterface";
 import { ChannelNotInactiveHandler } from "./Handler/ChannelNotInactiveHandler";
+import Logger from "../../Log/Logger";
 
 export class MasterEventHandler
 {
-    constructor(private readonly bot: Bot)
+    constructor(private readonly logger: Logger, private readonly bot: Bot)
     {
         this.registerServerEvents();
         this.registerBotEvents();
@@ -24,7 +25,7 @@ export class MasterEventHandler
             server.registerEvent("textchannel"),
             server.registerEvent("textprivate")
           ])
-          .catch(e => console.error('Error registering server event', e));
+          .catch(error => this.logger.error('Error registering server event', { error }));
     }
 
     private registerBotEvents()
@@ -32,21 +33,21 @@ export class MasterEventHandler
         const botEvents = this.bot.getBotEvents();
 
         botEvents.on(BotEventName.channelNotInactiveNotifyEvent, (event) => {
-            this.handleBotEvent(new ChannelNotInactiveHandler(this.bot, event));
+            this.handleBotEvent(new ChannelNotInactiveHandler(this.logger, this.bot, event));
         });
 
         botEvents.on(BotEventName.channelInactiveNotifyEvent, event => {
-            this.handleBotEvent(new ChannelInactiveNotifyHandler(this.bot, event));
+            this.handleBotEvent(new ChannelInactiveNotifyHandler(this.logger, this.bot, event));
         });
 
         botEvents.on(BotEventName.channelInactiveDeleteEvent, event => {
-            this.handleBotEvent(new ChannelInactiveDeleteHandler(event));
+            this.handleBotEvent(new ChannelInactiveDeleteHandler(this.logger, event));
         });
     }
 
     private handleBotEvent(event: EventHandlerInterface)
     {
         event.handle()
-            .catch(e => console.log('Error handling event:', e));
+            .catch(error => this.logger.error('Error handling event', { error }));
     }
 }

@@ -2,7 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const Factory_1 = require("../../Crawler/Repository/Factory");
 class ChannelInactiveNotifyHandler {
-    constructor(bot, event) {
+    constructor(logger, bot, event) {
+        this.logger = logger;
         this.bot = bot;
         this.event = event;
         this.repository = new Factory_1.Factory().create();
@@ -15,6 +16,10 @@ class ChannelInactiveNotifyHandler {
             return;
         await this.bot.setChannelIcon(this.event.channelId, this.event.icon);
         await this.repository.setChannelNotified(this.event.channelId, true);
+        this.logger.info('Crawler notified inative channel', {
+            canShare: true,
+            context: { channelId: this.event.channelId }
+        });
     }
 }
 exports.ChannelInactiveNotifyHandler = ChannelInactiveNotifyHandler;

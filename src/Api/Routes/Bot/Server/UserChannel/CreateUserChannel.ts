@@ -2,16 +2,16 @@ import { Express } from "express";
 import Joi from "@hapi/joi";
 import { Route } from "../../../../ApiTypes";
 import { CreateUserChannelAction } from "../../../../../Bot/Action/UserChannel/CreateUserChannelAction";
-import { Bot } from "../../../../../Bot/Bot";
 import { ApiRoute } from "../../../../ApiRoute";
 import { createChannel } from "./ValidationRules";
 import Validator from "../../../../Validator";
 import Logger from "../../../../../Log/Logger";
+import Manager from "../../../../../Bot/Manager";
 
 export class CreateUserChannel extends ApiRoute implements Route {
-    constructor(private readonly app: Express, private readonly bot: Bot, logger: Logger)
+    constructor(private readonly app: Express, private readonly manager: Manager, globalLogger: Logger)
     {
-        super(logger);
+        super(globalLogger);
     }
 
     /**
@@ -23,7 +23,7 @@ export class CreateUserChannel extends ApiRoute implements Route {
 
         this.app.post(this.getWithPrefix('createUserChannel'), async (req, res) => {
             validator.validate(req.body)
-                .then(() => new CreateUserChannelAction(this.bot, req.body).execute())
+                .then(() => new CreateUserChannelAction(this.manager.logger, this.manager.bot, req.body).execute())
                 .then(result => this.mapToResponse(res, result).send())
                 .catch(e => this.mapToExceptionResponse(res, e).send());
         });

@@ -4,12 +4,13 @@ import { ZoneChannelsResult, ChannelUtils } from "../../Utils/ChannelUtils";
 import { Bot } from "../../Bot";
 import { ZoneChannel } from "./UserChannelTypes";
 import { TeamSpeakChannel } from "ts3-nodejs-library";
+import Logger from "../../../Log/Logger";
 
 export abstract class ChannelAction
 {
     private channelList?: TeamSpeakChannel[];
 
-    constructor(protected readonly bot: Bot)
+    constructor(protected readonly logger: Logger, protected readonly bot: Bot)
     {
 
     }

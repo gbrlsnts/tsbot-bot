@@ -5,8 +5,8 @@ const Error_1 = require("../../Error");
 const ChannelAction_1 = require("./ChannelAction");
 const ChannelUtils_1 = require("../../Utils/ChannelUtils");
 class DeleteUserChannelAction extends ChannelAction_1.ChannelAction {
-    constructor(bot, data) {
-        super(bot);
+    constructor(logger, bot, data) {
+        super(logger, bot);
         this.data = data;
     }
     /**

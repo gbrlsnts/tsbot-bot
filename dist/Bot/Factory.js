@@ -19,11 +19,11 @@ class Factory {
         const botLogger = this.logger.scoped({
             server: serverName,
         });
-        const bot = await Bot_1.Bot.initialize(serverName, {
+        const bot = await Bot_1.Bot.initialize(botLogger, serverName, {
             ...config.connection,
             protocol: config.connection.protocol === Types_1.ConnectionProtocol.RAW ? ts3_nodejs_library_1.QueryProtocol.RAW : ts3_nodejs_library_1.QueryProtocol.SSH,
         });
-        const eventHandler = new MasterEventHandler_1.MasterEventHandler(bot);
+        const eventHandler = new MasterEventHandler_1.MasterEventHandler(botLogger, bot);
         let crawler;
         if (config.crawler) {
             crawler = new Crawler_1.Crawler(bot, botLogger, config.crawler);

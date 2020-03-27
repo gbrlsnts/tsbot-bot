@@ -9,9 +9,9 @@ import Logger from "../../../../../Log/Logger";
 
 export default class IconDelete extends ApiRoute implements Route
 {
-    constructor(private readonly app: Express, private readonly bot: Bot, logger: Logger)
+    constructor(private readonly app: Express, private readonly bot: Bot, globalLogger: Logger)
     {
-        super(logger);
+        super(globalLogger);
     }
 
     /**

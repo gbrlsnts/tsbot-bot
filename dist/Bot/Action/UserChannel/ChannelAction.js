@@ -3,7 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Error_1 = require("../../Error");
 const ChannelUtils_1 = require("../../Utils/ChannelUtils");
 class ChannelAction {
-    constructor(bot) {
+    constructor(logger, bot) {
+        this.logger = logger;
         this.bot = bot;
     }
     /**

@@ -5,8 +5,8 @@ const Either_1 = require("../../../Lib/Either");
 const Error_1 = require("../../Error");
 const CreateChannelAction_1 = require("./CreateChannelAction");
 class CreateUserChannelAction extends CreateChannelAction_1.CreateChannelAction {
-    constructor(bot, data) {
-        super(bot);
+    constructor(logger, bot, data) {
+        super(logger, bot);
         this.data = data;
         this.spacerFormat = '[*spacer%d]=';
     }

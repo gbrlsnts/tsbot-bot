@@ -8,8 +8,8 @@ const ApiRoute_1 = require("../../../../ApiRoute");
 const Validator_1 = __importDefault(require("../../../../Validator"));
 const IconUploadAction_1 = __importDefault(require("../../../../../Bot/Action/Icon/IconUploadAction"));
 class IconUpload extends ApiRoute_1.ApiRoute {
-    constructor(app, bot, logger) {
-        super(logger);
+    constructor(app, bot, globalLogger) {
+        super(globalLogger);
         this.app = app;
         this.bot = bot;
     }

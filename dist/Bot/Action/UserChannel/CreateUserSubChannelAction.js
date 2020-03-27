@@ -4,8 +4,8 @@ const Error_1 = require("../../Error");
 const Library_1 = require("../../../Lib/Library");
 const CreateChannelAction_1 = require("./CreateChannelAction");
 class CreateUserSubChannelAction extends CreateChannelAction_1.CreateChannelAction {
-    constructor(bot, data) {
-        super(bot);
+    constructor(logger, bot, data) {
+        super(logger, bot);
         this.data = data;
     }
     /**

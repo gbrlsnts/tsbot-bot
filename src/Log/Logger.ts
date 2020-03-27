@@ -1,5 +1,4 @@
 import pino from "pino";
-import e from "express";
 
 export default class Logger {
     readonly logger: pino.Logger;
@@ -12,11 +11,11 @@ export default class Logger {
             this.logger.level = level;
     }
 
-    scoped(context: Context, level?: string): Logger
+    scoped(merge: Log, level?: string): Logger
     {
         const child = this.logger.child({
             level,
-            context
+            ...merge
         });
 
         return new Logger({ existing: child });
@@ -24,50 +23,50 @@ export default class Logger {
 
     trace(message: string, opts: ErrorLogOptions): void
     {
-        this.logger.trace(this.getContextObject(opts), message);
+        this.logger.trace(this.getMergingObject(opts), message);
     }
 
     debug(message: string, opts?: LogOptions): void
     {
-        this.logger.debug(this.getContextObject(opts), message);
+        this.logger.debug(this.getMergingObject(opts), message);
     }
 
     info(message: string, opts?: LogOptions): void
     {
-        this.logger.info(this.getContextObject(opts), message);
+        this.logger.info(this.getMergingObject(opts), message);
     }
 
     warn(message: string, opts?: LogOptions): void
     {
-        this.logger.warn(this.getContextObject(opts), message);
+        this.logger.warn(this.getMergingObject(opts), message);
     }
 
     error(message: string, opts: ErrorLogOptions): void
     {
-        this.logger.error(this.getContextObject(opts), message);
+        this.logger.error(this.getMergingObject(opts), message);
     }
 
     fatal(message: string, opts: ErrorLogOptions): void
     {
-        this.logger.fatal(this.getContextObject(opts), message);
+        this.logger.fatal(this.getMergingObject(opts), message);
     }
 
-    private getContextObject(opts?: LogOptions | ErrorLogOptions): Object
+    private getMergingObject(opts?: LogOptions | ErrorLogOptions): Object
     {
-        const context: { [key: string]: any } = { ...opts?.context };
+        const ctx: { [key: string]: any } = { context: { ...opts?.context } };
 
         if(opts?.canShare)
-            context.canShare = true;
+            ctx.canShare = true;
 
         if(opts && this.isErrorLog(opts)) {
             if(this.isException(opts.error)) {
-                context.error = { msg: opts.error.message, name: opts.error.name, stack: opts.error.stack };
+                ctx.error = { msg: opts.error.message, name: opts.error.name, stack: opts.error.stack };
             } else {
-                context.error = opts.error;
+                ctx.error = opts.error;
             }
         }
 
-        return context;
+        return opts && Object.keys(ctx).length > 0 ? ctx : {};
     }
 
     private isErrorLog(object: Object): object is ErrorLogOptions {
@@ -81,7 +80,7 @@ export default class Logger {
 
 export type Level = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace';
 
-export interface Context
+export interface Log
 {
     /** Context properties */
     [key: string]: any,
@@ -90,7 +89,7 @@ export interface Context
 export interface LogOptions
 {
     /** the log context */
-    context?: Context
+    context?: Log
     /** If the log should be shared with the server owner. default: false */
     canShare?: boolean;
 }

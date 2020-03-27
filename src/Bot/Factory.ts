@@ -22,12 +22,12 @@ export default class Factory
             server: serverName,
         });
 
-        const bot = await Bot.initialize(serverName, {
+        const bot = await Bot.initialize(botLogger, serverName, {
             ...config.connection,
             protocol: config.connection.protocol === ConnectionProtocol.RAW ? QueryProtocol.RAW : QueryProtocol.SSH,
         });
 
-        const eventHandler = new MasterEventHandler(bot);
+        const eventHandler = new MasterEventHandler(botLogger, bot);
 
         let crawler: Crawler | undefined;        
         if(config.crawler) {

@@ -107,7 +107,14 @@ export abstract class CreateChannelAction extends ChannelAction
 
         channels.forEach(channel => {
             this.bot.setChannelGroupToClient(owner, channel.cid, group)
-                .catch(e => console.warn('Warning! Could not set channel group of id ' + group));
+                .catch(e => this.logger.warn('Could not set channel admin group', {
+                    canShare: true,
+                    context: {
+                        clientDatabaseId: owner,
+                        channel: channel.cid,
+                        groupId: group,
+                    }
+                }));
         });
     }
 
@@ -119,7 +126,11 @@ export abstract class CreateChannelAction extends ChannelAction
         try {
             channels.forEach(c => this.bot.deleteChannel(c.cid, true));
         } catch (e) {
-            console.error(`Error cleaning up channels: ${e.message}`);
+            this.logger.error(`Error cleaning up channels`, {
+                context: {
+                    channels: channels.map(channel => channel.cid),
+                },
+            });
         }
         
     }

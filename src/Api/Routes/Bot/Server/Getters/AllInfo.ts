@@ -11,7 +11,7 @@ import Logger from "../../../../../Log/Logger";
 
 export default class GetClientList extends ApiRoute implements Route
 {
-    constructor(private readonly app: Express, private readonly bot: Bot, logger: Logger)
+    constructor(private readonly app: Express, private readonly bot: Bot, private readonly logger: Logger)
     {
         super(logger);
     }
@@ -58,8 +58,8 @@ export default class GetClientList extends ApiRoute implements Route
                 clients,
                 channels,
             });
-        } catch(e) {
-            console.log('Get info error:', e);
+        } catch(error) {
+            this.logger.error('Get info error:', { error });
             return left(genericBotError());
         }
     }

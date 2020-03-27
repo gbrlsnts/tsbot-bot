@@ -9,12 +9,12 @@ export class Api
 {
     private readonly app: express.Express;
 
-    constructor(private readonly manager: Manager, private readonly logger: Logger)
+    constructor(private readonly manager: Manager, private readonly globalLogger: Logger)
     {
         this.app = express();
 
         this.app.use(pinoExpress({
-            logger: logger.logger
+            logger: globalLogger.logger
         }));
     }
 
@@ -24,7 +24,7 @@ export class Api
 
         this.registerRoutes();
         
-        this.app.listen(3000, () => this.logger.info('Api waiting for requests...'));
+        this.app.listen(3000, () => this.globalLogger.info('Api waiting for requests...'));
     }
 
     private registerRoutes()
@@ -33,6 +33,6 @@ export class Api
             res.send('awesome-teamspeak bot');
         });
         
-        new BotGroup(this.app, this.manager, this.logger).setPrefix('/bot').register();
+        new BotGroup(this.app, this.manager, this.globalLogger).setPrefix('/bot').register();
     }
 }

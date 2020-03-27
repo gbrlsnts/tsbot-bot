@@ -1,15 +1,16 @@
-import { TeamSpeak, TextMessageTargetMode, Codec, ConnectionParams } from "ts3-nodejs-library";
+import { TeamSpeak, TextMessageTargetMode, ConnectionParams } from "ts3-nodejs-library";
 import SelfInfo from "./SelfInfo";
 import { BotEvent } from "./Event/BotEvent";
 import { ChannelPermission, BotCodec } from "./Types";
 import File from "../Lib/File";
+import Logger from "../Log/Logger";
 
 export class Bot
 {
     private _isConnected = true;
     private readonly botEvents: BotEvent;
 
-    constructor(private readonly server: TeamSpeak, readonly self: SelfInfo, readonly name: string)
+    constructor(private readonly logger: Logger, private readonly server: TeamSpeak, readonly self: SelfInfo, readonly name: string)
     {
         this.botEvents = new BotEvent();
 
@@ -18,15 +19,16 @@ export class Bot
 
     /**
      * Initialize the bot
+     * @param logger The logger instance
      * @param server The Teamspeak server instance
      * @param name Configuration name
      */
-    static async initialize(name: string, config: Partial<ConnectionParams>): Promise<Bot>
+    static async initialize(logger: Logger, name: string, config: Partial<ConnectionParams>): Promise<Bot>
     {
         const ts3server = await TeamSpeak.connect(config);
         const self = await SelfInfo.initialize(ts3server);
 
-        return new Bot(ts3server, self, name);
+        return new Bot(logger, ts3server, self, name);
     }
 
     /**
@@ -53,14 +55,14 @@ export class Bot
     private setupConnectionLostHandler(attempts: number, waitMs: number)
     {
         this.server.on('close', async () => {
-            console.warn(`Disconnected from ${this.name}. Retrying...`);
+            this.logger.info(`Disconnected from server, retrying`, { canShare: true });
             this._isConnected = false;
 
             this.server.reconnect(attempts, waitMs)
                 .then(() => this.self.issueRefresh())
                 .then(() => this._isConnected = true)
-                .then(() => console.log(`Reconnected to ${this.name}!`))
-                .catch((e) => console.error('Error while reconnecting', e));
+                .then(() => this.logger.info(`Reconnected to server`, { canShare: true }))
+                .catch((e) => this.logger.error('Error while reconnecting', e));
         });
     }
 

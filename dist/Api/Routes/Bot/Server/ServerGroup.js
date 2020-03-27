@@ -13,25 +13,25 @@ const IconUpload_1 = __importDefault(require("./Icon/IconUpload"));
 const IconDelete_1 = __importDefault(require("./Icon/IconDelete"));
 const SetUserGroups_1 = __importDefault(require("./UserGroups/SetUserGroups"));
 class ServerGroup extends PrefixedRoute_1.PrefixedRoute {
-    constructor(app, bot, logger) {
+    constructor(app, manager, globalLogger) {
         super();
         this.app = app;
-        this.bot = bot;
-        this.logger = logger;
+        this.manager = manager;
+        this.globalLogger = globalLogger;
     }
     /**
      * Register the route
      */
     register() {
         const routes = [
-            new CreateUserChannel_1.CreateUserChannel(this.app, this.bot, this.logger),
-            new CreateUserSubChannel_1.CreateUserSubChannel(this.app, this.bot, this.logger),
-            new DeleteUserChannel_1.DeleteUserChannel(this.app, this.bot, this.logger),
-            new AllInfo_1.default(this.app, this.bot, this.logger),
-            new VerifyUser_1.default(this.app, this.bot, this.logger),
-            new IconUpload_1.default(this.app, this.bot, this.logger),
-            new IconDelete_1.default(this.app, this.bot, this.logger),
-            new SetUserGroups_1.default(this.app, this.bot, this.logger),
+            new CreateUserChannel_1.CreateUserChannel(this.app, this.manager, this.globalLogger),
+            new CreateUserSubChannel_1.CreateUserSubChannel(this.app, this.manager, this.globalLogger),
+            new DeleteUserChannel_1.DeleteUserChannel(this.app, this.manager, this.globalLogger),
+            new AllInfo_1.default(this.app, this.manager.bot, this.globalLogger),
+            new VerifyUser_1.default(this.app, this.manager.bot, this.globalLogger),
+            new IconUpload_1.default(this.app, this.manager.bot, this.globalLogger),
+            new IconDelete_1.default(this.app, this.manager.bot, this.globalLogger),
+            new SetUserGroups_1.default(this.app, this.manager.bot, this.globalLogger),
         ];
         routes.forEach(route => route.setPrefix(this.prefix).register());
         return this;

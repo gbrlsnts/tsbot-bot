@@ -13,10 +13,10 @@ class ChannelCleanup {
     async cleanupChannels() {
         const deletedChannels = [];
         const channelIds = await this.getChannelIds();
-        channelIds.forEach(async (id) => {
+        for (const id of channelIds) {
             await this.bot.deleteChannel(id);
             deletedChannels.push(id);
-        });
+        }
         return deletedChannels;
     }
     /**

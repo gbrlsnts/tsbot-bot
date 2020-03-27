@@ -7,14 +7,15 @@ import { Failure } from "../../../Lib/Failure";
 import { BotError, invalidZoneError, notConnectedError } from "../../Error";
 import { CreateUserChannelData, CreateUserChannelResultData, CreateChannelData } from "./UserChannelTypes";
 import { CreateChannelAction } from "./CreateChannelAction";
+import Logger from "../../../Log/Logger";
 
 export class CreateUserChannelAction extends CreateChannelAction implements ActionInterface<CreateUserChannelResultData>
 {
     readonly spacerFormat: string = '[*spacer%d]=';
     
-    constructor(bot: Bot, readonly data: CreateUserChannelData)
+    constructor(logger: Logger, bot: Bot, readonly data: CreateUserChannelData)
     {
-        super(bot);
+        super(logger, bot);
     }
 
     /**

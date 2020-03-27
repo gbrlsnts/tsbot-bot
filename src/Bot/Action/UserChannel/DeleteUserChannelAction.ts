@@ -1,4 +1,3 @@
-import { TeamSpeakChannel } from "ts3-nodejs-library";
 import { ActionInterface } from "../Action";
 import { Either, Failure, right, left } from "../../../Lib/Library";
 import { BotError, notConnectedError, invalidChannelError, onlyOneSubchannelError } from "../../Error";
@@ -6,12 +5,13 @@ import { Bot } from "../../Bot";
 import { DeleteChannelData, ZoneChannel } from "./UserChannelTypes";
 import { ChannelAction } from "./ChannelAction";
 import { ChannelUtils } from "../../Utils/ChannelUtils";
+import Logger from "../../../Log/Logger";
 
 export class DeleteUserChannelAction extends ChannelAction implements ActionInterface<boolean>
 {
-    constructor(bot: Bot, private readonly data: DeleteChannelData)
+    constructor(logger: Logger, bot: Bot, private readonly data: DeleteChannelData)
     {
-        super(bot);
+        super(logger, bot);
     }
 
     /**

@@ -1,11 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class ChannelInactiveDeleteHandler {
-    constructor(event) {
+    constructor(logger, event) {
+        this.logger = logger;
         this.event = event;
     }
     async handle() {
-        console.log('Dummy delete event', this.event.channelId);
+        this.logger.info('Crawler deleted inactive channel', {
+            canShare: true,
+            context: {
+                channelId: this.event.channelId
+            }
+        });
     }
 }
 exports.ChannelInactiveDeleteHandler = ChannelInactiveDeleteHandler;

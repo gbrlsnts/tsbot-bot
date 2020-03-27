@@ -1,16 +1,16 @@
-import { TeamSpeakChannel } from "ts3-nodejs-library";
 import { ActionInterface } from "../Action";
 import { BotError, notConnectedError } from "../../Error";
 import { Either, Failure, right, left } from "../../../Lib/Library";
 import { CreateUserSubChannelResultData, CreateSubChannelData, CreateChannelData } from "./UserChannelTypes";
 import { Bot } from "../../Bot";
 import { CreateChannelAction } from "./CreateChannelAction";
+import Logger from "../../../Log/Logger";
 
 export class CreateUserSubChannelAction extends CreateChannelAction implements ActionInterface<CreateUserSubChannelResultData>
 {
-    constructor(bot: Bot, private readonly data: CreateSubChannelData)
+    constructor(logger: Logger, bot: Bot, private readonly data: CreateSubChannelData)
     {
-        super(bot);
+        super(logger, bot);
     }
 
     /**

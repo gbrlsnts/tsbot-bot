@@ -9,6 +9,7 @@ class GetClientList extends ApiRoute_1.ApiRoute {
         super(logger);
         this.app = app;
         this.bot = bot;
+        this.logger = logger;
     }
     /**
      * Register the route
@@ -47,8 +48,8 @@ class GetClientList extends ApiRoute_1.ApiRoute {
                 channels,
             });
         }
-        catch (e) {
-            console.log('Get info error:', e);
+        catch (error) {
+            this.logger.error('Get info error:', { error });
             return Either_1.left(Error_1.genericBotError());
         }
     }

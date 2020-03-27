@@ -8,8 +8,8 @@ const ApiRoute_1 = require("../../../../ApiRoute");
 const VerifyUserAction_1 = __importDefault(require("../../../../../Bot/Action/VerifyUser/VerifyUserAction"));
 const Validator_1 = __importDefault(require("../../../../Validator"));
 class VerifyUser extends ApiRoute_1.ApiRoute {
-    constructor(app, bot, logger) {
-        super(logger);
+    constructor(app, bot, globalLogger) {
+        super(globalLogger);
         this.app = app;
         this.bot = bot;
     }
