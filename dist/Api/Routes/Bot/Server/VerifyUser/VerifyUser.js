@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const joi_1 = __importDefault(require("@hapi/joi"));
 const ApiRoute_1 = require("../../../../ApiRoute");
 const VerifyUserAction_1 = __importDefault(require("../../../../../Bot/Action/VerifyUser/VerifyUserAction"));
-const Validator_1 = __importDefault(require("../../../../Validator"));
+const Validator_1 = __importDefault(require("../../../../../Validation/Validator"));
 class VerifyUser extends ApiRoute_1.ApiRoute {
     constructor(app, bot, globalLogger) {
         super(globalLogger);

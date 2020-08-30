@@ -2,7 +2,7 @@ import { Express } from "express";
 import Joi from "@hapi/joi";
 import { ApiRoute } from "../../../ApiRoute";
 import { Route } from "../../../ApiTypes";
-import Validator from "../../../Validator";
+import Validator from "../../../../Validation/Validator";
 import Manager from "../../../../Bot/Manager";
 import { right } from "../../../../Lib/Either";
 import Logger from "../../../../Log/Logger";

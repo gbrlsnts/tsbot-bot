@@ -7,7 +7,7 @@ const ApiRoute_1 = require("../../../../ApiRoute");
 const DeleteUserChannelAction_1 = require("../../../../../Bot/Action/UserChannel/DeleteUserChannelAction");
 const Joi = require("@hapi/joi");
 const ValidationRules_1 = require("./ValidationRules");
-const Validator_1 = __importDefault(require("../../../../Validator"));
+const Validator_1 = __importDefault(require("../../../../../Validation/Validator"));
 class DeleteUserChannel extends ApiRoute_1.ApiRoute {
     constructor(app, manager, globalLogger) {
         super(globalLogger);

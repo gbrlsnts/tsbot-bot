@@ -3,7 +3,7 @@ import Joi from "@hapi/joi";
 import { Route } from "../../../../ApiTypes";
 import { ApiRoute } from "../../../../ApiRoute";
 import { Bot } from "../../../../../Bot/Bot";
-import Validator from "../../../../Validator";
+import Validator from "../../../../../Validation/Validator";
 import SetUserGroupsAction from "../../../../../Bot/Action/UserGroups/SetUserGroupsAction";
 import Logger from "../../../../../Log/Logger";
 

@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi_1 = __importDefault(require("@hapi/joi"));
 const ApiRoute_1 = require("../../../../ApiRoute");
-const Validator_1 = __importDefault(require("../../../../Validator"));
+const Validator_1 = __importDefault(require("../../../../../Validation/Validator"));
 const SetUserGroupsAction_1 = __importDefault(require("../../../../../Bot/Action/UserGroups/SetUserGroupsAction"));
 class SetUserGroups extends ApiRoute_1.ApiRoute {
     constructor(app, bot, globalLogger) {

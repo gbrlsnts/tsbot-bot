@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi_1 = __importDefault(require("@hapi/joi"));
 const ApiRoute_1 = require("../../../ApiRoute");
-const Validator_1 = __importDefault(require("../../../Validator"));
+const Validator_1 = __importDefault(require("../../../../Validation/Validator"));
 const Either_1 = require("../../../../Lib/Either");
 class SetConfig extends ApiRoute_1.ApiRoute {
     constructor(app, manager, logger) {

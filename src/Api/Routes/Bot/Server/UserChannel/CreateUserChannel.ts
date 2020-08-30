@@ -4,7 +4,7 @@ import { Route } from "../../../../ApiTypes";
 import { CreateUserChannelAction } from "../../../../../Bot/Action/UserChannel/CreateUserChannelAction";
 import { ApiRoute } from "../../../../ApiRoute";
 import { createChannel } from "./ValidationRules";
-import Validator from "../../../../Validator";
+import Validator from "../../../../../Validation/Validator";
 import Logger from "../../../../../Log/Logger";
 import Manager from "../../../../../Bot/Manager";
 

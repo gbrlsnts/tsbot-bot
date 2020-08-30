@@ -7,7 +7,7 @@ const joi_1 = __importDefault(require("@hapi/joi"));
 const CreateUserChannelAction_1 = require("../../../../../Bot/Action/UserChannel/CreateUserChannelAction");
 const ApiRoute_1 = require("../../../../ApiRoute");
 const ValidationRules_1 = require("./ValidationRules");
-const Validator_1 = __importDefault(require("../../../../Validator"));
+const Validator_1 = __importDefault(require("../../../../../Validation/Validator"));
 class CreateUserChannel extends ApiRoute_1.ApiRoute {
     constructor(app, manager, globalLogger) {
         super(globalLogger);
