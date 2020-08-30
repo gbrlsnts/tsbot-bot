@@ -11,24 +11,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const awilix = __importStar(require("awilix"));
-const Api_1 = require("./Api/Api");
 const container_1 = __importDefault(require("./container"));
+const Commands_1 = require("./Commands/Commands");
 const container = container_1.default();
 const scoped = container.createScope();
 const logger = scoped.resolve('logger');
 scoped.register({
-    serverName: awilix.asValue('testserver_crawl'),
+    serverName: awilix.asValue('testserver'),
 });
 logger.debug('Initializing instance');
-container.resolve('botFactory')
+container
+    .resolve('botFactory')
     .create(scoped.resolve('serverName'))
-    .then(manager => {
+    .then(async (manager) => {
     scoped.register({
         manager: awilix.asValue(manager),
         bot: awilix.asValue(manager.bot),
         logger: awilix.asValue(manager.logger),
     });
-    new Api_1.Api(manager, logger).boot();
+    //new Api(manager, logger).boot();
+    await new Commands_1.Commands(manager).init();
 })
     .catch(error => {
     logger.error('Error initializing bot', { error });

@@ -1,0 +1,2 @@
+nats:
+    url: nats://home.local:4222
