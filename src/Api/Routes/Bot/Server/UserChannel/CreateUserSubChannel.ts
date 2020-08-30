@@ -3,7 +3,7 @@ import Joi = require("@hapi/joi");
 import { Route } from "../../../../ApiTypes";
 import { ApiRoute } from "../../../../ApiRoute";
 import { CreateUserSubChannelAction } from "../../../../../Bot/Action/UserChannel/CreateUserSubChannelAction";
-import { createSubChannel } from "./ValidationRules";
+import { createSubChannel } from "../../../../../Validation/UserChannel/UserChannelValidationRules";
 import Validator from "../../../../../Validation/Validator";
 import Logger from "../../../../../Log/Logger";
 import Manager from "../../../../../Bot/Manager";

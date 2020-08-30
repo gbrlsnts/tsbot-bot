@@ -3,7 +3,7 @@ import { Express } from "express";
 import { ApiRoute } from "../../../../ApiRoute";
 import { DeleteUserChannelAction } from "../../../../../Bot/Action/UserChannel/DeleteUserChannelAction";
 import Joi = require("@hapi/joi");
-import { deleteChannel } from "./ValidationRules";
+import { deleteChannel } from "../../../../../Validation/UserChannel/UserChannelValidationRules";
 import Validator from "../../../../../Validation/Validator";
 import Logger from "../../../../../Log/Logger";
 import Manager from "../../../../../Bot/Manager";

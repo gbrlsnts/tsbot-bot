@@ -1,5 +1,5 @@
 import Joi = require("@hapi/joi");
-import { BotCodec } from "../../../../../Bot/Types";
+import { BotCodec } from "../../Bot/Types";
 
 export const zone = {
     zone: Joi.object().keys({

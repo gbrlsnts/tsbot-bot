@@ -3,7 +3,7 @@ import Joi from "@hapi/joi";
 import { Route } from "../../../../ApiTypes";
 import { CreateUserChannelAction } from "../../../../../Bot/Action/UserChannel/CreateUserChannelAction";
 import { ApiRoute } from "../../../../ApiRoute";
-import { createChannel } from "./ValidationRules";
+import { createChannel } from "../../../../../Validation/UserChannel/UserChannelValidationRules";
 import Validator from "../../../../../Validation/Validator";
 import Logger from "../../../../../Log/Logger";
 import Manager from "../../../../../Bot/Manager";
