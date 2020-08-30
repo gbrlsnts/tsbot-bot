@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const joi_1 = __importDefault(require("@hapi/joi"));
 const CreateUserChannelAction_1 = require("../../../../../Bot/Action/UserChannel/CreateUserChannelAction");
 const ApiRoute_1 = require("../../../../ApiRoute");
-const ValidationRules_1 = require("./ValidationRules");
+const UserChannelValidationRules_1 = require("../../../../../Validation/UserChannel/UserChannelValidationRules");
 const Validator_1 = __importDefault(require("../../../../../Validation/Validator"));
 class CreateUserChannel extends ApiRoute_1.ApiRoute {
     constructor(app, manager, globalLogger) {
@@ -31,7 +31,7 @@ class CreateUserChannel extends ApiRoute_1.ApiRoute {
      * Get the validation schema
      */
     getSchema() {
-        return joi_1.default.object(ValidationRules_1.createChannel);
+        return joi_1.default.object(UserChannelValidationRules_1.createChannel);
     }
 }
 exports.CreateUserChannel = CreateUserChannel;

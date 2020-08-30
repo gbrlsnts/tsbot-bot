@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const ApiRoute_1 = require("../../../../ApiRoute");
 const DeleteUserChannelAction_1 = require("../../../../../Bot/Action/UserChannel/DeleteUserChannelAction");
 const Joi = require("@hapi/joi");
-const ValidationRules_1 = require("./ValidationRules");
+const UserChannelValidationRules_1 = require("../../../../../Validation/UserChannel/UserChannelValidationRules");
 const Validator_1 = __importDefault(require("../../../../../Validation/Validator"));
 class DeleteUserChannel extends ApiRoute_1.ApiRoute {
     constructor(app, manager, globalLogger) {
@@ -31,7 +31,7 @@ class DeleteUserChannel extends ApiRoute_1.ApiRoute {
      * Get the validation schema
      */
     getSchema() {
-        return Joi.object(ValidationRules_1.deleteChannel);
+        return Joi.object(UserChannelValidationRules_1.deleteChannel);
     }
 }
 exports.DeleteUserChannel = DeleteUserChannel;

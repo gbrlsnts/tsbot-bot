@@ -17,8 +17,18 @@ class Validator {
      * @param validationOptions Options for the validation. Will override default options
      */
     async validate(data, validationOptions) {
-        return await this.schema
-            .validateAsync(data, validationOptions || this.defaultValidationOptions);
+        if (!this.schema)
+            throw new Error('no schema provided');
+        return await this.schema.validateAsync(data, validationOptions || this.defaultValidationOptions);
+    }
+    /**
+     * Validate request data against a schema
+     * @param schema schema to use for validation
+     * @param data Data to validate
+     * @param validationOptions Options for the validation. Will override default options
+     */
+    async validateSchema(schema, data, validationOptions) {
+        return await schema.validateAsync(data, validationOptions || this.defaultValidationOptions);
     }
 }
 exports.default = Validator;

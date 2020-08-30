@@ -1,6 +1,8 @@
 import Manager from '../Bot/Manager';
 import { NatsConnector } from './Nats/Connector';
 import { CommandGateway } from './Gateway';
+import { SubscriberInterface } from './Subscribers/SubscriberInterface';
+import { CreateUserChannelSubscriber } from './Subscribers/CreateUserChannel';
 
 export class Commands {
     constructor(private manager: Manager) {}
@@ -9,8 +11,12 @@ export class Commands {
         const nats = await new NatsConnector().connect();
 
         const gateway = new CommandGateway(this.manager, nats);
-        gateway.subscribe();
+        gateway.subscribe(this.getSubscribers());
 
         this.manager.logger.info('Command gateway initialized');
+    }
+
+    getSubscribers(): SubscriberInterface[] {
+        return [new CreateUserChannelSubscriber(this.manager)];
     }
 }

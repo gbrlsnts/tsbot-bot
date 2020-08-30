@@ -1,28 +1,82 @@
 import { Client } from 'nats';
+import { ValidationError } from '@hapi/joi';
 import Manager from '../Bot/Manager';
-import { CreateUserChannelHandler } from './Handlers/CreateUserChannel';
-import * as nats from 'nats';
+import Validator from '../Validation/Validator';
+import { SubscriberInterface } from './Subscribers/SubscriberInterface';
+import { Either, Failure } from '../Lib/Library';
 
 export class CommandGateway {
-    constructor(private manager: Manager, private nats: Client) {}
+    private readonly validator: Validator;
 
-    subscribe(): void {
-        const handler = new CreateUserChannelHandler(this.manager);
+    constructor(private manager: Manager, private nats: Client) {
+        this.validator = new Validator();
+    }
 
-        this.nats.subscribe(handler.getSubject(), (err, msg) => {
-            console.log(msg.subject, msg.data, msg.reply);
-            if (err) return console.log(err);
+    subscribe(subscribers: SubscriberInterface[]): void {
+        subscribers.forEach(sub => this.subscribeSubject(sub));
+    }
 
-            if (msg.reply) {
-                const replyData = {
-                    channel: Math.floor(Math.random() * 1000) + 1,
-                };
-
-                this.nats.publish(msg.reply, JSON.stringify(replyData), e => {
-                    if (e) console.log('error', e);
+    private subscribeSubject(subscriber: SubscriberInterface): void {
+        this.nats.subscribe(subscriber.getSubject(), async (error, msg) => {
+            if (error) {
+                return this.manager.logger.error('nats subscribe error', {
+                    error,
                 });
             }
-            //handler.handle(msg);
+
+            const { subject, data, reply } = msg;
+
+            this.manager.logger.debug('got nats data', {
+                context: { subject, data, reply },
+            });
+
+            const schema = subscriber.getValidationSchema();
+
+            try {
+                const dataObject = JSON.parse(data);
+
+                if (schema)
+                    await this.validator.validateSchema(schema, dataObject);
+
+                const result = await subscriber.handle(dataObject);
+
+                if (!reply) return;
+                this.reply(reply, result);
+            } catch (error) {
+                if (reply)
+                    this.replyError(reply, error?.message || error.toString());
+
+                return this.manager.logger.error('nats subscriber error', {
+                    canShare: true,
+                    error,
+                });
+            }
+        });
+    }
+
+    private reply(inbox: string, result: Either<Failure<any>, any>): void {
+        let response;
+
+        if (result.isLeft()) {
+            response = {
+                error: result.value.reason,
+            };
+        } else {
+            response = {
+                data: result.value,
+            };
+        }
+
+        this.sendReply(inbox, response);
+    }
+
+    private replyError(inbox: string, error: string): void {
+        this.sendReply(inbox, { error });
+    }
+
+    private sendReply(inbox: string, data: any): void {
+        this.nats.publish(inbox, JSON.stringify(data), error => {
+            if (error) this.manager.logger.error('nats reply error', { error });
         });
     }
 }
