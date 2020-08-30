@@ -1,31 +1,26 @@
-export enum ConnectionProtocol
-{
+export enum ConnectionProtocol {
     RAW = 'raw',
-    SSH = 'ssh'
+    SSH = 'ssh',
 }
 
-export enum BotCodec
-{
-    voice = "voice", // opus voice = 4
-    music = "music", // opus music = 5
+export enum BotCodec {
+    voice = 'OPUS_VOICE', // opus voice = 4
+    music = 'OPUS_MUSIC', // opus music = 5
 }
 
-export enum ClientType
-{
-    normal = "normal",
-    query = "query",
+export enum ClientType {
+    normal = 'normal',
+    query = 'query',
 }
 
-export interface ChannelPermission
-{
+export interface ChannelPermission {
     /** The permission id */
     permission: string;
     /** The permission value */
     value: number;
 }
 
-export interface SelfInfoData
-{
+export interface SelfInfoData {
     /** self client Id */
     clientId: number;
     /** self database Id */

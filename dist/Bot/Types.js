@@ -7,8 +7,8 @@ var ConnectionProtocol;
 })(ConnectionProtocol = exports.ConnectionProtocol || (exports.ConnectionProtocol = {}));
 var BotCodec;
 (function (BotCodec) {
-    BotCodec["voice"] = "voice";
-    BotCodec["music"] = "music";
+    BotCodec["voice"] = "OPUS_VOICE";
+    BotCodec["music"] = "OPUS_MUSIC";
 })(BotCodec = exports.BotCodec || (exports.BotCodec = {}));
 var ClientType;
 (function (ClientType) {
