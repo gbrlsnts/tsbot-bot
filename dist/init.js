@@ -21,7 +21,7 @@ const container = container_1.default();
 const scoped = container.createScope();
 const logger = scoped.resolve('logger');
 scoped.register({
-    serverName: awilix.asValue('testserver'),
+    serverName: awilix.asValue(process.env.SERVER_NAME || config_1.default.get('server.name')),
 });
 logger.debug('Initializing instance');
 container

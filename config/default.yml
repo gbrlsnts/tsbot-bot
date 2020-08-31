@@ -1,3 +1,6 @@
+server:
+    name: testserver
+
 nats:
     enabled: true
     url: nats://home.local:4222
