@@ -1,2 +1,7 @@
 nats:
+    enabled: true
     url: nats://home.local:4222
+
+api:
+    enabled: false
+    port: 3001

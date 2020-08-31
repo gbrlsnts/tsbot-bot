@@ -10,3 +10,8 @@ export interface Route {
      */
     setPrefix(prefix: string): this;
 }
+
+export interface ApiConfig {
+    enabled: boolean;
+    port: number;
+}
