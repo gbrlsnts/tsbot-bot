@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Connector_1 = require("./Nats/Connector");
 const Gateway_1 = require("./Gateway");
 const CreateUserChannel_1 = require("./Subscribers/CreateUserChannel");
+const DeleteUserChannel_1 = require("./Subscribers/DeleteUserChannel");
 class Commands {
     constructor(manager) {
         this.manager = manager;
@@ -14,7 +15,10 @@ class Commands {
         this.manager.logger.info('Command gateway initialized');
     }
     getSubscribers() {
-        return [new CreateUserChannel_1.CreateUserChannelSubscriber(this.manager)];
+        return [
+            new CreateUserChannel_1.CreateUserChannelSubscriber(this.manager),
+            new DeleteUserChannel_1.DeleteUserChannelSubscriber(this.manager),
+        ];
     }
 }
 exports.Commands = Commands;

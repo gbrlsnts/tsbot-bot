@@ -1,5 +1,4 @@
 import { Client } from 'nats';
-import { ValidationError } from '@hapi/joi';
 import Manager from '../Bot/Manager';
 import Validator from '../Validation/Validator';
 import { SubscriberInterface } from './Subscribers/SubscriberInterface';

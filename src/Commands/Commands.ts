@@ -3,6 +3,7 @@ import { NatsConnector } from './Nats/Connector';
 import { CommandGateway } from './Gateway';
 import { SubscriberInterface } from './Subscribers/SubscriberInterface';
 import { CreateUserChannelSubscriber } from './Subscribers/CreateUserChannel';
+import { DeleteUserChannelSubscriber } from './Subscribers/DeleteUserChannel';
 
 export class Commands {
     constructor(private manager: Manager) {}
@@ -17,6 +18,9 @@ export class Commands {
     }
 
     getSubscribers(): SubscriberInterface[] {
-        return [new CreateUserChannelSubscriber(this.manager)];
+        return [
+            new CreateUserChannelSubscriber(this.manager),
+            new DeleteUserChannelSubscriber(this.manager),
+        ];
     }
 }
