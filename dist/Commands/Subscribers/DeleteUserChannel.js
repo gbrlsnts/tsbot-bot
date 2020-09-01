@@ -10,7 +10,11 @@ class DeleteUserChannelSubscriber {
     constructor(manager) {
         this.manager = manager;
         this.subject = 'bot.server.*.channel.delete';
+        this.serverIdPos = this.subject.split('.').findIndex(f => f === '*');
         this.schema = joi_1.default.object(UserChannelValidationRules_1.deleteChannel);
+    }
+    getServerIdPosition() {
+        return this.serverIdPos;
     }
     getSubject() {
         return this.subject;
@@ -19,7 +23,7 @@ class DeleteUserChannelSubscriber {
         return this.schema;
     }
     handle(msg) {
-        return new DeleteUserChannelAction_1.DeleteUserChannelAction(this.manager.logger, this.manager.bot, msg).execute();
+        return new DeleteUserChannelAction_1.DeleteUserChannelAction(this.manager.logger, this.manager.bot, msg.data).execute();
     }
 }
 exports.DeleteUserChannelSubscriber = DeleteUserChannelSubscriber;

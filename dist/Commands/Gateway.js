@@ -15,7 +15,7 @@ class CommandGateway {
     }
     subscribeSubject(subscriber) {
         this.nats.subscribe(subscriber.getSubject(), async (error, msg) => {
-            var _a;
+            var _a, _b;
             if (error) {
                 return this.manager.logger.error('nats subscribe error', {
                     error,
@@ -30,14 +30,18 @@ class CommandGateway {
                 const dataObject = JSON.parse(data);
                 if (schema)
                     await this.validator.validateSchema(schema, dataObject);
-                const result = await subscriber.handle(dataObject);
+                const result = await subscriber.handle({
+                    data: dataObject,
+                    serverId: (_a = subject.split('.')) === null || _a === void 0 ? void 0 : _a[subscriber.getServerIdPosition()],
+                    subject,
+                });
                 if (!reply)
                     return;
                 this.reply(reply, result);
             }
             catch (error) {
                 if (reply)
-                    this.replyError(reply, ((_a = error) === null || _a === void 0 ? void 0 : _a.message) || error.toString());
+                    this.replyError(reply, ((_b = error) === null || _b === void 0 ? void 0 : _b.message) || error.toString());
                 return this.manager.logger.error('nats subscriber error', {
                     canShare: true,
                     error,

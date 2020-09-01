@@ -11,10 +11,10 @@ class Commands {
     async init() {
         const nats = await new Connector_1.NatsConnector().connect();
         const gateway = new Gateway_1.CommandGateway(this.manager, nats);
-        gateway.subscribe(this.getSubscribers());
+        gateway.subscribe(this.getServerSubscribers());
         this.manager.logger.info('Command gateway initialized');
     }
-    getSubscribers() {
+    getServerSubscribers() {
         return [
             new CreateUserChannel_1.CreateUserChannelSubscriber(this.manager),
             new DeleteUserChannel_1.DeleteUserChannelSubscriber(this.manager),

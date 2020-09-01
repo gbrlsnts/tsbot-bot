@@ -1,7 +1,7 @@
 import { Client } from 'nats';
 import Manager from '../Bot/Manager';
 import Validator from '../Validation/Validator';
-import { SubscriberInterface } from './Subscribers/SubscriberInterface';
+import { ServerMsgSubscriber } from './Subscribers/Interfaces';
 import { Either, Failure } from '../Lib/Library';
 
 export class CommandGateway {
@@ -11,11 +11,11 @@ export class CommandGateway {
         this.validator = new Validator();
     }
 
-    subscribe(subscribers: SubscriberInterface[]): void {
+    subscribe(subscribers: ServerMsgSubscriber[]): void {
         subscribers.forEach(sub => this.subscribeSubject(sub));
     }
 
-    private subscribeSubject(subscriber: SubscriberInterface): void {
+    private subscribeSubject(subscriber: ServerMsgSubscriber): void {
         this.nats.subscribe(subscriber.getSubject(), async (error, msg) => {
             if (error) {
                 return this.manager.logger.error('nats subscribe error', {
@@ -37,7 +37,13 @@ export class CommandGateway {
                 if (schema)
                     await this.validator.validateSchema(schema, dataObject);
 
-                const result = await subscriber.handle(dataObject);
+                const result = await subscriber.handle({
+                    data: dataObject,
+                    serverId: subject.split('.')?.[
+                        subscriber.getServerIdPosition()
+                    ],
+                    subject,
+                });
 
                 if (!reply) return;
                 this.reply(reply, result);

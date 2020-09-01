@@ -1,7 +1,7 @@
 import Manager from '../Bot/Manager';
 import { NatsConnector } from './Nats/Connector';
 import { CommandGateway } from './Gateway';
-import { SubscriberInterface } from './Subscribers/SubscriberInterface';
+import { ServerMsgSubscriber } from './Subscribers/Interfaces';
 import { CreateUserChannelSubscriber } from './Subscribers/CreateUserChannel';
 import { DeleteUserChannelSubscriber } from './Subscribers/DeleteUserChannel';
 
@@ -12,12 +12,12 @@ export class Commands {
         const nats = await new NatsConnector().connect();
 
         const gateway = new CommandGateway(this.manager, nats);
-        gateway.subscribe(this.getSubscribers());
+        gateway.subscribe(this.getServerSubscribers());
 
         this.manager.logger.info('Command gateway initialized');
     }
 
-    getSubscribers(): SubscriberInterface[] {
+    getServerSubscribers(): ServerMsgSubscriber[] {
         return [
             new CreateUserChannelSubscriber(this.manager),
             new DeleteUserChannelSubscriber(this.manager),

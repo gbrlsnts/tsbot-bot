@@ -10,7 +10,11 @@ class CreateUserChannelSubscriber {
     constructor(manager) {
         this.manager = manager;
         this.subject = 'bot.server.*.channel.create';
+        this.serverIdPos = this.subject.split('.').findIndex(f => f === '*');
         this.schema = joi_1.default.object(UserChannelValidationRules_1.createChannel);
+    }
+    getServerIdPosition() {
+        return this.serverIdPos;
     }
     getSubject() {
         return this.subject;
@@ -19,7 +23,7 @@ class CreateUserChannelSubscriber {
         return this.schema;
     }
     handle(msg) {
-        return new CreateUserChannelAction_1.CreateUserChannelAction(this.manager.logger, this.manager.bot, msg).execute();
+        return new CreateUserChannelAction_1.CreateUserChannelAction(this.manager.logger, this.manager.bot, msg.data).execute();
     }
 }
 exports.CreateUserChannelSubscriber = CreateUserChannelSubscriber;
