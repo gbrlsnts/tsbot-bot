@@ -59,11 +59,16 @@ class DeleteUserChannelAction extends ChannelAction_1.ChannelAction {
         // Shouldn't happen has it has been validated by the parent method
         if (!channel)
             return Error_1.invalidChannelError();
-        if (channel.pid !== 0) {
-            const root = ChannelUtils_1.ChannelUtils.getRootChannelBySubChannel(channel, channelList);
-            if (channel.pid === root.cid && ChannelUtils_1.ChannelUtils.getAllSubchannels(root, channelList).length === 1)
-                return Error_1.onlyOneSubchannelError();
-        }
+        if (channel.pid === 0)
+            return;
+        if (!this.data.rootChannelId)
+            return Error_1.deletingNoRootChannelError();
+        const root = ChannelUtils_1.ChannelUtils.getRootChannelBySubChannel(channel, channelList);
+        if (root.cid !== this.data.rootChannelId)
+            return Error_1.subchannelDoesntBelongToRootError();
+        if (channel.pid === root.cid &&
+            ChannelUtils_1.ChannelUtils.getAllSubchannels(root, channelList).length === 1)
+            return Error_1.onlyOneSubchannelError();
     }
     /**
      * Get the server bot instance

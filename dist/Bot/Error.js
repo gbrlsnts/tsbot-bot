@@ -12,6 +12,8 @@ var BotError;
     BotError["InvalidClient"] = "InvalidClient";
     BotError["ChannelNameExists"] = "ChannelNameExists";
     BotError["CannotDeleteOnlyOneSubchannel"] = "CannotDeleteOnlyOneSubchannel";
+    BotError["NoRootChannel"] = "NoRootChannel";
+    BotError["SubchannelNotOfRoot"] = "SubchannelNotOfRoot";
 })(BotError = exports.BotError || (exports.BotError = {}));
 exports.genericBotError = () => ({
     type: BotError.GenericBotError,
@@ -23,7 +25,7 @@ exports.notConnectedError = () => ({
 });
 exports.invalidZoneError = () => ({
     type: BotError.InvalidZone,
-    reason: 'The start or end channels doesn\'t exist',
+    reason: "The start or end channels doesn't exist",
 });
 exports.invalidConfigurationError = () => ({
     type: BotError.InvalidConfiguration,
@@ -52,5 +54,13 @@ exports.channelNameExistsError = (name) => ({
 exports.onlyOneSubchannelError = () => ({
     type: BotError.CannotDeleteOnlyOneSubchannel,
     reason: 'Can not delete channel since there is only one subchannel',
+});
+exports.deletingNoRootChannelError = () => ({
+    type: BotError.NoRootChannel,
+    reason: 'The root channel must be provided when deleting sub channel',
+});
+exports.subchannelDoesntBelongToRootError = () => ({
+    type: BotError.SubchannelNotOfRoot,
+    reason: 'The sub channel does not belong to the root channel',
 });
 //# sourceMappingURL=Error.js.map
