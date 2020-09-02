@@ -2,9 +2,10 @@ import Manager from '../Bot/Manager';
 import { NatsConnector } from './Nats/Connector';
 import { CommandGateway } from './Gateway';
 import { ServerMsgSubscriber } from './Subscribers/Interfaces';
-import { CreateUserChannelSubscriber } from './Subscribers/CreateUserChannel';
-import { DeleteUserChannelSubscriber } from './Subscribers/DeleteUserChannel';
-import { CreateUserSubChannelSubscriber } from './Subscribers/CreateUserSubChannel';
+import { CreateUserChannelSubscriber } from './Subscribers/Actions/CreateUserChannel';
+import { DeleteUserChannelSubscriber } from './Subscribers/Actions/DeleteUserChannel';
+import { CreateUserSubChannelSubscriber } from './Subscribers/Actions/CreateUserSubChannel';
+import { GetSubChannelCountSubscriber } from './Subscribers/Getters/GetSubChannelCount';
 
 export class Commands {
     constructor(private manager: Manager) {}
@@ -23,6 +24,7 @@ export class Commands {
             new CreateUserChannelSubscriber(this.manager),
             new CreateUserSubChannelSubscriber(this.manager),
             new DeleteUserChannelSubscriber(this.manager),
+            new GetSubChannelCountSubscriber(this.manager),
         ];
     }
 }

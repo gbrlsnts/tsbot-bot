@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const ts3_nodejs_library_1 = require("ts3-nodejs-library");
 const Either_1 = require("../../Lib/Either");
 const Error_1 = require("../Error");
 class ChannelUtils {
@@ -21,8 +22,12 @@ class ChannelUtils {
                 endChannel = channel;
                 break;
             }
-            if (startChannel && channel.cid !== start && channel.cid !== end &&
-                (includeSeparators || (!includeSeparators && !this.isChannelSeparator(channel, allChannels)))) {
+            if (startChannel &&
+                channel.cid !== start &&
+                channel.cid !== end &&
+                (includeSeparators ||
+                    (!includeSeparators &&
+                        !this.isChannelSeparator(channel, allChannels)))) {
                 channels.push(channel);
             }
         }
@@ -31,7 +36,7 @@ class ChannelUtils {
         return Either_1.right({
             start: startChannel,
             end: endChannel,
-            channels
+            channels,
         });
     }
     /**
@@ -40,9 +45,10 @@ class ChannelUtils {
      * @param channelList The server channel list
      */
     static getAllSubchannels(channel, channelList) {
+        const channelId = channel instanceof ts3_nodejs_library_1.TeamSpeakChannel ? channel.cid : channel;
         const subChannelList = [];
         channelList
-            .filter(channelToFilter => channelToFilter.pid === channel.cid)
+            .filter(channelToFilter => channelToFilter.pid === channelId)
             .forEach(subChannel => {
             const children = this.getAllSubchannels(subChannel, channelList);
             subChannelList.push(subChannel, ...children);
@@ -93,7 +99,8 @@ class ChannelUtils {
      * @param channelList List with all server channels
      */
     static isChannelSeparator(channel, channelList) {
-        return this.isChannelSpacer(channel.name) && this.getAllSubchannels(channel, channelList).length === 0;
+        return (this.isChannelSpacer(channel.name) &&
+            this.getAllSubchannels(channel, channelList).length === 0);
     }
     /**
      * Get the channel before the specified channel
@@ -110,5 +117,5 @@ class ChannelUtils {
     }
 }
 exports.ChannelUtils = ChannelUtils;
-ChannelUtils.spacerRegex = new RegExp('\[[\*lcr]spacer.*\].*');
+ChannelUtils.spacerRegex = new RegExp('[[*lcr]spacer.*].*');
 //# sourceMappingURL=ChannelUtils.js.map

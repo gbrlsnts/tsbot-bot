@@ -1,14 +1,14 @@
 import Joi from '@hapi/joi';
-import Manager from '../../Bot/Manager';
+import Manager from '../../../Bot/Manager';
 import {
     SubscriberInterface,
     HandleServerMessagesInterface,
-} from './Interfaces';
-import { Either, Failure } from '../../Lib/Library';
-import { CreateUserChannelAction } from '../../Bot/Action/UserChannel/CreateUserChannelAction';
-import { CreateUserChannelData } from '../../Bot/Action/UserChannel/UserChannelTypes';
-import { createChannel } from '../../Validation/UserChannel/UserChannelValidationRules';
-import { Message } from '../Message';
+} from '../Interfaces';
+import { Either, Failure } from '../../../Lib/Library';
+import { CreateUserChannelAction } from '../../../Bot/Action/UserChannel/CreateUserChannelAction';
+import { CreateUserChannelData } from '../../../Bot/Action/UserChannel/UserChannelTypes';
+import { createChannel } from '../../../Validation/UserChannel/UserChannelValidationRules';
+import { Message } from '../../Message';
 
 export class CreateUserChannelSubscriber
     implements SubscriberInterface, HandleServerMessagesInterface {

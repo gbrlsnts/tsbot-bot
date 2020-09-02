@@ -2,13 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const Joi = require("@hapi/joi");
 const Types_1 = require("../../Bot/Types");
-exports.zone = {
-    zone: Joi.object().keys({
-        start: Joi.number().min(1).required(),
-        end: Joi.number().min(1).required(),
-        separators: Joi.boolean().required(),
-    }),
-};
+const SharedRules_1 = require("../SharedRules");
 exports.channelProps = {
     permissions: Joi.array().items(Joi.object().keys({
         permission: Joi.string().required(),
@@ -24,7 +18,7 @@ exports.channelProps = {
     }),
 };
 exports.createChannel = {
-    ...exports.zone,
+    ...SharedRules_1.zone,
     owner: Joi.number().min(1),
     group: Joi.number().min(1),
     channels: Joi.array()
@@ -37,19 +31,13 @@ exports.createChannel = {
     })),
     ...exports.channelProps,
 };
-exports.channelId = {
-    channelId: Joi.number().required().min(1),
-};
-exports.rootChannelId = {
-    rootChannelId: Joi.number().optional().min(1),
-};
 exports.createSubChannel = {
     ...exports.createChannel,
-    ...exports.rootChannelId,
+    ...SharedRules_1.rootChannelId,
 };
 exports.deleteChannel = {
-    ...exports.zone,
-    ...exports.channelId,
-    ...exports.rootChannelId,
+    ...SharedRules_1.zone,
+    ...SharedRules_1.channelId,
+    ...SharedRules_1.rootChannelId,
 };
 //# sourceMappingURL=UserChannelValidationRules.js.map

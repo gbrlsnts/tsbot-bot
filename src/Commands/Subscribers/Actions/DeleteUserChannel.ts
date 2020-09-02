@@ -1,14 +1,14 @@
 import Joi from '@hapi/joi';
-import Manager from '../../Bot/Manager';
+import Manager from '../../../Bot/Manager';
 import {
     SubscriberInterface,
     HandleServerMessagesInterface,
-} from './Interfaces';
-import { Either, Failure } from '../../Lib/Library';
-import { DeleteChannelData } from '../../Bot/Action/UserChannel/UserChannelTypes';
-import { deleteChannel } from '../../Validation/UserChannel/UserChannelValidationRules';
-import { DeleteUserChannelAction } from '../../Bot/Action/UserChannel/DeleteUserChannelAction';
-import { Message } from '../Message';
+} from '../Interfaces';
+import { Either, Failure } from '../../../Lib/Library';
+import { DeleteChannelData } from '../../../Bot/Action/UserChannel/UserChannelTypes';
+import { deleteChannel } from '../../../Validation/UserChannel/UserChannelValidationRules';
+import { DeleteUserChannelAction } from '../../../Bot/Action/UserChannel/DeleteUserChannelAction';
+import { Message } from '../../Message';
 
 export class DeleteUserChannelSubscriber
     implements SubscriberInterface, HandleServerMessagesInterface {
