@@ -1,52 +1,65 @@
-import { ActionInterface } from "../Action";
-import { BotError, notConnectedError } from "../../Error";
-import { Either, Failure, right, left } from "../../../Lib/Library";
-import { CreateUserSubChannelResultData, CreateSubChannelData, CreateChannelData } from "./UserChannelTypes";
-import { Bot } from "../../Bot";
-import { CreateChannelAction } from "./CreateChannelAction";
-import Logger from "../../../Log/Logger";
+import { ActionInterface } from '../Action';
+import { BotError, notConnectedError } from '../../Error';
+import { Either, Failure, right, left } from '../../../Lib/Library';
+import {
+    CreateUserSubChannelResultData,
+    CreateSubChannelData,
+    CreateChannelData,
+} from './UserChannelTypes';
+import { Bot } from '../../Bot';
+import { CreateChannelAction } from './CreateChannelAction';
+import Logger from '../../../Log/Logger';
 
-export class CreateUserSubChannelAction extends CreateChannelAction implements ActionInterface<CreateUserSubChannelResultData>
-{
-    constructor(logger: Logger, bot: Bot, private readonly data: CreateSubChannelData)
-    {
+export class CreateUserSubChannelAction
+    extends CreateChannelAction
+    implements ActionInterface<CreateUserSubChannelResultData> {
+    constructor(
+        logger: Logger,
+        bot: Bot,
+        private readonly data: CreateSubChannelData
+    ) {
         super(logger, bot);
     }
 
     /**
      * Create the user sub channel
      */
-    async execute(): Promise<Either<Failure<BotError>, CreateUserSubChannelResultData>>
-    {
-        if(!this.bot.isConnected)
-            return left(notConnectedError());
+    async execute(): Promise<
+        Either<Failure<BotError>, CreateUserSubChannelResultData>
+    > {
+        if (!this.bot.isConnected) return left(notConnectedError());
 
-        const failure = await this.validateAction(this.data.channelId) || await this.validateChannel(this.data.channelId);
+        const failure =
+            (await this.validateAction(this.data.rootChannelId)) ||
+            (await this.validateChannel(this.data.rootChannelId));
 
-        if(failure)
-            return left(failure);
+        if (failure) return left(failure);
 
         await this.createSubChannel();
         this.setUserChannelAdminGroup(this.getCreatedChannels());
-        
+
         return right({
-            channels: this.getCreatedChannels().map(channel => channel.cid)
+            channels: this.getCreatedChannels().map(channel => channel.cid),
         });
     }
 
     /**
      * Create sub channels in the request
      */
-    async createSubChannel()
-    {
+    async createSubChannel() {
         try {
-            for(const config of this.data.channels) {
-                await this.createUserChannel({ config, parent: this.data.channelId });
+            for (const config of this.data.channels) {
+                await this.createUserChannel({
+                    config,
+                    parent: this.data.rootChannelId,
+                });
             }
         } catch (e) {
             this.cleanUpCreatedChannels(this.getCreatedChannels());
-            
-            return Promise.reject(new Error(`Error while creating channels: ${e.message}`));
+
+            return Promise.reject(
+                new Error(`Error while creating channels: ${e.message}`)
+            );
         }
     }
 

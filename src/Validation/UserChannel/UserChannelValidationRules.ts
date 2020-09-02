@@ -47,13 +47,17 @@ export const channelId = {
     channelId: Joi.number().required().min(1),
 };
 
+export const rootChannelId = {
+    rootChannelId: Joi.number().optional().min(1),
+};
+
 export const createSubChannel = {
     ...createChannel,
-    ...channelId,
+    ...rootChannelId,
 };
 
 export const deleteChannel = {
     ...zone,
     ...channelId,
-    rootChannelId: Joi.number().optional().min(1),
+    ...rootChannelId,
 };

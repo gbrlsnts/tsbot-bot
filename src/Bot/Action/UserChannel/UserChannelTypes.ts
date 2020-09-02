@@ -23,7 +23,7 @@ export interface CreateUserChannelData extends CreateChannelData {}
 
 export interface CreateSubChannelData extends CreateChannelData {
     /** Parent to create sub channel */
-    channelId: number;
+    rootChannelId: number;
 }
 
 export interface DeleteChannelData extends ZoneChannel {

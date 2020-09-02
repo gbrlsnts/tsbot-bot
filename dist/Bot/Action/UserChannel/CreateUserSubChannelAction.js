@@ -14,13 +14,14 @@ class CreateUserSubChannelAction extends CreateChannelAction_1.CreateChannelActi
     async execute() {
         if (!this.bot.isConnected)
             return Library_1.left(Error_1.notConnectedError());
-        const failure = await this.validateAction(this.data.channelId) || await this.validateChannel(this.data.channelId);
+        const failure = (await this.validateAction(this.data.rootChannelId)) ||
+            (await this.validateChannel(this.data.rootChannelId));
         if (failure)
             return Library_1.left(failure);
         await this.createSubChannel();
         this.setUserChannelAdminGroup(this.getCreatedChannels());
         return Library_1.right({
-            channels: this.getCreatedChannels().map(channel => channel.cid)
+            channels: this.getCreatedChannels().map(channel => channel.cid),
         });
     }
     /**
@@ -29,7 +30,10 @@ class CreateUserSubChannelAction extends CreateChannelAction_1.CreateChannelActi
     async createSubChannel() {
         try {
             for (const config of this.data.channels) {
-                await this.createUserChannel({ config, parent: this.data.channelId });
+                await this.createUserChannel({
+                    config,
+                    parent: this.data.rootChannelId,
+                });
             }
         }
         catch (e) {

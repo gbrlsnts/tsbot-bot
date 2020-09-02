@@ -40,13 +40,16 @@ exports.createChannel = {
 exports.channelId = {
     channelId: Joi.number().required().min(1),
 };
+exports.rootChannelId = {
+    rootChannelId: Joi.number().optional().min(1),
+};
 exports.createSubChannel = {
     ...exports.createChannel,
-    ...exports.channelId,
+    ...exports.rootChannelId,
 };
 exports.deleteChannel = {
     ...exports.zone,
     ...exports.channelId,
-    rootChannelId: Joi.number().optional().min(1),
+    ...exports.rootChannelId,
 };
 //# sourceMappingURL=UserChannelValidationRules.js.map

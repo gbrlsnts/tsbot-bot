@@ -4,6 +4,7 @@ import { CommandGateway } from './Gateway';
 import { ServerMsgSubscriber } from './Subscribers/Interfaces';
 import { CreateUserChannelSubscriber } from './Subscribers/CreateUserChannel';
 import { DeleteUserChannelSubscriber } from './Subscribers/DeleteUserChannel';
+import { CreateUserSubChannelSubscriber } from './Subscribers/CreateUserSubChannel';
 
 export class Commands {
     constructor(private manager: Manager) {}
@@ -20,6 +21,7 @@ export class Commands {
     getServerSubscribers(): ServerMsgSubscriber[] {
         return [
             new CreateUserChannelSubscriber(this.manager),
+            new CreateUserSubChannelSubscriber(this.manager),
             new DeleteUserChannelSubscriber(this.manager),
         ];
     }
