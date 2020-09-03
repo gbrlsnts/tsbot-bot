@@ -11,7 +11,11 @@ exports.zone = {
 exports.channelId = {
     channelId: Joi.number().required().min(1),
 };
-exports.rootChannelId = {
+exports.optRootChannelId = {
     rootChannelId: Joi.number().optional().min(1),
+};
+exports.channelNames = {
+    channels: Joi.array().required().min(1).items(Joi.string()),
+    ...exports.optRootChannelId,
 };
 //# sourceMappingURL=SharedRules.js.map

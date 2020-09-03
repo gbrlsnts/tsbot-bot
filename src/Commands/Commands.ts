@@ -6,6 +6,7 @@ import { CreateUserChannelSubscriber } from './Subscribers/Actions/CreateUserCha
 import { DeleteUserChannelSubscriber } from './Subscribers/Actions/DeleteUserChannel';
 import { CreateUserSubChannelSubscriber } from './Subscribers/Actions/CreateUserSubChannel';
 import { GetSubChannelCountSubscriber } from './Subscribers/Getters/GetSubChannelCount';
+import { ValidateChannelsUniqueSubscriber } from './Subscribers/Getters/ValidateChannelUnique';
 
 export class Commands {
     constructor(private manager: Manager) {}
@@ -25,6 +26,7 @@ export class Commands {
             new CreateUserSubChannelSubscriber(this.manager),
             new DeleteUserChannelSubscriber(this.manager),
             new GetSubChannelCountSubscriber(this.manager),
+            new ValidateChannelsUniqueSubscriber(this.manager),
         ];
     }
 }

@@ -10,6 +10,7 @@ import { Message } from '../../Message';
 import { Bot } from '../../../Bot/Bot';
 import { notConnectedError, invalidChannelError } from '../../../Bot/Error';
 import { ChannelUtils } from '../../../Bot/Utils/ChannelUtils';
+import { ChannelIdRequest } from './Types';
 
 export class GetSubChannelCountSubscriber
     implements SubscriberInterface, HandleServerMessagesInterface {
@@ -35,7 +36,7 @@ export class GetSubChannelCountSubscriber
     }
 
     async handle(
-        msg: Message<{ channelId: number }>
+        msg: Message<ChannelIdRequest>
     ): Promise<Either<Failure<any>, any>> {
         const {
             data: { channelId },

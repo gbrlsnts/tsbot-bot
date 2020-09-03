@@ -1,6 +1,6 @@
 import Joi = require('@hapi/joi');
 import { BotCodec } from '../../Bot/Types';
-import { channelId, rootChannelId, zone } from '../SharedRules';
+import { channelId, optRootChannelId, zone } from '../SharedRules';
 
 export const channelProps = {
     permissions: Joi.array().items(
@@ -38,11 +38,11 @@ export const createChannel = {
 
 export const createSubChannel = {
     ...createChannel,
-    ...rootChannelId,
+    ...optRootChannelId,
 };
 
 export const deleteChannel = {
     ...zone,
     ...channelId,
-    ...rootChannelId,
+    ...optRootChannelId,
 };

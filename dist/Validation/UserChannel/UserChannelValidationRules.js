@@ -33,11 +33,11 @@ exports.createChannel = {
 };
 exports.createSubChannel = {
     ...exports.createChannel,
-    ...SharedRules_1.rootChannelId,
+    ...SharedRules_1.optRootChannelId,
 };
 exports.deleteChannel = {
     ...SharedRules_1.zone,
     ...SharedRules_1.channelId,
-    ...SharedRules_1.rootChannelId,
+    ...SharedRules_1.optRootChannelId,
 };
 //# sourceMappingURL=UserChannelValidationRules.js.map

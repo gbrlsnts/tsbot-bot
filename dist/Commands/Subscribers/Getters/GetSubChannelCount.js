@@ -26,10 +26,14 @@ class GetSubChannelCountSubscriber {
         return this.schema;
     }
     async handle(msg) {
+        const { data: { channelId }, } = msg;
         if (!this.bot.isConnected)
             return Library_1.left(Error_1.notConnectedError());
         const channels = await this.bot.getServer().channelList();
-        const count = ChannelUtils_1.ChannelUtils.getAllSubchannels(msg.data.channelId, channels).length;
+        if (channels.findIndex(c => c.cid === channelId) === -1)
+            return Library_1.left(Error_1.invalidChannelError());
+        const count = ChannelUtils_1.ChannelUtils.getAllSubchannels(channelId, channels)
+            .length;
         return Library_1.right(count);
     }
 }

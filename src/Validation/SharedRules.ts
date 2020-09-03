@@ -12,6 +12,11 @@ export const channelId = {
     channelId: Joi.number().required().min(1),
 };
 
-export const rootChannelId = {
+export const optRootChannelId = {
     rootChannelId: Joi.number().optional().min(1),
+};
+
+export const channelNames = {
+    channels: Joi.array().required().min(1).items(Joi.string()),
+    ...optRootChannelId,
 };
