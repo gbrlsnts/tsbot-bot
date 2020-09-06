@@ -36,7 +36,7 @@ export default class Validator {
      * @param validationOptions Options for the validation. Will override default options
      */
     async validateSchema(
-        schema: Joi.ObjectSchema,
+        schema: Joi.Schema,
         data: any,
         validationOptions?: ValidationOptions
     ): Promise<any> {

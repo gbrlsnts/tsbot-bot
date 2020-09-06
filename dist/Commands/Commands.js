@@ -7,6 +7,8 @@ const DeleteUserChannel_1 = require("./Subscribers/Actions/DeleteUserChannel");
 const CreateUserSubChannel_1 = require("./Subscribers/Actions/CreateUserSubChannel");
 const GetSubChannelCount_1 = require("./Subscribers/Getters/GetSubChannelCount");
 const ValidateChannelUnique_1 = require("./Subscribers/Getters/ValidateChannelUnique");
+const GetIcons_1 = require("./Subscribers/Getters/GetIcons");
+const GetServerGroups_1 = require("./Subscribers/Getters/GetServerGroups");
 class Commands {
     constructor(manager) {
         this.manager = manager;
@@ -23,6 +25,8 @@ class Commands {
             new CreateUserSubChannel_1.CreateUserSubChannelSubscriber(this.manager),
             new DeleteUserChannel_1.DeleteUserChannelSubscriber(this.manager),
             new GetSubChannelCount_1.GetSubChannelCountSubscriber(this.manager),
+            new GetServerGroups_1.GetServerGroupsSubscriber(this.manager),
+            new GetIcons_1.GetIconsSubscriber(this.manager),
             new ValidateChannelUnique_1.ValidateChannelsUniqueSubscriber(this.manager),
         ];
     }

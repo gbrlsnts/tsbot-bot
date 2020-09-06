@@ -48,13 +48,18 @@ class Bot {
      */
     setupConnectionLostHandler(attempts, waitMs) {
         this.server.on('close', async () => {
-            this.logger.info(`Disconnected from server, retrying`, { canShare: true });
+            this.logger.info(`Disconnected from server, retrying`, {
+                canShare: true,
+            });
             this._isConnected = false;
-            this.server.reconnect(attempts, waitMs)
+            this.server
+                .reconnect(attempts, waitMs)
                 .then(() => this.self.issueRefresh())
-                .then(() => this._isConnected = true)
-                .then(() => this.logger.info(`Reconnected to server`, { canShare: true }))
-                .catch((e) => this.logger.error('Error while reconnecting', e));
+                .then(() => (this._isConnected = true))
+                .then(() => this.logger.info(`Reconnected to server`, {
+                canShare: true,
+            }))
+                .catch(e => this.logger.error('Error while reconnecting', e));
         });
     }
     /**
@@ -78,7 +83,7 @@ class Bot {
     async sendClientMessage(clientId, message) {
         return this.server.sendTextMessage(clientId, ts3_nodejs_library_1.TextMessageTargetMode.CLIENT, message);
     }
-    async createChannel({ name, password, parent, afterChannel, codec, codec_quality }) {
+    async createChannel({ name, password, parent, afterChannel, codec, codec_quality, }) {
         let serverCodec;
         switch (codec) {
             case Types_1.BotCodec.voice:
@@ -94,7 +99,7 @@ class Bot {
             channel_order: afterChannel,
             cpid: parent,
             channel_codec: serverCodec,
-            channel_codec_quality: codec_quality
+            channel_codec_quality: codec_quality,
         });
     }
     async createSpacer(name, afterChannel) {
@@ -130,6 +135,9 @@ class Bot {
                 permvalue: perm.value,
             };
         }));
+    }
+    async downloadIcon(iconId) {
+        return this.server.downloadIcon(`/icon_${iconId}`);
     }
     async uploadIcon(data) {
         const iconId = File_1.default.calculateNumberChecksum(data);

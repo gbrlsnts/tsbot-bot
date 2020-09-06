@@ -4,7 +4,7 @@ import { Message } from '../Message';
 
 export interface SubscriberInterface {
     getSubject(): string;
-    getValidationSchema(): Joi.ObjectSchema | null;
+    getValidationSchema(): Joi.Schema | null;
     handle(msg: Message<any>): Promise<Either<Failure<any>, any>>;
 }
 
