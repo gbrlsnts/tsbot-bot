@@ -19,7 +19,9 @@ class SetUserGroupsAction {
     async execute() {
         if (!this.bot.isConnected)
             return Library_1.left(Error_1.notConnectedError());
-        const allowedGroups = await this.repository.getUserGroups();
+        const allowedGroups = this.data.trustedSource
+            ? this.data.allowed || []
+            : await this.repository.getUserGroups();
         if (!this.validateGroups(allowedGroups))
             return Library_1.left(Error_1.invalidServerGroupError());
         const client = await this.bot.getClientByDatabaseId(this.data.clientDatabaseId);
@@ -28,7 +30,7 @@ class SetUserGroupsAction {
         const { toAdd, toRemove } = this.getGroupsToChange(client.servergroups || [], allowedGroups);
         await Promise.all([
             this.bot.clientAddServerGroups(client.databaseId, toAdd),
-            this.bot.clientRemoveServerGroups(client.databaseId, toRemove)
+            this.bot.clientRemoveServerGroups(client.databaseId, toRemove),
         ]);
         return Library_1.right(true);
     }

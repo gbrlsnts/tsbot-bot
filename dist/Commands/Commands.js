@@ -9,6 +9,7 @@ const GetSubChannelCount_1 = require("./Subscribers/Getters/GetSubChannelCount")
 const ValidateChannelUnique_1 = require("./Subscribers/Getters/ValidateChannelUnique");
 const GetIcons_1 = require("./Subscribers/Getters/GetIcons");
 const GetServerGroups_1 = require("./Subscribers/Getters/GetServerGroups");
+const SetUserGroups_1 = require("./Subscribers/Actions/SetUserGroups");
 class Commands {
     constructor(manager) {
         this.manager = manager;
@@ -28,6 +29,7 @@ class Commands {
             new GetServerGroups_1.GetServerGroupsSubscriber(this.manager),
             new GetIcons_1.GetIconsSubscriber(this.manager),
             new ValidateChannelUnique_1.ValidateChannelsUniqueSubscriber(this.manager),
+            new SetUserGroups_1.SetUserGroupsSubscriber(this.manager),
         ];
     }
 }

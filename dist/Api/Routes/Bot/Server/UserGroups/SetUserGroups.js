@@ -7,6 +7,7 @@ const joi_1 = __importDefault(require("@hapi/joi"));
 const ApiRoute_1 = require("../../../../ApiRoute");
 const Validator_1 = __importDefault(require("../../../../../Validation/Validator"));
 const SetUserGroupsAction_1 = __importDefault(require("../../../../../Bot/Action/UserGroups/SetUserGroupsAction"));
+const UserGroups_1 = require("../../../../../Validation/UserGroups");
 class SetUserGroups extends ApiRoute_1.ApiRoute {
     constructor(app, bot, globalLogger) {
         super(globalLogger);
@@ -19,9 +20,13 @@ class SetUserGroups extends ApiRoute_1.ApiRoute {
     register() {
         const validator = new Validator_1.default(this.getSchema());
         this.app.post(this.getWithPrefix('setUserGroups'), async (req, res) => {
-            validator.validate(req.body)
-                .then(() => new SetUserGroupsAction_1.default(this.bot, req.body).execute())
-                .then((result) => this.mapToResponse(res, result).send())
+            validator
+                .validate(req.body)
+                .then(() => new SetUserGroupsAction_1.default(this.bot, {
+                ...req.body,
+                trustedSource: false,
+            }).execute())
+                .then(result => this.mapToResponse(res, result).send())
                 .catch(e => this.mapToExceptionResponse(res, e).send());
         });
         return this;
@@ -30,10 +35,7 @@ class SetUserGroups extends ApiRoute_1.ApiRoute {
      * Get the validation schema
      */
     getSchema() {
-        return joi_1.default.object({
-            clientDatabaseId: joi_1.default.number().required().min(1),
-            groups: joi_1.default.array().required().unique().items(joi_1.default.number().min(1)),
-        });
+        return joi_1.default.object(UserGroups_1.setUserGroupsBase);
     }
 }
 exports.default = SetUserGroups;
