@@ -21,14 +21,22 @@ class GetIconsSubscriber {
         return this.schema;
     }
     async handle(msg) {
-        const { data } = msg;
+        let { data } = msg;
         if (!this.bot.isConnected)
             return Library_1.left(Error_1.notConnectedError());
+        if (data.length === 0)
+            data = await this.getAllServerIcons();
         const icons = await Promise.all(data.map(async (id) => ({
-            iconId: data,
+            iconId: id,
             content: (await this.bot.downloadIcon(id)).toString('base64'),
         })));
         return Library_1.right(icons);
+    }
+    async getAllServerIcons() {
+        const icons = await this.bot.getAllIcons();
+        return icons
+            .filter(i => i.type === 1)
+            .map(i => Number(i.path.replace('icon_', '')));
     }
 }
 exports.GetIconsSubscriber = GetIconsSubscriber;

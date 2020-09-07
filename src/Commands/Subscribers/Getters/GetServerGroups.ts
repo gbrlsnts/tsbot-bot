@@ -41,9 +41,14 @@ export class GetServerGroupsSubscriber
         return right(
             groups.map(g => ({
                 tsId: g.sgid,
-                iconId: g.iconid,
+                iconId: this.normalizeIconId(g.iconid),
                 name: g.name,
             }))
         );
+    }
+
+    normalizeIconId(id: number): number | undefined {
+        // 0xf: fix bug with teamspeak icon IDs being negative
+        return id !== 0 ? id >>> 0 : undefined;
     }
 }

@@ -136,8 +136,11 @@ class Bot {
             };
         }));
     }
+    async getAllIcons() {
+        return this.server.ftGetFileList(0, '/icons');
+    }
     async downloadIcon(iconId) {
-        return this.server.downloadIcon(`/icon_${iconId}`);
+        return this.server.downloadIcon(`icon_${iconId}`);
     }
     async uploadIcon(data) {
         const iconId = File_1.default.calculateNumberChecksum(data);

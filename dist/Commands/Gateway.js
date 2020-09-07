@@ -42,7 +42,7 @@ class CommandGateway {
             catch (error) {
                 if (reply)
                     this.replyError(reply, ((_b = error) === null || _b === void 0 ? void 0 : _b.message) || error.toString());
-                return this.manager.logger.error('nats subscriber error', {
+                return this.manager.logger.error(subscriber.getSubject(), {
                     canShare: true,
                     error,
                 });

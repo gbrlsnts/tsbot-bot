@@ -201,8 +201,12 @@ export class Bot {
         );
     }
 
+    async getAllIcons() {
+        return this.server.ftGetFileList(0, '/icons');
+    }
+
     async downloadIcon(iconId: number) {
-        return this.server.downloadIcon(`/icon_${iconId}`);
+        return this.server.downloadIcon(`icon_${iconId}`);
     }
 
     async uploadIcon(data: Buffer) {

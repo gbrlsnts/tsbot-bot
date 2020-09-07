@@ -9,6 +9,7 @@ import { Message } from '../../Message';
 import { Bot } from '../../../Bot/Bot';
 import { notConnectedError } from '../../../Bot/Error';
 import { iconIds } from '../../../Validation/SharedRules';
+import { GetIconsResult } from './Types';
 
 export class GetIconsSubscriber
     implements SubscriberInterface, HandleServerMessagesInterface {
@@ -34,17 +35,27 @@ export class GetIconsSubscriber
     }
 
     async handle(msg: Message<number[]>): Promise<Either<Failure<any>, any>> {
-        const { data } = msg;
+        let { data } = msg;
 
         if (!this.bot.isConnected) return left(notConnectedError());
 
-        const icons = await Promise.all(
+        if (data.length === 0) data = await this.getAllServerIcons();
+
+        const icons: GetIconsResult = await Promise.all(
             data.map(async id => ({
-                iconId: data,
+                iconId: id,
                 content: (await this.bot.downloadIcon(id)).toString('base64'),
             }))
         );
 
         return right(icons);
+    }
+
+    async getAllServerIcons(): Promise<number[]> {
+        const icons = await this.bot.getAllIcons();
+
+        return icons
+            .filter(i => i.type === 1)
+            .map(i => Number(i.path.replace('icon_', '')));
     }
 }

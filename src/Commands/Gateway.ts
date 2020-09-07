@@ -51,7 +51,7 @@ export class CommandGateway {
                 if (reply)
                     this.replyError(reply, error?.message || error.toString());
 
-                return this.manager.logger.error('nats subscriber error', {
+                return this.manager.logger.error(subscriber.getSubject(), {
                     canShare: true,
                     error,
                 });

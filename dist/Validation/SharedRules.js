@@ -20,6 +20,7 @@ exports.channelNames = {
 };
 exports.iconIds = Joi.array()
     .required()
+    .unique()
     .min(1)
-    .items(Joi.number().integer().positive());
+    .items(Joi.number().integer().not(0, 100, 200, 300, 400, 500, 600));
 //# sourceMappingURL=SharedRules.js.map
