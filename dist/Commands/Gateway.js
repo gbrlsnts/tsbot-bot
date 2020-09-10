@@ -11,7 +11,12 @@ class CommandGateway {
         this.validator = new Validator_1.default();
     }
     subscribe(subscribers) {
-        subscribers.forEach(sub => this.subscribeSubject(sub));
+        subscribers.forEach(sub => {
+            this.subscribeSubject(sub);
+            this.manager.logger.debug(`subscribing to ${sub.getSubject()}`, {
+                canShare: true,
+            });
+        });
     }
     subscribeSubject(subscriber) {
         this.nats.subscribe(subscriber.getSubject(), async (error, msg) => {
@@ -42,6 +47,7 @@ class CommandGateway {
             catch (error) {
                 if (reply)
                     this.replyError(reply, ((_b = error) === null || _b === void 0 ? void 0 : _b.message) || error.toString());
+                console.error(error);
                 return this.manager.logger.error(subscriber.getSubject(), {
                     canShare: true,
                     error,

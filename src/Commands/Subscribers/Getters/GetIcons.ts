@@ -13,7 +13,7 @@ import { GetIconsResult } from './Types';
 
 export class GetIconsSubscriber
     implements SubscriberInterface, HandleServerMessagesInterface {
-    readonly subject = 'bot.server.*.icons.get';
+    readonly subject = 'bot.server.*.icon.list';
     readonly serverIdPos = this.subject.split('.').findIndex(f => f === '*');
     readonly schema: Joi.ArraySchema = iconIds;
     readonly bot: Bot;
@@ -39,7 +39,7 @@ export class GetIconsSubscriber
 
         if (!this.bot.isConnected) return left(notConnectedError());
 
-        if (data.length === 0) data = await this.getAllServerIcons();
+        if (data.length === 0) data = await this.bot.getAllIconIds();
 
         const icons: GetIconsResult = await Promise.all(
             data.map(async id => ({
@@ -49,13 +49,5 @@ export class GetIconsSubscriber
         );
 
         return right(icons);
-    }
-
-    async getAllServerIcons(): Promise<number[]> {
-        const icons = await this.bot.getAllIcons();
-
-        return icons
-            .filter(i => i.type === 1)
-            .map(i => Number(i.path.replace('icon_', '')));
     }
 }

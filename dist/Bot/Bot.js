@@ -137,14 +137,21 @@ class Bot {
         }));
     }
     async getAllIcons() {
-        return this.server.ftGetFileList(0, '/icons');
+        return this.server.ftGetFileList(0, '/icons', '');
+    }
+    async getAllIconIds() {
+        const icons = await this.getAllIcons();
+        return icons
+            .filter(i => i.type === 1)
+            .map(i => Number(i.name.replace('icon_', '')));
     }
     async downloadIcon(iconId) {
         return this.server.downloadIcon(`icon_${iconId}`);
     }
     async uploadIcon(data) {
         const iconId = File_1.default.calculateNumberChecksum(data);
-        return this.server.uploadFile(`/icon_${iconId}`, data);
+        await this.server.uploadFile(`/icon_${iconId}`, data);
+        return iconId;
     }
     async deleteIcon(iconId) {
         return this.server.ftDeleteFile(0, `/icon_${iconId}`, '');

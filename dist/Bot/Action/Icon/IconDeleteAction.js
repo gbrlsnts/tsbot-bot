@@ -13,6 +13,9 @@ class IconDeleteAction {
     async execute() {
         if (!this.bot.isConnected)
             return Library_1.left(Error_1.notConnectedError());
+        const allIcons = await this.bot.getAllIconIds();
+        if (!allIcons.includes(this.data.iconId))
+            return Library_1.right(true);
         await this.bot.deleteIcon(this.data.iconId);
         return Library_1.right(true);
     }

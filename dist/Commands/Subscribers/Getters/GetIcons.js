@@ -6,7 +6,7 @@ const SharedRules_1 = require("../../../Validation/SharedRules");
 class GetIconsSubscriber {
     constructor(manager) {
         this.manager = manager;
-        this.subject = 'bot.server.*.icons.get';
+        this.subject = 'bot.server.*.icon.list';
         this.serverIdPos = this.subject.split('.').findIndex(f => f === '*');
         this.schema = SharedRules_1.iconIds;
         this.bot = manager.bot;
@@ -25,18 +25,12 @@ class GetIconsSubscriber {
         if (!this.bot.isConnected)
             return Library_1.left(Error_1.notConnectedError());
         if (data.length === 0)
-            data = await this.getAllServerIcons();
+            data = await this.bot.getAllIconIds();
         const icons = await Promise.all(data.map(async (id) => ({
             iconId: id,
             content: (await this.bot.downloadIcon(id)).toString('base64'),
         })));
         return Library_1.right(icons);
-    }
-    async getAllServerIcons() {
-        const icons = await this.bot.getAllIcons();
-        return icons
-            .filter(i => i.type === 1)
-            .map(i => Number(i.path.replace('icon_', '')));
     }
 }
 exports.GetIconsSubscriber = GetIconsSubscriber;

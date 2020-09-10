@@ -12,7 +12,12 @@ export class CommandGateway {
     }
 
     subscribe(subscribers: ServerMsgSubscriber[]): void {
-        subscribers.forEach(sub => this.subscribeSubject(sub));
+        subscribers.forEach(sub => {
+            this.subscribeSubject(sub);
+            this.manager.logger.debug(`subscribing to ${sub.getSubject()}`, {
+                canShare: true,
+            });
+        });
     }
 
     private subscribeSubject(subscriber: ServerMsgSubscriber): void {
@@ -50,6 +55,8 @@ export class CommandGateway {
             } catch (error) {
                 if (reply)
                     this.replyError(reply, error?.message || error.toString());
+
+                console.error(error);
 
                 return this.manager.logger.error(subscriber.getSubject(), {
                     canShare: true,

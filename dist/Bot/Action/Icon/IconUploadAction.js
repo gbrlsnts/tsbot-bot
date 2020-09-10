@@ -13,8 +13,8 @@ class IconUploadAction {
     async execute() {
         if (!this.bot.isConnected)
             return Library_1.left(Error_1.notConnectedError());
-        await this.bot.uploadIcon(this.data.icon);
-        return Library_1.right(true);
+        const iconId = await this.bot.uploadIcon(this.data.icon);
+        return Library_1.right(iconId);
     }
 }
 exports.default = IconUploadAction;

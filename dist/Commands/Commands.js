@@ -10,6 +10,8 @@ const ValidateChannelUnique_1 = require("./Subscribers/Getters/ValidateChannelUn
 const GetIcons_1 = require("./Subscribers/Getters/GetIcons");
 const GetServerGroups_1 = require("./Subscribers/Getters/GetServerGroups");
 const SetUserGroups_1 = require("./Subscribers/Actions/SetUserGroups");
+const IconUpload_1 = require("./Subscribers/Actions/IconUpload");
+const IconDelete_1 = require("./Subscribers/Actions/IconDelete");
 class Commands {
     constructor(manager) {
         this.manager = manager;
@@ -30,6 +32,8 @@ class Commands {
             new GetIcons_1.GetIconsSubscriber(this.manager),
             new ValidateChannelUnique_1.ValidateChannelsUniqueSubscriber(this.manager),
             new SetUserGroups_1.SetUserGroupsSubscriber(this.manager),
+            new IconUpload_1.IconUploadSubscriber(this.manager),
+            new IconDelete_1.IconDeleteSubscriber(this.manager),
         ];
     }
 }

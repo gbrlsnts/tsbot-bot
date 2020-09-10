@@ -202,17 +202,27 @@ export class Bot {
     }
 
     async getAllIcons() {
-        return this.server.ftGetFileList(0, '/icons');
+        return this.server.ftGetFileList(0, '/icons', '');
+    }
+
+    async getAllIconIds(): Promise<number[]> {
+        const icons = await this.getAllIcons();
+
+        return icons
+            .filter(i => i.type === 1)
+            .map(i => Number(i.name.replace('icon_', '')));
     }
 
     async downloadIcon(iconId: number) {
         return this.server.downloadIcon(`icon_${iconId}`);
     }
 
-    async uploadIcon(data: Buffer) {
+    async uploadIcon(data: Buffer): Promise<number> {
         const iconId = File.calculateNumberChecksum(data);
 
-        return this.server.uploadFile(`/icon_${iconId}`, data);
+        await this.server.uploadFile(`/icon_${iconId}`, data);
+
+        return iconId;
     }
 
     async deleteIcon(iconId: number) {

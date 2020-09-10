@@ -10,6 +10,8 @@ import { ValidateChannelsUniqueSubscriber } from './Subscribers/Getters/Validate
 import { GetIconsSubscriber } from './Subscribers/Getters/GetIcons';
 import { GetServerGroupsSubscriber } from './Subscribers/Getters/GetServerGroups';
 import { SetUserGroupsSubscriber } from './Subscribers/Actions/SetUserGroups';
+import { IconUploadSubscriber } from './Subscribers/Actions/IconUpload';
+import { IconDeleteSubscriber } from './Subscribers/Actions/IconDelete';
 
 export class Commands {
     constructor(private manager: Manager) {}
@@ -33,6 +35,8 @@ export class Commands {
             new GetIconsSubscriber(this.manager),
             new ValidateChannelsUniqueSubscriber(this.manager),
             new SetUserGroupsSubscriber(this.manager),
+            new IconUploadSubscriber(this.manager),
+            new IconDeleteSubscriber(this.manager),
         ];
     }
 }
