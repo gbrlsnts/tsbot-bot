@@ -12,6 +12,8 @@ import { GetServerGroupsSubscriber } from './Subscribers/Getters/GetServerGroups
 import { SetUserGroupsSubscriber } from './Subscribers/Actions/SetUserGroups';
 import { IconUploadSubscriber } from './Subscribers/Actions/IconUpload';
 import { IconDeleteSubscriber } from './Subscribers/Actions/IconDelete';
+import { VerifyUserSubscriber } from './Subscribers/Actions/VerifyUser';
+import { GetUsersByAddressSubscriber } from './Subscribers/Getters/GetUsersByAddress';
 
 export class Commands {
     constructor(private manager: Manager) {}
@@ -37,6 +39,8 @@ export class Commands {
             new SetUserGroupsSubscriber(this.manager),
             new IconUploadSubscriber(this.manager),
             new IconDeleteSubscriber(this.manager),
+            new VerifyUserSubscriber(this.manager),
+            new GetUsersByAddressSubscriber(this.manager),
         ];
     }
 }

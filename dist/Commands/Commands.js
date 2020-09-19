@@ -12,6 +12,8 @@ const GetServerGroups_1 = require("./Subscribers/Getters/GetServerGroups");
 const SetUserGroups_1 = require("./Subscribers/Actions/SetUserGroups");
 const IconUpload_1 = require("./Subscribers/Actions/IconUpload");
 const IconDelete_1 = require("./Subscribers/Actions/IconDelete");
+const VerifyUser_1 = require("./Subscribers/Actions/VerifyUser");
+const GetUsersByAddress_1 = require("./Subscribers/Getters/GetUsersByAddress");
 class Commands {
     constructor(manager) {
         this.manager = manager;
@@ -34,6 +36,8 @@ class Commands {
             new SetUserGroups_1.SetUserGroupsSubscriber(this.manager),
             new IconUpload_1.IconUploadSubscriber(this.manager),
             new IconDelete_1.IconDeleteSubscriber(this.manager),
+            new VerifyUser_1.VerifyUserSubscriber(this.manager),
+            new GetUsersByAddress_1.GetUsersByAddressSubscriber(this.manager),
         ];
     }
 }

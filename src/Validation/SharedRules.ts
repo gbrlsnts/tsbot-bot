@@ -26,3 +26,10 @@ export const iconIds = Joi.array()
     .unique()
     .min(1)
     .items(Joi.number().integer().not(0, 100, 200, 300, 400, 500, 600));
+
+export const clientIpAddress = Joi.string()
+    .required()
+    .ip({
+        cidr: 'forbidden',
+        version: ['ipv4', 'ipv6'],
+    });

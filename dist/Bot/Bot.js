@@ -119,6 +119,12 @@ class Bot {
             throw new Error('Could not find channel group with id ' + groupId);
         return await group.setClient(channelId, databaseId);
     }
+    getClientsByAddress(address) {
+        return this.server.clientList({
+            client_type: 0,
+            connection_client_ip: address,
+        });
+    }
     async getClientByDbid(databaseId) {
         return await this.server.getClientByDBID(databaseId);
     }

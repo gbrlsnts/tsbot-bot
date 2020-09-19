@@ -3,10 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const joi_1 = __importDefault(require("@hapi/joi"));
 const ApiRoute_1 = require("../../../../ApiRoute");
 const VerifyUserAction_1 = __importDefault(require("../../../../../Bot/Action/VerifyUser/VerifyUserAction"));
 const Validator_1 = __importDefault(require("../../../../../Validation/Validator"));
+const User_1 = require("../../../../../Validation/User");
 class VerifyUser extends ApiRoute_1.ApiRoute {
     constructor(app, bot, globalLogger) {
         super(globalLogger);
@@ -19,9 +19,10 @@ class VerifyUser extends ApiRoute_1.ApiRoute {
     register() {
         const validator = new Validator_1.default(this.getSchema());
         this.app.post(this.getWithPrefix('verifyUser'), async (req, res) => {
-            validator.validate(req.body)
+            validator
+                .validate(req.body)
                 .then(() => new VerifyUserAction_1.default(this.bot, req.body).execute())
-                .then((result) => this.mapToResponse(res, result).send())
+                .then(result => this.mapToResponse(res, result).send())
                 .catch(e => this.mapToExceptionResponse(res, e).send());
         });
         return this;
@@ -30,12 +31,7 @@ class VerifyUser extends ApiRoute_1.ApiRoute {
      * Get the validation schema
      */
     getSchema() {
-        return joi_1.default.object({
-            targets: joi_1.default.array().required().min(1).unique('clientId').unique('token').items(joi_1.default.object().keys({
-                clientId: joi_1.default.number().required().min(1),
-                token: joi_1.default.string().required().min(1).max(40),
-            })),
-        });
+        return User_1.verifyUser;
     }
 }
 exports.default = VerifyUser;

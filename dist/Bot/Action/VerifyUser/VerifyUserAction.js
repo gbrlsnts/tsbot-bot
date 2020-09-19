@@ -26,10 +26,7 @@ class VerifyUserAction {
      * @param token Token to add to the message
      */
     formatClientMessage(token) {
-        return '\n[color=green][b]Verification Token[/b][/color]\n\n' +
-            'Please use this token to get [b]verified[/b] in our website:\n---------\n' +
-            `${token}\n---------\n` +
-            '[color=red]Please ignore if you aren\'t trying to verify your account. [b]Do not give to anyone![/b][/color]';
+        return this.data.template.replace('{%TOKEN%}', token);
     }
 }
 exports.default = VerifyUserAction;

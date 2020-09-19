@@ -5,7 +5,7 @@ import {
 } from 'ts3-nodejs-library';
 import SelfInfo from './SelfInfo';
 import { BotEvent } from './Event/BotEvent';
-import { ChannelPermission, BotCodec } from './Types';
+import { ChannelPermission, BotCodec, ClientType } from './Types';
 import File from '../Lib/File';
 import Logger from '../Log/Logger';
 
@@ -172,6 +172,13 @@ export class Bot {
             throw new Error('Could not find channel group with id ' + groupId);
 
         return await group.setClient(channelId, databaseId);
+    }
+
+    getClientsByAddress(address: string) {
+        return this.server.clientList({
+            client_type: 0,
+            connection_client_ip: address,
+        });
     }
 
     async getClientByDbid(databaseId: number) {
