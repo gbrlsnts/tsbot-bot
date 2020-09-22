@@ -14,6 +14,7 @@ import { IconUploadSubscriber } from './Subscribers/Actions/IconUpload';
 import { IconDeleteSubscriber } from './Subscribers/Actions/IconDelete';
 import { VerifyUserSubscriber } from './Subscribers/Actions/VerifyUser';
 import { GetUsersByAddressSubscriber } from './Subscribers/Getters/GetUsersByAddress';
+import { GetUserServerGroupIdsSubscriber } from './Subscribers/Getters/GetUserServerGroupIds';
 
 export class Commands {
     constructor(private manager: Manager) {}
@@ -41,6 +42,7 @@ export class Commands {
             new IconDeleteSubscriber(this.manager),
             new VerifyUserSubscriber(this.manager),
             new GetUsersByAddressSubscriber(this.manager),
+            new GetUserServerGroupIdsSubscriber(this.manager),
         ];
     }
 }
