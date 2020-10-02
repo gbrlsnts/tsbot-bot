@@ -119,7 +119,7 @@ export class Bot {
         );
     }
 
-    async createChannel({
+    createChannel({
         name,
         password,
         parent,
@@ -138,7 +138,7 @@ export class Bot {
                 break;
         }
 
-        return await this.server.channelCreate(name, {
+        return this.server.channelCreate(name, {
             channel_password: password,
             channel_flag_permanent: 1,
             channel_order: afterChannel,
@@ -148,8 +148,8 @@ export class Bot {
         });
     }
 
-    async createSpacer(name: string, afterChannel?: number) {
-        return await this.server.channelCreate(name, {
+    createSpacer(name: string, afterChannel?: number) {
+        return this.server.channelCreate(name, {
             channel_maxclients: 0,
             channel_codec_quality: 0,
             channel_flag_permanent: 1,
@@ -196,8 +196,10 @@ export class Bot {
     async setChannelPermissions(
         channelId: number,
         permissions: ChannelPermission[]
-    ) {
-        return await this.server.channelSetPerms(
+    ): Promise<void> {
+        if (!permissions || permissions.length == 0) return;
+
+        await this.server.channelSetPerms(
             channelId,
             permissions.map(perm => {
                 return {

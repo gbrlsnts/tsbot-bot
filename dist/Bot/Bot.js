@@ -83,7 +83,7 @@ class Bot {
     async sendClientMessage(clientId, message) {
         return this.server.sendTextMessage(clientId, ts3_nodejs_library_1.TextMessageTargetMode.CLIENT, message);
     }
-    async createChannel({ name, password, parent, afterChannel, codec, codec_quality, }) {
+    createChannel({ name, password, parent, afterChannel, codec, codec_quality, }) {
         let serverCodec;
         switch (codec) {
             case Types_1.BotCodec.voice:
@@ -93,7 +93,7 @@ class Bot {
                 serverCodec = 5;
                 break;
         }
-        return await this.server.channelCreate(name, {
+        return this.server.channelCreate(name, {
             channel_password: password,
             channel_flag_permanent: 1,
             channel_order: afterChannel,
@@ -102,8 +102,8 @@ class Bot {
             channel_codec_quality: codec_quality,
         });
     }
-    async createSpacer(name, afterChannel) {
-        return await this.server.channelCreate(name, {
+    createSpacer(name, afterChannel) {
+        return this.server.channelCreate(name, {
             channel_maxclients: 0,
             channel_codec_quality: 0,
             channel_flag_permanent: 1,
@@ -135,7 +135,9 @@ class Bot {
         return await this.setChannelIcon(channelId, 0);
     }
     async setChannelPermissions(channelId, permissions) {
-        return await this.server.channelSetPerms(channelId, permissions.map(perm => {
+        if (!permissions || permissions.length == 0)
+            return;
+        await this.server.channelSetPerms(channelId, permissions.map(perm => {
             return {
                 permsid: perm.permission,
                 permvalue: perm.value,
