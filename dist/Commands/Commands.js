@@ -15,6 +15,7 @@ const IconDelete_1 = require("./Subscribers/Actions/IconDelete");
 const VerifyUser_1 = require("./Subscribers/Actions/VerifyUser");
 const GetUsersByAddress_1 = require("./Subscribers/Getters/GetUsersByAddress");
 const GetUserServerGroupIds_1 = require("./Subscribers/Getters/GetUserServerGroupIds");
+const GetChannelZone_1 = require("./Subscribers/Getters/GetChannelZone");
 class Commands {
     constructor(manager) {
         this.manager = manager;
@@ -40,6 +41,7 @@ class Commands {
             new VerifyUser_1.VerifyUserSubscriber(this.manager),
             new GetUsersByAddress_1.GetUsersByAddressSubscriber(this.manager),
             new GetUserServerGroupIds_1.GetUserServerGroupIdsSubscriber(this.manager),
+            new GetChannelZone_1.GetChannelZoneSubscriber(this.manager),
         ];
     }
 }

@@ -1,11 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Joi = require("@hapi/joi");
+exports.zoneRules = {
+    id: Joi.number().integer().positive().required(),
+    start: Joi.number().integer().positive().required(),
+    end: Joi.number().integer().positive().required(),
+    separators: Joi.boolean().required(),
+};
 exports.zone = {
     zone: Joi.object().keys({
-        start: Joi.number().integer().positive().required(),
-        end: Joi.number().integer().positive().required(),
-        separators: Joi.boolean().required(),
+        start: exports.zoneRules.start,
+        end: exports.zoneRules.end,
+        separators: exports.zoneRules.separators,
     }),
 };
 exports.channelId = {

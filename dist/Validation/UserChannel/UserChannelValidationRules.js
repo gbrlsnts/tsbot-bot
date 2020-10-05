@@ -40,4 +40,17 @@ exports.deleteChannel = {
     ...SharedRules_1.channelId,
     ...SharedRules_1.optRootChannelId,
 };
+exports.getZoneRequest = {
+    ...SharedRules_1.channelId,
+    zones: Joi.array()
+        .required()
+        .unique()
+        .min(1)
+        .items(Joi.object().keys({
+        id: SharedRules_1.zoneRules.id,
+        start: SharedRules_1.zoneRules.start,
+        end: SharedRules_1.zoneRules.end,
+        separators: SharedRules_1.zoneRules.separators,
+    })),
+};
 //# sourceMappingURL=UserChannelValidationRules.js.map

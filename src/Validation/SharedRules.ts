@@ -1,10 +1,17 @@
 import Joi = require('@hapi/joi');
 
+export const zoneRules = {
+    id: Joi.number().integer().positive().required(),
+    start: Joi.number().integer().positive().required(),
+    end: Joi.number().integer().positive().required(),
+    separators: Joi.boolean().required(),
+};
+
 export const zone = {
     zone: Joi.object().keys({
-        start: Joi.number().integer().positive().required(),
-        end: Joi.number().integer().positive().required(),
-        separators: Joi.boolean().required(),
+        start: zoneRules.start,
+        end: zoneRules.end,
+        separators: zoneRules.separators,
     }),
 };
 

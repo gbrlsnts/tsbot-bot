@@ -1,3 +1,5 @@
+import { Zone } from '../../../Bot/Action/UserChannel/UserChannelTypes';
+
 export interface ChannelIdRequest {
     channelId: number;
 }
@@ -13,3 +15,12 @@ export interface GetIconResult {
 }
 
 export declare type GetIconsResult = GetIconResult[];
+
+interface ZoneWithId extends Zone {
+    id: number;
+}
+
+export interface GetChannelZoneRequest {
+    channelId: number;
+    zones: ZoneWithId[];
+}
