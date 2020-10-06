@@ -24,3 +24,8 @@ export interface GetChannelZoneRequest {
     channelId: number;
     zones: ZoneWithId[];
 }
+
+export interface GetChannelZoneResponse {
+    zoneId?: number;
+    existsOutOfZone?: boolean;
+}

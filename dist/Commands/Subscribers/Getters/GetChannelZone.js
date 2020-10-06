@@ -30,15 +30,18 @@ class GetChannelZoneSubscriber {
             return Library_1.left(Error_1.notConnectedError());
         const channelList = await this.bot.getServer().channelList();
         for (const zone of msg.data.zones) {
-            const inZone = ChannelUtils_1.ChannelUtils.getZoneTopChannels(channelList, zone.start, zone.end, zone.separators).applyOnRight(result => this.isInZone(msg.data.channelId, result.channels));
+            const inZone = ChannelUtils_1.ChannelUtils.getZoneTopChannels(channelList, zone.start, zone.end, zone.separators).applyOnRight(result => this.channelExists(msg.data.channelId, result.channels));
             if (inZone.isLeft())
                 continue;
             if (inZone.value)
-                return Library_1.right(zone.id);
+                return Library_1.right({ zoneId: zone.id });
         }
-        return Library_1.right(undefined);
+        let existsOutOfZone = false;
+        if (this.channelExists(msg.data.channelId, channelList))
+            existsOutOfZone = true;
+        return Library_1.right({ existsOutOfZone });
     }
-    isInZone(channelId, channelList) {
+    channelExists(channelId, channelList) {
         return channelList.findIndex(c => c.cid === channelId) >= 0;
     }
 }

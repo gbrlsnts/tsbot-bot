@@ -9,7 +9,7 @@ import { Message } from '../../Message';
 import { Bot } from '../../../Bot/Bot';
 import { getZoneRequest } from '../../../Validation/UserChannel/UserChannelValidationRules';
 import { notConnectedError } from '../../../Bot/Error';
-import { GetChannelZoneRequest } from './Types';
+import { GetChannelZoneRequest, GetChannelZoneResponse } from './Types';
 import { ChannelUtils } from '../../../Bot/Utils/ChannelUtils';
 import { TeamSpeakChannel } from 'ts3-nodejs-library';
 
@@ -38,7 +38,7 @@ export class GetChannelZoneSubscriber
 
     async handle(
         msg: Message<GetChannelZoneRequest>
-    ): Promise<Either<Failure<any>, any>> {
+    ): Promise<Either<Failure<any>, GetChannelZoneResponse>> {
         if (!this.bot.isConnected) return left(notConnectedError());
 
         const channelList = await this.bot.getServer().channelList();
@@ -50,18 +50,22 @@ export class GetChannelZoneSubscriber
                 zone.end,
                 zone.separators
             ).applyOnRight(result =>
-                this.isInZone(msg.data.channelId, result.channels)
+                this.channelExists(msg.data.channelId, result.channels)
             );
 
             if (inZone.isLeft()) continue;
 
-            if (inZone.value) return right(zone.id);
+            if (inZone.value) return right({ zoneId: zone.id });
         }
 
-        return right(undefined);
+        let existsOutOfZone = false;
+        if (this.channelExists(msg.data.channelId, channelList))
+            existsOutOfZone = true;
+
+        return right({ existsOutOfZone });
     }
 
-    private isInZone(
+    private channelExists(
         channelId: number,
         channelList: TeamSpeakChannel[]
     ): boolean {
