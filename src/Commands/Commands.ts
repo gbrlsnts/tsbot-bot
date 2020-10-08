@@ -8,7 +8,7 @@ import { CreateUserSubChannelSubscriber } from './Subscribers/Actions/CreateUser
 import { GetSubChannelCountSubscriber } from './Subscribers/Getters/GetSubChannelCount';
 import { ValidateChannelsUniqueSubscriber } from './Subscribers/Getters/ValidateChannelUnique';
 import { GetIconsSubscriber } from './Subscribers/Getters/GetIcons';
-import { GetServerGroupsSubscriber } from './Subscribers/Getters/GetServerGroups';
+import { GetGroupsSubscriber } from './Subscribers/Getters/GetServerGroups';
 import { SetUserGroupsSubscriber } from './Subscribers/Actions/SetUserGroups';
 import { IconUploadSubscriber } from './Subscribers/Actions/IconUpload';
 import { IconDeleteSubscriber } from './Subscribers/Actions/IconDelete';
@@ -35,7 +35,7 @@ export class Commands {
             new CreateUserSubChannelSubscriber(this.manager),
             new DeleteUserChannelSubscriber(this.manager),
             new GetSubChannelCountSubscriber(this.manager),
-            new GetServerGroupsSubscriber(this.manager),
+            new GetGroupsSubscriber(this.manager),
             new GetIconsSubscriber(this.manager),
             new ValidateChannelsUniqueSubscriber(this.manager),
             new SetUserGroupsSubscriber(this.manager),

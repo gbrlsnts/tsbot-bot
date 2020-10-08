@@ -32,7 +32,7 @@ class Commands {
             new CreateUserSubChannel_1.CreateUserSubChannelSubscriber(this.manager),
             new DeleteUserChannel_1.DeleteUserChannelSubscriber(this.manager),
             new GetSubChannelCount_1.GetSubChannelCountSubscriber(this.manager),
-            new GetServerGroups_1.GetServerGroupsSubscriber(this.manager),
+            new GetServerGroups_1.GetGroupsSubscriber(this.manager),
             new GetIcons_1.GetIconsSubscriber(this.manager),
             new ValidateChannelUnique_1.ValidateChannelsUniqueSubscriber(this.manager),
             new SetUserGroups_1.SetUserGroupsSubscriber(this.manager),

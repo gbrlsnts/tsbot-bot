@@ -29,3 +29,14 @@ export interface GetChannelZoneResponse {
     zoneId?: number;
     existsOutOfZone?: boolean;
 }
+
+export enum TsGroupType {
+    SERVER = 'SERVER',
+    CHANNEL = 'CHANNEL',
+}
+
+export interface TsGroup {
+    tsId: number;
+    iconId?: number;
+    name: string;
+}

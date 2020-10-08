@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const Types_1 = require("../Commands/Subscribers/Getters/Types");
 const Joi = require("@hapi/joi");
 exports.zoneRules = {
     id: Joi.number().integer().positive().required(),
@@ -35,4 +36,7 @@ exports.clientIpAddress = Joi.string()
     cidr: 'forbidden',
     version: ['ipv4', 'ipv6'],
 });
+exports.tsGroupType = Joi.string()
+    .required()
+    .valid(...Object.values(Types_1.TsGroupType));
 //# sourceMappingURL=SharedRules.js.map

@@ -1,3 +1,4 @@
+import { TsGroupType } from '../Commands/Subscribers/Getters/Types';
 import Joi = require('@hapi/joi');
 
 export const zoneRules = {
@@ -40,3 +41,7 @@ export const clientIpAddress = Joi.string()
         cidr: 'forbidden',
         version: ['ipv4', 'ipv6'],
     });
+
+export const tsGroupType = Joi.string()
+    .required()
+    .valid(...Object.values(TsGroupType));
