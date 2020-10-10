@@ -15,7 +15,6 @@ const awilix = __importStar(require("awilix"));
 const container_1 = __importDefault(require("./container"));
 const Commands_1 = require("./Commands/Commands");
 const InstanceManager_1 = require("./Instance/InstanceManager");
-const apiEnabled = process.env.API_ENABLED || config_1.default.get('api.enabled');
 const natsEnabled = process.env.NATS_ENABLED || config_1.default.get('nats.enabled');
 const container = container_1.default();
 const scoped = container.createScope();
@@ -28,7 +27,6 @@ const botFactory = container.resolve('botFactory');
 const instanceManager = new InstanceManager_1.InstanceManager(botFactory);
 new Promise(async (resolve, reject) => {
     try {
-        //if (apiEnabled) new Api(instanceManager, logger).boot();
         if (natsEnabled)
             await new Commands_1.Commands(logger, instanceManager).init();
     }

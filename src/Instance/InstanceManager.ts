@@ -1,15 +1,10 @@
 import Factory from '../Bot/Factory';
 import Manager from '../Bot/Manager';
-import { Api } from '../Api/Api';
-import { Commands } from '../Commands/Commands';
 
 export class InstanceManager {
     private readonly instances: Map<number, Manager>;
 
-    constructor(
-        private readonly factory: Factory,
-        readonly gateways?: InstanceManagerGateways
-    ) {
+    constructor(private readonly factory: Factory) {
         this.instances = new Map();
     }
 
@@ -56,9 +51,4 @@ export class InstanceManager {
     removeInstance(serverId: number): void {
         this.instances.delete(serverId);
     }
-}
-
-export interface InstanceManagerGateways {
-    api?: Api;
-    commands?: Commands;
 }

@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class InstanceManager {
-    constructor(factory, gateways) {
+    constructor(factory) {
         this.factory = factory;
-        this.gateways = gateways;
         this.instances = new Map();
     }
     /**
