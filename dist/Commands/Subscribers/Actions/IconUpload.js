@@ -6,8 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const joi_1 = __importDefault(require("@hapi/joi"));
 const IconUploadAction_1 = __importDefault(require("../../../Bot/Action/Icon/IconUploadAction"));
 class IconUploadSubscriber {
-    constructor(manager) {
-        this.manager = manager;
+    constructor() {
         this.subject = 'bot.server.*.icon.upload';
         this.serverIdPos = this.subject.split('.').findIndex(f => f === '*');
         this.schema = joi_1.default.string().required().base64();
@@ -21,8 +20,8 @@ class IconUploadSubscriber {
     getValidationSchema() {
         return this.schema;
     }
-    handle(msg) {
-        return new IconUploadAction_1.default(this.manager.bot, {
+    handle(botManager, msg) {
+        return new IconUploadAction_1.default(botManager.bot, {
             icon: Buffer.from(msg.data, 'base64'),
         }).execute();
     }

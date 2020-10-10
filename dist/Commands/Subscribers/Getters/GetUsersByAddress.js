@@ -4,11 +4,9 @@ const Library_1 = require("../../../Lib/Library");
 const SharedRules_1 = require("../../../Validation/SharedRules");
 const Error_1 = require("../../../Bot/Error");
 class GetUsersByAddressSubscriber {
-    constructor(manager) {
-        this.manager = manager;
+    constructor() {
         this.subject = 'bot.server.*.user.get-by-addr';
         this.serverIdPos = this.subject.split('.').findIndex(f => f === '*');
-        this.bot = manager.bot;
     }
     getServerIdPosition() {
         return this.serverIdPos;
@@ -19,11 +17,11 @@ class GetUsersByAddressSubscriber {
     getValidationSchema() {
         return SharedRules_1.clientIpAddress;
     }
-    async handle(msg) {
+    async handle(botManager, msg) {
         const address = msg.data;
-        if (!this.bot.isConnected)
+        if (!botManager.bot.isConnected)
             return Library_1.left(Error_1.notConnectedError());
-        const clients = await this.bot.getClientsByAddress(address);
+        const clients = await botManager.bot.getClientsByAddress(address);
         return Library_1.right(clients.map(c => ({
             id: c.clid,
             dbId: c.databaseId,

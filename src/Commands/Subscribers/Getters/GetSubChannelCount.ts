@@ -1,27 +1,17 @@
 import Joi from '@hapi/joi';
 import Manager from '../../../Bot/Manager';
-import {
-    SubscriberInterface,
-    HandleServerMessagesInterface,
-} from '../Interfaces';
+import { SubscriberInterface, SubscribesServerMessages } from '../Interfaces';
 import { Either, Failure, left, right } from '../../../Lib/Library';
 import { channelId } from '../../../Validation/SharedRules';
 import { Message } from '../../Message';
-import { Bot } from '../../../Bot/Bot';
 import { notConnectedError, invalidChannelError } from '../../../Bot/Error';
 import { ChannelUtils } from '../../../Bot/Utils/ChannelUtils';
 import { ChannelIdRequest } from './Types';
 
-export class GetSubChannelCountSubscriber
-    implements SubscriberInterface, HandleServerMessagesInterface {
+export class GetSubChannelCountSubscriber implements SubscribesServerMessages {
     readonly subject = 'bot.server.*.channel.sub.count';
     readonly serverIdPos = this.subject.split('.').findIndex(f => f === '*');
     readonly schema: Joi.ObjectSchema = Joi.object(channelId);
-    readonly bot: Bot;
-
-    constructor(private manager: Manager) {
-        this.bot = manager.bot;
-    }
 
     getServerIdPosition(): number {
         return this.serverIdPos;
@@ -36,15 +26,16 @@ export class GetSubChannelCountSubscriber
     }
 
     async handle(
+        botManager: Manager,
         msg: Message<ChannelIdRequest>
     ): Promise<Either<Failure<any>, any>> {
         const {
             data: { channelId },
         } = msg;
 
-        if (!this.bot.isConnected) return left(notConnectedError());
+        if (!botManager.bot.isConnected) return left(notConnectedError());
 
-        const channels = await this.bot.getServer().channelList();
+        const channels = await botManager.bot.getServer().channelList();
 
         if (channels.findIndex(c => c.cid === channelId) === -1)
             return left(invalidChannelError());

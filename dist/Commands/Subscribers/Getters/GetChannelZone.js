@@ -9,12 +9,10 @@ const UserChannelValidationRules_1 = require("../../../Validation/UserChannel/Us
 const Error_1 = require("../../../Bot/Error");
 const ChannelUtils_1 = require("../../../Bot/Utils/ChannelUtils");
 class GetChannelZoneSubscriber {
-    constructor(manager) {
-        this.manager = manager;
+    constructor() {
         this.subject = 'bot.server.*.channel.get-zone';
         this.serverIdPos = this.subject.split('.').findIndex(f => f === '*');
         this.schema = joi_1.default.object(UserChannelValidationRules_1.getZoneRequest);
-        this.bot = manager.bot;
     }
     getServerIdPosition() {
         return this.serverIdPos;
@@ -25,10 +23,10 @@ class GetChannelZoneSubscriber {
     getValidationSchema() {
         return this.schema;
     }
-    async handle(msg) {
-        if (!this.bot.isConnected)
+    async handle(botManager, msg) {
+        if (!botManager.bot.isConnected)
             return Library_1.left(Error_1.notConnectedError());
-        const channelList = await this.bot.getServer().channelList();
+        const channelList = await botManager.bot.getServer().channelList();
         for (const zone of msg.data.zones) {
             const inZone = ChannelUtils_1.ChannelUtils.getZoneTopChannels(channelList, zone.start, zone.end, zone.separators).applyOnRight(result => this.channelExists(msg.data.channelId, result.channels));
             if (inZone.isLeft())

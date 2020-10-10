@@ -7,8 +7,7 @@ const joi_1 = __importDefault(require("@hapi/joi"));
 const UserChannelValidationRules_1 = require("../../../Validation/UserChannel/UserChannelValidationRules");
 const DeleteUserChannelAction_1 = require("../../../Bot/Action/UserChannel/DeleteUserChannelAction");
 class DeleteUserChannelSubscriber {
-    constructor(manager) {
-        this.manager = manager;
+    constructor() {
         this.subject = 'bot.server.*.channel.delete';
         this.serverIdPos = this.subject.split('.').findIndex(f => f === '*');
         this.schema = joi_1.default.object(UserChannelValidationRules_1.deleteChannel);
@@ -22,8 +21,8 @@ class DeleteUserChannelSubscriber {
     getValidationSchema() {
         return this.schema;
     }
-    handle(msg) {
-        return new DeleteUserChannelAction_1.DeleteUserChannelAction(this.manager.logger, this.manager.bot, msg.data).execute();
+    handle(botManager, msg) {
+        return new DeleteUserChannelAction_1.DeleteUserChannelAction(botManager.logger, botManager.bot, msg.data).execute();
     }
 }
 exports.DeleteUserChannelSubscriber = DeleteUserChannelSubscriber;

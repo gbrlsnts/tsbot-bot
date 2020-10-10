@@ -1,22 +1,16 @@
 import Joi from '@hapi/joi';
 import Manager from '../../../Bot/Manager';
-import {
-    SubscriberInterface,
-    HandleServerMessagesInterface,
-} from '../Interfaces';
+import { SubscribesServerMessages } from '../Interfaces';
 import { Either, Failure } from '../../../Lib/Library';
 import { DeleteChannelData } from '../../../Bot/Action/UserChannel/UserChannelTypes';
 import { deleteChannel } from '../../../Validation/UserChannel/UserChannelValidationRules';
 import { DeleteUserChannelAction } from '../../../Bot/Action/UserChannel/DeleteUserChannelAction';
 import { Message } from '../../Message';
 
-export class DeleteUserChannelSubscriber
-    implements SubscriberInterface, HandleServerMessagesInterface {
+export class DeleteUserChannelSubscriber implements SubscribesServerMessages {
     readonly subject = 'bot.server.*.channel.delete';
     readonly serverIdPos = this.subject.split('.').findIndex(f => f === '*');
     readonly schema: Joi.ObjectSchema = Joi.object(deleteChannel);
-
-    constructor(private manager: Manager) {}
 
     getServerIdPosition(): number {
         return this.serverIdPos;
@@ -31,11 +25,12 @@ export class DeleteUserChannelSubscriber
     }
 
     handle(
+        botManager: Manager,
         msg: Message<DeleteChannelData>
     ): Promise<Either<Failure<any>, any>> {
         return new DeleteUserChannelAction(
-            this.manager.logger,
-            this.manager.bot,
+            botManager.logger,
+            botManager.bot,
             msg.data
         ).execute();
     }

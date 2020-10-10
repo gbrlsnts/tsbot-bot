@@ -12,9 +12,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const config_1 = __importDefault(require("config"));
 const awilix = __importStar(require("awilix"));
-const Api_1 = require("./Api/Api");
 const container_1 = __importDefault(require("./container"));
 const Commands_1 = require("./Commands/Commands");
+const InstanceManager_1 = require("./Instance/InstanceManager");
 const apiEnabled = process.env.API_ENABLED || config_1.default.get('api.enabled');
 const natsEnabled = process.env.NATS_ENABLED || config_1.default.get('nats.enabled');
 const container = container_1.default();
@@ -24,21 +24,23 @@ scoped.register({
     serverName: awilix.asValue(process.env.SERVER_NAME || config_1.default.get('server.name')),
 });
 logger.debug('Initializing instance');
-container
-    .resolve('botFactory')
-    .create(scoped.resolve('serverName'))
-    .then(async (manager) => {
-    scoped.register({
-        manager: awilix.asValue(manager),
-        bot: awilix.asValue(manager.bot),
-        logger: awilix.asValue(manager.logger),
-    });
-    if (apiEnabled)
-        new Api_1.Api(manager, logger).boot();
-    if (natsEnabled)
-        await new Commands_1.Commands(manager).init();
+const botFactory = container.resolve('botFactory');
+const instanceManager = new InstanceManager_1.InstanceManager(botFactory);
+new Promise(async (resolve, reject) => {
+    try {
+        //if (apiEnabled) new Api(instanceManager, logger).boot();
+        if (natsEnabled)
+            await new Commands_1.Commands(logger, instanceManager).init();
+    }
+    catch (error) {
+        return reject(error);
+    }
+    resolve();
+})
+    .then(() => {
+    return instanceManager.loadInstance(scoped.resolve('serverName'));
 })
     .catch(error => {
-    logger.error('Error initializing bot', { error });
+    logger.error('Error loading bot instance', { error });
 });
 //# sourceMappingURL=init.js.map

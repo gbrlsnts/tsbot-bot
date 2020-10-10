@@ -1,38 +1,65 @@
 import { Client } from 'nats';
-import Manager from '../Bot/Manager';
 import Validator from '../Validation/Validator';
-import { ServerMsgSubscriber } from './Subscribers/Interfaces';
+import { SubscribesServerMessages } from './Subscribers/Interfaces';
 import { Either, Failure } from '../Lib/Library';
+import { InstanceManager } from '../Instance/InstanceManager';
+import Logger from '../Log/Logger';
 
 export class CommandGateway {
     private readonly validator: Validator;
 
-    constructor(private manager: Manager, private nats: Client) {
+    constructor(
+        private readonly logger: Logger,
+        private readonly instanceManager: InstanceManager,
+        private readonly nats: Client
+    ) {
         this.validator = new Validator();
     }
 
-    subscribe(subscribers: ServerMsgSubscriber[]): void {
+    /**
+     * Registers all subscribers
+     * @param subscribers
+     */
+    subscribe(subscribers: SubscribesServerMessages[]): void {
         subscribers.forEach(sub => {
             this.subscribeSubject(sub);
-            this.manager.logger.debug(`subscribing to ${sub.getSubject()}`, {
+            this.logger.debug(`subscribing to ${sub.getSubject()}`, {
                 canShare: true,
             });
         });
     }
 
-    private subscribeSubject(subscriber: ServerMsgSubscriber): void {
+    /**
+     * Register a subscriber
+     * @param subscriber
+     */
+    subscribeSubject(subscriber: SubscribesServerMessages): void {
         this.nats.subscribe(subscriber.getSubject(), async (error, msg) => {
             if (error) {
-                return this.manager.logger.error('nats subscribe error', {
+                return this.logger.error('nats subscribe error', {
                     error,
                 });
             }
 
             const { subject, data, reply } = msg;
 
-            this.manager.logger.debug('got nats data', {
+            this.logger.debug('got nats data', {
                 context: { subject, data, reply },
             });
+
+            const serverId = Number(
+                subject.split('.')?.[subscriber.getServerIdPosition()]
+            );
+
+            const botManager = this.instanceManager.getInstance(serverId);
+
+            if (!serverId || !botManager) {
+                this.logger.debug('ignoring message, no instance found', {
+                    context: { serverId },
+                });
+
+                return;
+            }
 
             const schema = subscriber.getValidationSchema();
 
@@ -42,11 +69,9 @@ export class CommandGateway {
                 if (schema)
                     await this.validator.validateSchema(schema, dataObject);
 
-                const result = await subscriber.handle({
+                const result = await subscriber.handle(botManager, {
                     data: dataObject,
-                    serverId: subject.split('.')?.[
-                        subscriber.getServerIdPosition()
-                    ],
+                    serverId,
                     subject,
                 });
 
@@ -58,7 +83,7 @@ export class CommandGateway {
 
                 console.error(error);
 
-                return this.manager.logger.error(subscriber.getSubject(), {
+                return this.logger.error(subscriber.getSubject(), {
                     canShare: true,
                     error,
                 });
@@ -66,6 +91,11 @@ export class CommandGateway {
         });
     }
 
+    /**
+     * Reply to a message
+     * @param inbox inbox to reply to
+     * @param result results to send
+     */
     private reply(inbox: string, result: Either<Failure<any>, any>): void {
         let response;
 
@@ -82,13 +112,23 @@ export class CommandGateway {
         this.sendReply(inbox, response);
     }
 
+    /**
+     * Reply as error
+     * @param inbox inbox to reply to
+     * @param error error to send
+     */
     private replyError(inbox: string, error: string): void {
         this.sendReply(inbox, { error });
     }
 
+    /**
+     * Reply with data
+     * @param inbox inbox to reply to
+     * @param data data to send
+     */
     private sendReply(inbox: string, data: any): void {
         this.nats.publish(inbox, JSON.stringify(data), error => {
-            if (error) this.manager.logger.error('nats reply error', { error });
+            if (error) this.logger.error('nats reply error', { error });
         });
     }
 }

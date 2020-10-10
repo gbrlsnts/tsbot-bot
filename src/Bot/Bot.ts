@@ -17,6 +17,7 @@ export class Bot {
         private readonly logger: Logger,
         private readonly server: TeamSpeak,
         readonly self: SelfInfo,
+        readonly serverId: number,
         readonly name: string
     ) {
         this.botEvents = new BotEvent();
@@ -32,13 +33,14 @@ export class Bot {
      */
     static async initialize(
         logger: Logger,
+        serverId: number,
         name: string,
         config: Partial<ConnectionParams>
     ): Promise<Bot> {
         const ts3server = await TeamSpeak.connect(config);
         const self = await SelfInfo.initialize(ts3server);
 
-        return new Bot(logger, ts3server, self, name);
+        return new Bot(logger, ts3server, self, serverId, name);
     }
 
     /**

@@ -1,26 +1,16 @@
 import Manager from '../../../Bot/Manager';
-import {
-    SubscriberInterface,
-    HandleServerMessagesInterface,
-} from '../Interfaces';
+import { SubscribesServerMessages } from '../Interfaces';
 import { Either, Failure, left, right } from '../../../Lib/Library';
 import { Message } from '../../Message';
-import { Bot } from '../../../Bot/Bot';
 import { notConnectedError } from '../../../Bot/Error';
 import { ClientType } from 'ts3-nodejs-library';
 import { TsGroupType, TsGroup } from './Types';
 import { tsGroupType } from '../../../Validation/SharedRules';
 import { Schema } from '@hapi/joi';
 
-export class GetGroupsSubscriber
-    implements SubscriberInterface, HandleServerMessagesInterface {
+export class GetGroupsSubscriber implements SubscribesServerMessages {
     readonly subject = 'bot.server.*.server-groups.get';
     readonly serverIdPos = this.subject.split('.').findIndex(f => f === '*');
-    readonly bot: Bot;
-
-    constructor(private manager: Manager) {
-        this.bot = manager.bot;
-    }
 
     getServerIdPosition(): number {
         return this.serverIdPos;
@@ -35,24 +25,25 @@ export class GetGroupsSubscriber
     }
 
     async handle(
+        botManager: Manager,
         msg: Message<TsGroupType>
     ): Promise<Either<Failure<any>, TsGroup[]>> {
-        if (!this.bot.isConnected) return left(notConnectedError());
+        if (!botManager.bot.isConnected) return left(notConnectedError());
 
         switch (msg.data) {
             case TsGroupType.SERVER:
-                return right(await this.getServerGroups());
+                return right(await this.getServerGroups(botManager));
 
             case TsGroupType.CHANNEL:
-                return right(await this.getChannelGroups());
+                return right(await this.getChannelGroups(botManager));
 
             default:
                 return right([]);
         }
     }
 
-    async getServerGroups(): Promise<TsGroup[]> {
-        const groups = await this.bot.getServer().serverGroupList({
+    async getServerGroups(botManager: Manager): Promise<TsGroup[]> {
+        const groups = await botManager.bot.getServer().serverGroupList({
             type: ClientType.ServerQuery,
         });
 
@@ -63,8 +54,8 @@ export class GetGroupsSubscriber
         }));
     }
 
-    async getChannelGroups(): Promise<TsGroup[]> {
-        const groups = await this.bot.getServer().channelGroupList({
+    async getChannelGroups(botManager: Manager): Promise<TsGroup[]> {
+        const groups = await botManager.bot.getServer().channelGroupList({
             type: ClientType.ServerQuery,
         });
 

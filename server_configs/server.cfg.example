@@ -1,4 +1,5 @@
 {
+    "id": 123,
     "connection": {
         "host": "server-host",
         "queryport": 10011,

@@ -7,8 +7,7 @@ const joi_1 = __importDefault(require("@hapi/joi"));
 const CreateUserSubChannelAction_1 = require("../../../Bot/Action/UserChannel/CreateUserSubChannelAction");
 const UserChannelValidationRules_1 = require("../../../Validation/UserChannel/UserChannelValidationRules");
 class CreateUserSubChannelSubscriber {
-    constructor(manager) {
-        this.manager = manager;
+    constructor() {
         this.subject = 'bot.server.*.channel.sub.create';
         this.serverIdPos = this.subject.split('.').findIndex(f => f === '*');
         this.schema = joi_1.default.object(UserChannelValidationRules_1.createSubChannel);
@@ -22,8 +21,8 @@ class CreateUserSubChannelSubscriber {
     getValidationSchema() {
         return this.schema;
     }
-    handle(msg) {
-        return new CreateUserSubChannelAction_1.CreateUserSubChannelAction(this.manager.logger, this.manager.bot, msg.data).execute();
+    handle(botManager, msg) {
+        return new CreateUserSubChannelAction_1.CreateUserSubChannelAction(botManager.logger, botManager.bot, msg.data).execute();
     }
 }
 exports.CreateUserSubChannelSubscriber = CreateUserSubChannelSubscriber;

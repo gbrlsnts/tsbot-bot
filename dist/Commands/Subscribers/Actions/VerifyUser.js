@@ -6,8 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const User_1 = require("../../../Validation/User");
 const VerifyUserAction_1 = __importDefault(require("../../../Bot/Action/VerifyUser/VerifyUserAction"));
 class VerifyUserSubscriber {
-    constructor(manager) {
-        this.manager = manager;
+    constructor() {
         this.subject = 'bot.server.*.user.verification';
         this.serverIdPos = this.subject.split('.').findIndex(f => f === '*');
     }
@@ -20,8 +19,8 @@ class VerifyUserSubscriber {
     getValidationSchema() {
         return User_1.verifyUser;
     }
-    handle(msg) {
-        return new VerifyUserAction_1.default(this.manager.bot, msg.data).execute();
+    handle(botManager, msg) {
+        return new VerifyUserAction_1.default(botManager.bot, msg.data).execute();
     }
 }
 exports.VerifyUserSubscriber = VerifyUserSubscriber;

@@ -1,22 +1,16 @@
 import Joi from '@hapi/joi';
 import Manager from '../../../Bot/Manager';
-import {
-    SubscriberInterface,
-    HandleServerMessagesInterface,
-} from '../Interfaces';
+import { SubscribesServerMessages } from '../Interfaces';
 import { Either, Failure } from '../../../Lib/Library';
 import { CreateUserChannelAction } from '../../../Bot/Action/UserChannel/CreateUserChannelAction';
 import { CreateUserChannelData } from '../../../Bot/Action/UserChannel/UserChannelTypes';
 import { createChannel } from '../../../Validation/UserChannel/UserChannelValidationRules';
 import { Message } from '../../Message';
 
-export class CreateUserChannelSubscriber
-    implements SubscriberInterface, HandleServerMessagesInterface {
+export class CreateUserChannelSubscriber implements SubscribesServerMessages {
     readonly subject = 'bot.server.*.channel.create';
     readonly serverIdPos = this.subject.split('.').findIndex(f => f === '*');
     readonly schema: Joi.ObjectSchema = Joi.object(createChannel);
-
-    constructor(private manager: Manager) {}
 
     getServerIdPosition(): number {
         return this.serverIdPos;
@@ -31,11 +25,12 @@ export class CreateUserChannelSubscriber
     }
 
     handle(
+        botManager: Manager,
         msg: Message<CreateUserChannelData>
     ): Promise<Either<Failure<any>, any>> {
         return new CreateUserChannelAction(
-            this.manager.logger,
-            this.manager.bot,
+            botManager.logger,
+            botManager.bot,
             msg.data
         ).execute();
     }

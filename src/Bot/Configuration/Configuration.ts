@@ -1,6 +1,8 @@
-import { ConnectionProtocol } from "../Types";
+import { ConnectionProtocol } from '../Types';
 
 export interface Configuration {
+    /** server identifier, should be unique */
+    id: number;
     /** Server connection configurations */
     connection: ConnectionConfiguration;
 
@@ -16,7 +18,7 @@ export interface ConnectionConfiguration {
     /** Voice port */
     serverport: number;
     /** Query protocol */
-    protocol: ConnectionProtocol
+    protocol: ConnectionProtocol;
     /** Username to login with */
     username?: string;
     /** Password to use in login */
@@ -27,7 +29,7 @@ export interface ConnectionConfiguration {
 
 export interface CrawlerConfiguration {
     /** Interval in seconds that the bot should crawl the server */
-    interval: number,
+    interval: number;
     /** A list of zones with user channels that should be monitored */
     zones: CrawlZone[];
 }

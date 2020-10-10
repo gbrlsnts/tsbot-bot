@@ -1,20 +1,14 @@
 import Joi from '@hapi/joi';
 import Manager from '../../../Bot/Manager';
-import {
-    SubscriberInterface,
-    HandleServerMessagesInterface,
-} from '../Interfaces';
+import { SubscribesServerMessages } from '../Interfaces';
 import { Either, Failure } from '../../../Lib/Library';
 import { Message } from '../../Message';
 import IconUploadAction from '../../../Bot/Action/Icon/IconUploadAction';
 
-export class IconUploadSubscriber
-    implements SubscriberInterface, HandleServerMessagesInterface {
+export class IconUploadSubscriber implements SubscribesServerMessages {
     readonly subject = 'bot.server.*.icon.upload';
     readonly serverIdPos = this.subject.split('.').findIndex(f => f === '*');
     readonly schema: Joi.Schema = Joi.string().required().base64();
-
-    constructor(private manager: Manager) {}
 
     getServerIdPosition(): number {
         return this.serverIdPos;
@@ -28,8 +22,11 @@ export class IconUploadSubscriber
         return this.schema;
     }
 
-    handle(msg: Message<string>): Promise<Either<Failure<any>, any>> {
-        return new IconUploadAction(this.manager.bot, {
+    handle(
+        botManager: Manager,
+        msg: Message<string>
+    ): Promise<Either<Failure<any>, any>> {
+        return new IconUploadAction(botManager.bot, {
             icon: Buffer.from(msg.data, 'base64'),
         }).execute();
     }

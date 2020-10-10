@@ -9,10 +9,11 @@ const BotEvent_1 = require("./Event/BotEvent");
 const Types_1 = require("./Types");
 const File_1 = __importDefault(require("../Lib/File"));
 class Bot {
-    constructor(logger, server, self, name) {
+    constructor(logger, server, self, serverId, name) {
         this.logger = logger;
         this.server = server;
         this.self = self;
+        this.serverId = serverId;
         this.name = name;
         this._isConnected = true;
         this.botEvents = new BotEvent_1.BotEvent();
@@ -24,10 +25,10 @@ class Bot {
      * @param server The Teamspeak server instance
      * @param name Configuration name
      */
-    static async initialize(logger, name, config) {
+    static async initialize(logger, serverId, name, config) {
         const ts3server = await ts3_nodejs_library_1.TeamSpeak.connect(config);
         const self = await SelfInfo_1.default.initialize(ts3server);
-        return new Bot(logger, ts3server, self, name);
+        return new Bot(logger, ts3server, self, serverId, name);
     }
     /**
      * Get the server instance

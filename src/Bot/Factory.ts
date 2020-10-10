@@ -7,30 +7,31 @@ import Manager from './Manager';
 import { LoaderInterface } from './Configuration/LoaderInterface';
 import Logger from '../Log/Logger';
 
-export default class Factory
-{
-    constructor(private readonly configLoader: LoaderInterface, private readonly logger: Logger)
-    {
+export default class Factory {
+    constructor(
+        private readonly configLoader: LoaderInterface,
+        private readonly logger: Logger
+    ) {}
 
-    }
-
-    async create(serverName: string): Promise<Manager>
-    {
+    async create(serverName: string): Promise<Manager> {
         const config = await this.configLoader.loadConfiguration(serverName);
 
         const botLogger = this.logger.scoped({
             server: serverName,
         });
 
-        const bot = await Bot.initialize(botLogger, serverName, {
+        const bot = await Bot.initialize(botLogger, config.id, serverName, {
             ...config.connection,
-            protocol: config.connection.protocol === ConnectionProtocol.RAW ? QueryProtocol.RAW : QueryProtocol.SSH,
+            protocol:
+                config.connection.protocol === ConnectionProtocol.RAW
+                    ? QueryProtocol.RAW
+                    : QueryProtocol.SSH,
         });
 
         const eventHandler = new MasterEventHandler(botLogger, bot);
 
-        let crawler: Crawler | undefined;        
-        if(config.crawler) {
+        let crawler: Crawler | undefined;
+        if (config.crawler) {
             crawler = new Crawler(bot, botLogger, config.crawler);
             crawler.boot();
         }

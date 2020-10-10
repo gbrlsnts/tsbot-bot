@@ -6,11 +6,9 @@ const ts3_nodejs_library_1 = require("ts3-nodejs-library");
 const Types_1 = require("./Types");
 const SharedRules_1 = require("../../../Validation/SharedRules");
 class GetGroupsSubscriber {
-    constructor(manager) {
-        this.manager = manager;
+    constructor() {
         this.subject = 'bot.server.*.server-groups.get';
         this.serverIdPos = this.subject.split('.').findIndex(f => f === '*');
-        this.bot = manager.bot;
     }
     getServerIdPosition() {
         return this.serverIdPos;
@@ -21,20 +19,20 @@ class GetGroupsSubscriber {
     getValidationSchema() {
         return SharedRules_1.tsGroupType;
     }
-    async handle(msg) {
-        if (!this.bot.isConnected)
+    async handle(botManager, msg) {
+        if (!botManager.bot.isConnected)
             return Library_1.left(Error_1.notConnectedError());
         switch (msg.data) {
             case Types_1.TsGroupType.SERVER:
-                return Library_1.right(await this.getServerGroups());
+                return Library_1.right(await this.getServerGroups(botManager));
             case Types_1.TsGroupType.CHANNEL:
-                return Library_1.right(await this.getChannelGroups());
+                return Library_1.right(await this.getChannelGroups(botManager));
             default:
                 return Library_1.right([]);
         }
     }
-    async getServerGroups() {
-        const groups = await this.bot.getServer().serverGroupList({
+    async getServerGroups(botManager) {
+        const groups = await botManager.bot.getServer().serverGroupList({
             type: ts3_nodejs_library_1.ClientType.ServerQuery,
         });
         return groups.map(g => ({
@@ -43,8 +41,8 @@ class GetGroupsSubscriber {
             name: g.name,
         }));
     }
-    async getChannelGroups() {
-        const groups = await this.bot.getServer().channelGroupList({
+    async getChannelGroups(botManager) {
+        const groups = await botManager.bot.getServer().channelGroupList({
             type: ts3_nodejs_library_1.ClientType.ServerQuery,
         });
         return groups.map(g => ({

@@ -9,12 +9,10 @@ const SharedRules_1 = require("../../../Validation/SharedRules");
 const Error_1 = require("../../../Bot/Error");
 const ChannelUtils_1 = require("../../../Bot/Utils/ChannelUtils");
 class GetSubChannelCountSubscriber {
-    constructor(manager) {
-        this.manager = manager;
+    constructor() {
         this.subject = 'bot.server.*.channel.sub.count';
         this.serverIdPos = this.subject.split('.').findIndex(f => f === '*');
         this.schema = joi_1.default.object(SharedRules_1.channelId);
-        this.bot = manager.bot;
     }
     getServerIdPosition() {
         return this.serverIdPos;
@@ -25,11 +23,11 @@ class GetSubChannelCountSubscriber {
     getValidationSchema() {
         return this.schema;
     }
-    async handle(msg) {
+    async handle(botManager, msg) {
         const { data: { channelId }, } = msg;
-        if (!this.bot.isConnected)
+        if (!botManager.bot.isConnected)
             return Library_1.left(Error_1.notConnectedError());
-        const channels = await this.bot.getServer().channelList();
+        const channels = await botManager.bot.getServer().channelList();
         if (channels.findIndex(c => c.cid === channelId) === -1)
             return Library_1.left(Error_1.invalidChannelError());
         const count = ChannelUtils_1.ChannelUtils.getAllSubchannels(channelId, channels)

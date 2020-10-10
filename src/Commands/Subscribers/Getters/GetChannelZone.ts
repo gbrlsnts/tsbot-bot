@@ -1,28 +1,18 @@
 import Joi from '@hapi/joi';
 import Manager from '../../../Bot/Manager';
-import {
-    SubscriberInterface,
-    HandleServerMessagesInterface,
-} from '../Interfaces';
+import { SubscribesServerMessages } from '../Interfaces';
 import { Either, Failure, left, right } from '../../../Lib/Library';
 import { Message } from '../../Message';
-import { Bot } from '../../../Bot/Bot';
 import { getZoneRequest } from '../../../Validation/UserChannel/UserChannelValidationRules';
 import { notConnectedError } from '../../../Bot/Error';
 import { GetChannelZoneRequest, GetChannelZoneResponse } from './Types';
 import { ChannelUtils } from '../../../Bot/Utils/ChannelUtils';
 import { TeamSpeakChannel } from 'ts3-nodejs-library';
 
-export class GetChannelZoneSubscriber
-    implements SubscriberInterface, HandleServerMessagesInterface {
+export class GetChannelZoneSubscriber implements SubscribesServerMessages {
     readonly subject = 'bot.server.*.channel.get-zone';
     readonly serverIdPos = this.subject.split('.').findIndex(f => f === '*');
     readonly schema = Joi.object(getZoneRequest);
-    readonly bot: Bot;
-
-    constructor(private manager: Manager) {
-        this.bot = manager.bot;
-    }
 
     getServerIdPosition(): number {
         return this.serverIdPos;
@@ -37,11 +27,12 @@ export class GetChannelZoneSubscriber
     }
 
     async handle(
+        botManager: Manager,
         msg: Message<GetChannelZoneRequest>
     ): Promise<Either<Failure<any>, GetChannelZoneResponse>> {
-        if (!this.bot.isConnected) return left(notConnectedError());
+        if (!botManager.bot.isConnected) return left(notConnectedError());
 
-        const channelList = await this.bot.getServer().channelList();
+        const channelList = await botManager.bot.getServer().channelList();
 
         for (const zone of msg.data.zones) {
             const inZone = ChannelUtils.getZoneTopChannels(

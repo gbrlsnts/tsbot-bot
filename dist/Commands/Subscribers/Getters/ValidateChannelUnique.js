@@ -9,12 +9,10 @@ const SharedRules_1 = require("../../../Validation/SharedRules");
 const Error_1 = require("../../../Bot/Error");
 const ChannelUtils_1 = require("../../../Bot/Utils/ChannelUtils");
 class ValidateChannelsUniqueSubscriber {
-    constructor(manager) {
-        this.manager = manager;
+    constructor() {
         this.subject = 'bot.server.*.channel.is-unique';
         this.serverIdPos = this.subject.split('.').findIndex(f => f === '*');
         this.schema = joi_1.default.object(SharedRules_1.channelNames);
-        this.bot = manager.bot;
     }
     getServerIdPosition() {
         return this.serverIdPos;
@@ -25,15 +23,15 @@ class ValidateChannelsUniqueSubscriber {
     getValidationSchema() {
         return this.schema;
     }
-    async handle(msg) {
+    async handle(botManager, msg) {
         const { data: { channels, rootChannelId }, } = msg;
-        if (!this.bot.isConnected)
+        if (!botManager.bot.isConnected)
             return Library_1.left(Error_1.notConnectedError());
         if (rootChannelId) {
-            const channelList = await this.bot.getServer().channelList();
+            const channelList = await botManager.bot.getServer().channelList();
             return Library_1.right(this.validateSubChannelsUnique(channelList, channels, rootChannelId));
         }
-        const channelList = await this.bot.getServer().channelList({
+        const channelList = await botManager.bot.getServer().channelList({
             pid: 0,
         });
         return Library_1.right(this.isNameUnique(channelList, channels));

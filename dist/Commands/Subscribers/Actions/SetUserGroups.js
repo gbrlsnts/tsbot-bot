@@ -7,8 +7,7 @@ const joi_1 = __importDefault(require("@hapi/joi"));
 const SetUserGroupsAction_1 = __importDefault(require("../../../Bot/Action/UserGroups/SetUserGroupsAction"));
 const UserGroups_1 = require("../../../Validation/UserGroups");
 class SetUserGroupsSubscriber {
-    constructor(manager) {
-        this.manager = manager;
+    constructor() {
         this.subject = 'bot.server.*.badges.set';
         this.serverIdPos = this.subject.split('.').findIndex(f => f === '*');
         this.schema = joi_1.default.object(UserGroups_1.setUserGroupsCommand);
@@ -22,8 +21,8 @@ class SetUserGroupsSubscriber {
     getValidationSchema() {
         return this.schema;
     }
-    handle(msg) {
-        return new SetUserGroupsAction_1.default(this.manager.bot, {
+    handle(botManager, msg) {
+        return new SetUserGroupsAction_1.default(botManager.bot, {
             ...msg.data,
             trustedSource: true,
         }).execute();

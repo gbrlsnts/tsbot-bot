@@ -5,6 +5,7 @@ import { Api } from './Api/Api';
 import configureContainer from './container';
 import Logger from './Log/Logger';
 import { Commands } from './Commands/Commands';
+import { InstanceManager } from './Instance/InstanceManager';
 
 const apiEnabled = process.env.API_ENABLED || config.get('api.enabled');
 const natsEnabled = process.env.NATS_ENABLED || config.get('nats.enabled');
@@ -22,19 +23,22 @@ scoped.register({
 
 logger.debug('Initializing instance');
 
-container
-    .resolve<Factory>('botFactory')
-    .create(scoped.resolve('serverName'))
-    .then(async manager => {
-        scoped.register({
-            manager: awilix.asValue(manager),
-            bot: awilix.asValue(manager.bot),
-            logger: awilix.asValue(manager.logger),
-        });
+const botFactory = container.resolve<Factory>('botFactory');
+const instanceManager = new InstanceManager(botFactory);
 
-        if (apiEnabled) new Api(manager, logger).boot();
-        if (natsEnabled) await new Commands(manager).init();
+new Promise(async (resolve, reject) => {
+    try {
+        //if (apiEnabled) new Api(instanceManager, logger).boot();
+        if (natsEnabled) await new Commands(logger, instanceManager).init();
+    } catch (error) {
+        return reject(error);
+    }
+
+    resolve();
+})
+    .then(() => {
+        return instanceManager.loadInstance(scoped.resolve('serverName'));
     })
     .catch(error => {
-        logger.error('Error initializing bot', { error });
+        logger.error('Error loading bot instance', { error });
     });

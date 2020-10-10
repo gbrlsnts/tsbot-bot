@@ -7,8 +7,7 @@ const Library_1 = require("../../../Lib/Library");
 const SharedRules_1 = require("../../../Validation/SharedRules");
 const IconDeleteAction_1 = __importDefault(require("../../../Bot/Action/Icon/IconDeleteAction"));
 class IconDeleteSubscriber {
-    constructor(manager) {
-        this.manager = manager;
+    constructor() {
         this.subject = 'bot.server.*.icon.delete';
         this.serverIdPos = this.subject.split('.').findIndex(f => f === '*');
         this.schema = SharedRules_1.iconIds;
@@ -22,9 +21,9 @@ class IconDeleteSubscriber {
     getValidationSchema() {
         return this.schema;
     }
-    async handle(msg) {
+    async handle(botManager, msg) {
         const result = await Promise.all(msg.data.map(iconId => {
-            return new IconDeleteAction_1.default(this.manager.bot, {
+            return new IconDeleteAction_1.default(botManager.bot, {
                 iconId,
             }).execute();
         }));

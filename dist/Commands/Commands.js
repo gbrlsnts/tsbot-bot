@@ -17,31 +17,32 @@ const GetUsersByAddress_1 = require("./Subscribers/Getters/GetUsersByAddress");
 const GetUserServerGroupIds_1 = require("./Subscribers/Getters/GetUserServerGroupIds");
 const GetChannelZone_1 = require("./Subscribers/Getters/GetChannelZone");
 class Commands {
-    constructor(manager) {
+    constructor(logger, manager) {
+        this.logger = logger;
         this.manager = manager;
     }
     async init() {
         const nats = await new Connector_1.NatsConnector().connect();
-        const gateway = new Gateway_1.CommandGateway(this.manager, nats);
+        const gateway = new Gateway_1.CommandGateway(this.logger, this.manager, nats);
         gateway.subscribe(this.getServerSubscribers());
-        this.manager.logger.info('Command gateway initialized');
+        this.logger.info('Command gateway initialized');
     }
     getServerSubscribers() {
         return [
-            new CreateUserChannel_1.CreateUserChannelSubscriber(this.manager),
-            new CreateUserSubChannel_1.CreateUserSubChannelSubscriber(this.manager),
-            new DeleteUserChannel_1.DeleteUserChannelSubscriber(this.manager),
-            new GetSubChannelCount_1.GetSubChannelCountSubscriber(this.manager),
-            new GetServerGroups_1.GetGroupsSubscriber(this.manager),
-            new GetIcons_1.GetIconsSubscriber(this.manager),
-            new ValidateChannelUnique_1.ValidateChannelsUniqueSubscriber(this.manager),
-            new SetUserGroups_1.SetUserGroupsSubscriber(this.manager),
-            new IconUpload_1.IconUploadSubscriber(this.manager),
-            new IconDelete_1.IconDeleteSubscriber(this.manager),
-            new VerifyUser_1.VerifyUserSubscriber(this.manager),
-            new GetUsersByAddress_1.GetUsersByAddressSubscriber(this.manager),
-            new GetUserServerGroupIds_1.GetUserServerGroupIdsSubscriber(this.manager),
-            new GetChannelZone_1.GetChannelZoneSubscriber(this.manager),
+            new CreateUserChannel_1.CreateUserChannelSubscriber(),
+            new CreateUserSubChannel_1.CreateUserSubChannelSubscriber(),
+            new DeleteUserChannel_1.DeleteUserChannelSubscriber(),
+            new GetSubChannelCount_1.GetSubChannelCountSubscriber(),
+            new GetServerGroups_1.GetGroupsSubscriber(),
+            new GetIcons_1.GetIconsSubscriber(),
+            new ValidateChannelUnique_1.ValidateChannelsUniqueSubscriber(),
+            new SetUserGroups_1.SetUserGroupsSubscriber(),
+            new IconUpload_1.IconUploadSubscriber(),
+            new IconDelete_1.IconDeleteSubscriber(),
+            new VerifyUser_1.VerifyUserSubscriber(),
+            new GetUsersByAddress_1.GetUsersByAddressSubscriber(),
+            new GetUserServerGroupIds_1.GetUserServerGroupIdsSubscriber(),
+            new GetChannelZone_1.GetChannelZoneSubscriber(),
         ];
     }
 }
