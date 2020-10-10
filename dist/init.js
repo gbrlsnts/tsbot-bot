@@ -2,41 +2,38 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const config_1 = __importDefault(require("config"));
-const awilix = __importStar(require("awilix"));
-const container_1 = __importDefault(require("./container"));
+const path_1 = require("path");
+const Factory_1 = require("./Bot/Configuration/Factory");
+const Factory_2 = __importDefault(require("./Bot/Factory"));
+const Logger_1 = __importDefault(require("./Log/Logger"));
 const Commands_1 = require("./Commands/Commands");
 const InstanceManager_1 = require("./Instance/InstanceManager");
+const serverName = process.env.SERVER_NAME || config_1.default.get('server.name');
 const natsEnabled = process.env.NATS_ENABLED || config_1.default.get('nats.enabled');
-const container = container_1.default();
-const scoped = container.createScope();
-const logger = scoped.resolve('logger');
-scoped.register({
-    serverName: awilix.asValue(process.env.SERVER_NAME || config_1.default.get('server.name')),
-});
+const logger = new Logger_1.default({ level: 'debug' });
 logger.debug('Initializing instance');
-const botFactory = container.resolve('botFactory');
-const instanceManager = new InstanceManager_1.InstanceManager(botFactory);
+let instanceManager;
 new Promise(async (resolve, reject) => {
     try {
-        if (natsEnabled)
-            await new Commands_1.Commands(logger, instanceManager).init();
+        const configLoader = new Factory_1.Factory({
+            mode: 'local',
+            configFolder: path_1.resolve('server_configs'),
+        }).create();
+        resolve(new InstanceManager_1.InstanceManager(new Factory_2.default(configLoader, logger)));
     }
     catch (error) {
-        return reject(error);
+        reject(error);
     }
-    resolve();
+})
+    .then(manager => {
+    instanceManager = manager;
+    if (natsEnabled)
+        return new Commands_1.Commands(logger, instanceManager).init();
 })
     .then(() => {
-    return instanceManager.loadInstance(scoped.resolve('serverName'));
+    return instanceManager.loadInstance(serverName);
 })
     .catch(error => {
     logger.error('Error loading bot instance', { error });

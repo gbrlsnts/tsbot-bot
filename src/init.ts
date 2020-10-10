@@ -1,40 +1,37 @@
 import config from 'config';
-import * as awilix from 'awilix';
+import { resolve as pathResolve } from 'path';
+import { Factory as LoaderFactory } from './Bot/Configuration/Factory';
 import Factory from './Bot/Factory';
-import configureContainer from './container';
 import Logger from './Log/Logger';
 import { Commands } from './Commands/Commands';
 import { InstanceManager } from './Instance/InstanceManager';
 
+const serverName: string = process.env.SERVER_NAME || config.get('server.name');
 const natsEnabled = process.env.NATS_ENABLED || config.get('nats.enabled');
 
-const container = configureContainer();
-const scoped = container.createScope();
-
-const logger = scoped.resolve<Logger>('logger');
-
-scoped.register({
-    serverName: awilix.asValue(
-        process.env.SERVER_NAME || config.get('server.name')
-    ),
-});
-
+const logger = new Logger({ level: 'debug' });
 logger.debug('Initializing instance');
 
-const botFactory = container.resolve<Factory>('botFactory');
-const instanceManager = new InstanceManager(botFactory);
+let instanceManager: InstanceManager;
 
 new Promise(async (resolve, reject) => {
     try {
-        if (natsEnabled) await new Commands(logger, instanceManager).init();
-    } catch (error) {
-        return reject(error);
-    }
+        const configLoader = new LoaderFactory({
+            mode: 'local',
+            configFolder: pathResolve('server_configs'),
+        }).create();
 
-    resolve();
+        resolve(new InstanceManager(new Factory(configLoader, logger)));
+    } catch (error) {
+        reject(error);
+    }
 })
+    .then(manager => {
+        instanceManager = manager as InstanceManager;
+        if (natsEnabled) return new Commands(logger, instanceManager).init();
+    })
     .then(() => {
-        return instanceManager.loadInstance(scoped.resolve('serverName'));
+        return instanceManager.loadInstance(serverName);
     })
     .catch(error => {
         logger.error('Error loading bot instance', { error });
