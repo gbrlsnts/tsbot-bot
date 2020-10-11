@@ -1,3 +1,4 @@
+import { Client } from 'nats';
 import { LoaderInterface } from './LoaderInterface';
 import { LocalLoader } from './LocalLoader';
 import { NatsLoader } from './NatsLoader';
@@ -11,7 +12,7 @@ export class Factory {
                 return new LocalLoader(this.config.configFolder);
 
             case 'nats':
-                return new NatsLoader();
+                return new NatsLoader(this.config.client);
 
             default:
                 throw new Error('invalid server mode. valid: local, nats');
@@ -33,4 +34,6 @@ export interface LocalLoaderOptions {
 export interface NatsLoaderOptions {
     /** Loader mode */
     mode: 'nats';
+    /** nats client */
+    client: Client;
 }

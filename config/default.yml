@@ -6,5 +6,4 @@ server:
         serverId: 10
 
 nats:
-    enabled: true
     url: nats://home.local:4222

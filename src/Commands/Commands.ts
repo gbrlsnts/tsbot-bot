@@ -1,7 +1,8 @@
+import { Client } from 'nats';
 import { InstanceManager } from '../Instance/InstanceManager';
 import { NatsConnector } from './Nats/Connector';
 import { CommandGateway } from './Gateway';
-import { Subscriber, SubscribesServerMessages } from './Subscribers/Interfaces';
+import { SubscribesServerMessages } from './Subscribers/Interfaces';
 import { CreateUserChannelSubscriber } from './Subscribers/Actions/CreateUserChannel';
 import { DeleteUserChannelSubscriber } from './Subscribers/Actions/DeleteUserChannel';
 import { CreateUserSubChannelSubscriber } from './Subscribers/Actions/CreateUserSubChannel';
@@ -21,13 +22,16 @@ import Logger from '../Log/Logger';
 export class Commands {
     constructor(
         private readonly logger: Logger,
+        private readonly natsClient: Client,
         private readonly manager: InstanceManager
     ) {}
 
     async init(): Promise<void> {
-        const nats = await new NatsConnector().connect();
-
-        const gateway = new CommandGateway(this.logger, this.manager, nats);
+        const gateway = new CommandGateway(
+            this.logger,
+            this.manager,
+            this.natsClient
+        );
         gateway.subscribe(this.getServerSubscribers());
 
         this.logger.info('Command gateway initialized');
