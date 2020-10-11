@@ -128,10 +128,10 @@ export class Crawler {
                         return;
 
                     if (
-                        ChannelUtils.countChannelTreeTotalClients(
+                        ChannelUtils.getChannelTreeMinSecondsEmpty(
                             channel,
                             channelList
-                        ) === 0
+                        ) > 0
                     )
                         zoneInactiveChannels.push(channel.cid);
                     else zoneActiveChannels.push(channel.cid);

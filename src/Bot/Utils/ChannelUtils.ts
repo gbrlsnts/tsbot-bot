@@ -118,6 +118,24 @@ export class ChannelUtils {
     }
 
     /**
+     * Gets the mininum seconds empty for a given channel and subchannels.
+     * @param channel Channel to count clients
+     * @param channelList List with all server channels
+     */
+    static getChannelTreeMinSecondsEmpty(
+        channel: TeamSpeakChannel,
+        channelList: TeamSpeakChannel[]
+    ): number {
+        const secondsEmptyMin = this.getAllSubchannels(channel, channelList)
+            .map(sub => sub.secondsEmpty ?? 0)
+            .sort();
+
+        if (secondsEmptyMin.length === 0) return 0;
+
+        return secondsEmptyMin[0] >= 0 ? secondsEmptyMin[0] : 0;
+    }
+
+    /**
      * Check is a root/top channel
      * @param ChannelId The channel name to check
      */
