@@ -1,7 +1,7 @@
-import { Client } from 'nats';
 import { LoaderInterface } from './LoaderInterface';
 import { LocalLoader } from './LocalLoader';
 import { NatsLoader } from './NatsLoader';
+import { NatsConnector } from '../../Commands/Nats/Connector';
 
 export class Factory {
     constructor(readonly config: LoaderFactoryConfig) {}
@@ -35,5 +35,5 @@ export interface NatsLoaderOptions {
     /** Loader mode */
     mode: 'nats';
     /** nats client */
-    client: Client;
+    client: NatsConnector;
 }

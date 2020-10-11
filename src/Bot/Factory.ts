@@ -6,10 +6,12 @@ import { Crawler } from './Crawler/Crawler';
 import Manager from './Manager';
 import { LoaderInterface } from './Configuration/LoaderInterface';
 import Logger from '../Log/Logger';
+import { RepositoryInterface } from './Repository/RepositoryInterface';
 
 export default class Factory {
     constructor(
         private readonly configLoader: LoaderInterface,
+        private readonly repository: RepositoryInterface,
         private readonly logger: Logger
     ) {}
 
@@ -28,11 +30,20 @@ export default class Factory {
                     : QueryProtocol.SSH,
         });
 
-        const eventHandler = new MasterEventHandler(botLogger, bot);
+        const eventHandler = new MasterEventHandler(
+            botLogger,
+            bot,
+            this.repository
+        );
 
         let crawler: Crawler | undefined;
         if (config.crawler) {
-            crawler = new Crawler(bot, botLogger, config.crawler);
+            crawler = new Crawler(
+                bot,
+                botLogger,
+                this.repository,
+                config.crawler
+            );
             crawler.boot();
         }
 
@@ -41,6 +52,7 @@ export default class Factory {
             eventHandler,
             crawler,
             logger: botLogger,
+            repository: this.repository,
         });
     }
 }

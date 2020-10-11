@@ -22,7 +22,7 @@ import Logger from '../Log/Logger';
 export class Commands {
     constructor(
         private readonly logger: Logger,
-        private readonly natsClient: Client,
+        private readonly natsClient: NatsConnector,
         private readonly manager: InstanceManager
     ) {}
 
@@ -30,7 +30,7 @@ export class Commands {
         const gateway = new CommandGateway(
             this.logger,
             this.manager,
-            this.natsClient
+            this.natsClient.getClient()
         );
         gateway.subscribe(this.getServerSubscribers());
 

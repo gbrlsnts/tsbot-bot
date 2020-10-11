@@ -64,13 +64,10 @@ export class CommandGateway {
             const schema = subscriber.getValidationSchema();
 
             try {
-                const dataObject = JSON.parse(data);
-
-                if (schema)
-                    await this.validator.validateSchema(schema, dataObject);
+                if (schema) await this.validator.validateSchema(schema, data);
 
                 const result = await subscriber.handle(botManager, {
-                    data: dataObject,
+                    data,
                     serverId,
                     subject,
                 });

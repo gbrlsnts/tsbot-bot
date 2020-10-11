@@ -1,14 +1,14 @@
-import { Bot } from "../Bot";
-import { CrawlerConfiguration } from "../Configuration/Configuration";
-import { clearTimeout } from "timers";
-import { ChannelUtils } from "../Utils/ChannelUtils";
-import { ZoneCrawlResult, ZoneProcessResult } from "./CrawlerTypes";
-import { ProcessResult } from "./ProcessResult";
-import { ChannelCleanup } from "./ChannelCleanup";
-import Logger from "../../Log/Logger";
+import { Bot } from '../Bot';
+import { CrawlerConfiguration } from '../Configuration/Configuration';
+import { clearTimeout } from 'timers';
+import { ChannelUtils } from '../Utils/ChannelUtils';
+import { ZoneCrawlResult, ZoneProcessResult } from './CrawlerTypes';
+import { ProcessResult } from './ProcessResult';
+import { ChannelCleanup } from './ChannelCleanup';
+import Logger from '../../Log/Logger';
+import { RepositoryInterface } from '../Repository/RepositoryInterface';
 
-export class Crawler
-{
+export class Crawler {
     private readonly bootTimer: number = 30;
 
     private isBooted: boolean = false;
@@ -21,19 +21,15 @@ export class Crawler
     constructor(
         private readonly bot: Bot,
         private readonly logger: Logger,
+        private readonly repository: RepositoryInterface,
         private config: CrawlerConfiguration
-    )
-    {
-
-    }
+    ) {}
 
     /**
      * Boot the crawler
      */
-    boot()
-    {
-        if(this.isBooted)
-            return;
+    boot() {
+        if (this.isBooted) return;
 
         this.startTimer();
 
@@ -43,14 +39,12 @@ export class Crawler
     /**
      * Stop the crawler
      */
-    stop()
-    {
+    stop() {
         this.onCrawlEnd = () => {
-            if(this.timer)
-                clearTimeout(this.timer);
+            if (this.timer) clearTimeout(this.timer);
         };
 
-        if(!this.isRunning) {
+        if (!this.isRunning) {
             this.onCrawlEnd();
 
             return;
@@ -61,42 +55,34 @@ export class Crawler
      * Reload the crawler config
      * @param config the config to apply
      */
-    reload(config: CrawlerConfiguration)
-    {
-        if(!this.isRunning) {
+    reload(config: CrawlerConfiguration) {
+        if (!this.isRunning) {
             this.config = config;
 
             return;
         }
 
-        this.onCrawlEnd = () => this.config = config;
+        this.onCrawlEnd = () => (this.config = config);
     }
 
     /**
      * Start the crawl timer
      */
-    private startTimer()
-    {
-        if(this.timer)
-            clearTimeout(this.timer);
+    private startTimer() {
+        if (this.timer) clearTimeout(this.timer);
 
         const interval = this.getTimerInterval();
 
-        this.timer = setTimeout(
-            this.crawl.bind(this),
-            interval
-        );
+        this.timer = setTimeout(this.crawl.bind(this), interval);
 
-        this.logger.debug(`Next crawl to run in ${interval/1000} seconds`);
+        this.logger.debug(`Next crawl to run in ${interval / 1000} seconds`);
     }
 
     /**
      * Get the interval to run the crawl timer
      */
-    private getTimerInterval()
-    {
-        if(this.isBooted)
-            return this.config.interval * 1000;
+    private getTimerInterval() {
+        if (this.isBooted) return this.config.interval * 1000;
 
         return this.bootTimer * 1000;
     }
@@ -104,50 +90,58 @@ export class Crawler
     /**
      * Do a crawl
      */
-    private async crawl()
-    {
+    private async crawl() {
         this.logger.debug('Starting crawl');
         this.isRunning = true;
 
         try {
-            if(!this.bot.isConnected)
+            if (!this.bot.isConnected)
                 throw new Error('Bot not connected to server');
 
             const channelList = await this.bot.getServer().channelList();
             const crawlResults: ZoneCrawlResult[] = [];
 
             this.config.zones.forEach(zone => {
-                const channelsInZoneResult = ChannelUtils.getZoneTopChannels(channelList, zone.start, zone.end, !zone.spacerAsSeparator);
+                const channelsInZoneResult = ChannelUtils.getZoneTopChannels(
+                    channelList,
+                    zone.start,
+                    zone.end,
+                    !zone.spacerAsSeparator
+                );
 
-                if(channelsInZoneResult.isLeft()) {
+                if (channelsInZoneResult.isLeft()) {
                     this.logger.warn(channelsInZoneResult.value.reason, {
                         context: {
                             zone: zone.name,
                         },
                         canShare: true,
                     });
-                    
+
                     return;
                 }
 
                 const zoneInactiveChannels: number[] = [],
-                      zoneActiveChannels: number[] = [];
+                    zoneActiveChannels: number[] = [];
 
                 channelsInZoneResult.value.channels.forEach(channel => {
-                    if(ChannelUtils.isChannelSeparator(channel, channelList))
+                    if (ChannelUtils.isChannelSeparator(channel, channelList))
                         return;
-                    
-                    if(ChannelUtils.countChannelTreeTotalClients(channel, channelList) === 0)
+
+                    if (
+                        ChannelUtils.countChannelTreeTotalClients(
+                            channel,
+                            channelList
+                        ) === 0
+                    )
                         zoneInactiveChannels.push(channel.cid);
-                    else
-                        zoneActiveChannels.push(channel.cid);
+                    else zoneActiveChannels.push(channel.cid);
                 });
 
                 crawlResults.push({
                     zone: zone.name,
                     inactive: zoneInactiveChannels,
                     active: zoneActiveChannels,
-                    total: channelsInZoneResult.value.channels.length
+                    total: channelsInZoneResult.value.channels.length,
                 });
             });
 
@@ -155,18 +149,28 @@ export class Crawler
                 context: crawlResults.map(c => c.inactive),
             });
 
-            const results = await new ProcessResult(crawlResults, this.config).processResults();
-            const deletedChannels = await new ChannelCleanup(this.bot, this.config.zones, results).cleanupChannels();
+            const results = await new ProcessResult(
+                this.bot.serverId,
+                crawlResults,
+                this.config,
+                this.repository
+            ).processResults();
+
+            const deletedChannels = await new ChannelCleanup(
+                this.bot,
+                this.config.zones,
+                results
+            ).cleanupChannels();
 
             this.raiseChannelEvents(results, deletedChannels);
-        } catch(e) {
+        } catch (e) {
             this.logger.error('Crawl error', { error: e });
         } finally {
             this.startTimer();
             this.logger.debug('Crawl ended');
             this.isRunning = false;
 
-            if(this.onCrawlEnd) {
+            if (this.onCrawlEnd) {
                 this.onCrawlEnd();
                 this.onCrawlEnd = undefined;
             }
@@ -177,23 +181,43 @@ export class Crawler
      * Raise events for the processed results
      * @param result Crawl processing result
      */
-    private raiseChannelEvents(result: ZoneProcessResult[], deletedChannels: number[])
-    {
+    private raiseChannelEvents(
+        result: ZoneProcessResult[],
+        deletedChannels: number[]
+    ) {
         const botEvents = this.bot.getBotEvents();
 
-        result.forEach(({ zone, toNotify, toDelete, activeNotifiedChannels }) => {
-            const config = this.config.zones.find(conf => conf.name === zone);
+        result.forEach(
+            ({ zone, toNotify, toDelete, activeNotifiedChannels }) => {
+                const config = this.config.zones.find(
+                    conf => conf.name === zone
+                );
 
-            if(!config)
-                return;
+                if (!config) return;
 
-            toNotify.forEach(channel => botEvents.raiseChannelInactiveNotify(channel.channelId, config.name, config.inactiveIcon));
-            activeNotifiedChannels.forEach(channel => botEvents.raiseChannelNotInactiveNotify(channel.channelId));
+                toNotify.forEach(channel =>
+                    botEvents.raiseChannelInactiveNotify(
+                        channel.channelId,
+                        config.name,
+                        config.inactiveIcon
+                    )
+                );
+                activeNotifiedChannels.forEach(channel =>
+                    botEvents.raiseChannelNotInactiveNotify(channel.channelId)
+                );
 
-            // notify only with channels actually deleted from server
-            toDelete
-                .filter(toDel => deletedChannels.indexOf(toDel.channelId) >= 0)
-                .forEach(channel => botEvents.raiseChannelInactiveDelete(channel.channelId, config.name));
-        });
+                // notify only with channels actually deleted from server
+                toDelete
+                    .filter(
+                        toDel => deletedChannels.indexOf(toDel.channelId) >= 0
+                    )
+                    .forEach(channel =>
+                        botEvents.raiseChannelInactiveDelete(
+                            channel.channelId,
+                            config.name
+                        )
+                    );
+            }
+        );
     }
 }

@@ -34,7 +34,7 @@
         "nats": "^2.0.0-27",
         "pino": "^5.17.0",
         "randomstring": "^1.1.5",
-        "ts3-nodejs-library": "^2.3.3"
+        "ts3-nodejs-library": "^2.4.4"
     },
     "devDependencies": {
         "@types/config": "0.0.36",

@@ -1,15 +1,19 @@
 import config from 'config';
 import { resolve as pathResolve } from 'path';
+import { Client } from 'nats';
 import {
     Factory as LoaderFactory,
     LoaderFactoryConfig,
 } from './Bot/Configuration/Factory';
-import Factory from './Bot/Factory';
+import BotFactory from './Bot/Factory';
+import {
+    Factory as RepositoryFactory,
+    RepositoryFactoryConfig,
+} from './Bot/Repository/Factory';
 import Logger from './Log/Logger';
 import { Commands } from './Commands/Commands';
 import { InstanceManager } from './Instance/InstanceManager';
 import { NatsConnector } from './Commands/Nats/Connector';
-import { Client } from 'nats';
 
 const loadMode = process.env.LOAD_MODE || config.get('server.mode');
 const server: string =
@@ -23,34 +27,45 @@ bootstrap().catch(error => {
 });
 
 async function bootstrap() {
-    const natsClient = await new NatsConnector().connect();
+    const natsClient = new NatsConnector();
+    await natsClient.connect();
 
-    const configLoader = new LoaderFactory(
-        buildLoaderConfig(natsClient)
-    ).create();
+    const configs = buildDependencyConfigs(natsClient);
+
+    const configLoader = new LoaderFactory(configs.loader).create();
+    const repository = new RepositoryFactory(configs.repository).create();
 
     const instanceManager = new InstanceManager(
-        new Factory(configLoader, logger)
+        new BotFactory(configLoader, repository, logger)
     );
+
     new Commands(logger, natsClient, instanceManager).init();
 
     await instanceManager.loadInstance(server);
 }
 
-function buildLoaderConfig(client: Client): LoaderFactoryConfig {
-    let loaderFactoryConfig: LoaderFactoryConfig;
+function buildDependencyConfigs(
+    client: NatsConnector
+): { loader: LoaderFactoryConfig; repository: RepositoryFactoryConfig } {
+    let loader: LoaderFactoryConfig;
+    let repository: RepositoryFactoryConfig;
 
     switch (loadMode) {
         case 'local':
-            loaderFactoryConfig = {
+            loader = {
                 mode: 'local',
                 configFolder: pathResolve('server_configs'),
+            };
+
+            repository = {
+                mode: 'local',
+                configFolder: pathResolve('database'),
             };
 
             break;
 
         case 'nats':
-            loaderFactoryConfig = {
+            loader = repository = {
                 mode: 'nats',
                 client,
             };
@@ -61,5 +76,5 @@ function buildLoaderConfig(client: Client): LoaderFactoryConfig {
             throw new Error('Invalid server mode. valid: local, nats');
     }
 
-    return loaderFactoryConfig;
+    return { loader, repository };
 }
