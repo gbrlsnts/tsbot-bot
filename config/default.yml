@@ -1,5 +1,9 @@
 server:
-    name: testserver
+    mode: 'nats'
+    local:
+        name: testserver
+    nats:
+        serverId: 10
 
 nats:
     enabled: true
