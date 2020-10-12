@@ -127,12 +127,7 @@ export class Crawler {
                     if (ChannelUtils.isChannelSeparator(channel, channelList))
                         return;
 
-                    if (
-                        ChannelUtils.getChannelTreeMinSecondsEmpty(
-                            channel,
-                            channelList
-                        ) > 0
-                    )
+                    if ((channel.secondsEmpty ?? 0) > 0)
                         zoneInactiveChannels.push(channel.cid);
                     else zoneActiveChannels.push(channel.cid);
                 });
