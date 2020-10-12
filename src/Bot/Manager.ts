@@ -30,6 +30,8 @@ export default class Manager {
     disableCrawler(): void {
         this.crawler?.stop();
         this.components.crawler = undefined;
+
+        this.logger.debug('disabled crawler');
     }
 
     /**
@@ -48,6 +50,8 @@ export default class Manager {
         } else {
             this.crawler.reload(config);
         }
+
+        this.logger.debug('set crawler config', { context: { config } });
     }
 }
 

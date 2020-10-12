@@ -18,6 +18,7 @@ import { GetUsersByAddressSubscriber } from './Subscribers/Getters/GetUsersByAdd
 import { GetUserServerGroupIdsSubscriber } from './Subscribers/Getters/GetUserServerGroupIds';
 import { GetChannelZoneSubscriber } from './Subscribers/Getters/GetChannelZone';
 import Logger from '../Log/Logger';
+import { HandleCrawlUpdatedEvent } from './Subscribers/Events/HandleCrawlUpdatedEvent';
 
 export class Commands {
     constructor(
@@ -53,6 +54,7 @@ export class Commands {
             new GetUsersByAddressSubscriber(),
             new GetUserServerGroupIdsSubscriber(),
             new GetChannelZoneSubscriber(),
+            new HandleCrawlUpdatedEvent(),
         ];
     }
 }
