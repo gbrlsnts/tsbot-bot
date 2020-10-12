@@ -124,7 +124,7 @@ export class CommandGateway {
      * @param data data to send
      */
     private sendReply(inbox: string, data: any): void {
-        this.nats.publish(inbox, JSON.stringify(data), error => {
+        this.nats.publish(inbox, data, error => {
             if (error) this.logger.error('nats reply error', { error });
         });
     }

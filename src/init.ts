@@ -1,6 +1,5 @@
 import config from 'config';
 import { resolve as pathResolve } from 'path';
-import { Client } from 'nats';
 import {
     Factory as LoaderFactory,
     LoaderFactoryConfig,
@@ -36,7 +35,7 @@ async function bootstrap() {
     const repository = new RepositoryFactory(configs.repository).create();
 
     const instanceManager = new InstanceManager(
-        new BotFactory(configLoader, repository, logger)
+        new BotFactory(configLoader, repository, logger, natsClient)
     );
 
     new Commands(logger, natsClient, instanceManager).init();

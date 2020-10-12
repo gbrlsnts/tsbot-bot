@@ -1,34 +1,59 @@
-import { EventEmitter } from "events";
-import { ChannelInactiveNotifyEvent, ZoneChannelEvent, ChannelEvent } from "./EventTypes";
+import { EventEmitter } from 'events';
+import { BotConnectionLostHandler } from './Handler/BotConnectionLostHandler';
+import { BotConnectionLostEvent } from './EventTypes';
+import {
+    ChannelInactiveNotifyEvent,
+    ZoneChannelEvent,
+    ChannelEvent,
+} from './EventTypes';
 
-export class BotEvent extends EventEmitter
-{
-    raiseChannelNotInactiveNotify(channelId: number)
-    {
+export class BotEvent extends EventEmitter {
+    raiseChannelNotInactiveNotify(channelId: number) {
         this.emit(BotEventName.channelNotInactiveNotifyEvent, { channelId });
     }
 
-    raiseChannelInactiveNotify(channelId: number, zone: string, icon?: number)
-    {
-        this.emit(BotEventName.channelInactiveNotifyEvent, { channelId, zone, icon });
+    raiseChannelInactiveNotify(channelId: number, zone: string, icon?: number) {
+        this.emit(BotEventName.channelInactiveNotifyEvent, {
+            channelId,
+            zone,
+            icon,
+        });
     }
 
-    raiseChannelInactiveDelete(channelId: number, zone: string)
-    {
+    raiseChannelInactiveDelete(channelId: number, zone: string) {
         this.emit(BotEventName.channelInactiveDeleteEvent, { channelId, zone });
     }
 }
 
-export interface BotEvent
-{
-    on(event: 'bot.user.channel.not-inactive.notify', listener: (event: ChannelEvent) => void): this;
-    on(event: 'bot.user.channel.inactive.notify', listener: (event: ChannelInactiveNotifyEvent) => void): this;
-    on(event: 'bot.user.channel.delete.notify', listener: (event: ZoneChannelEvent) => void): this;
+export interface BotEvent {
+    on(
+        event: 'bot.connection.lost',
+        listener: (event: BotConnectionLostEvent) => void
+    ): this;
+
+    on(
+        event: 'bot.user.channel.not-inactive.notify',
+        listener: (event: ChannelEvent) => void
+    ): this;
+
+    on(
+        event: 'bot.user.channel.inactive.notify',
+        listener: (event: ChannelInactiveNotifyEvent) => void
+    ): this;
+
+    on(
+        event: 'bot.user.channel.delete.notify',
+        listener: (event: ZoneChannelEvent) => void
+    ): this;
 }
 
-export class BotEventName
-{
-    static readonly channelNotInactiveNotifyEvent = 'bot.user.channel.not-inactive.notify';
-    static readonly channelInactiveNotifyEvent = 'bot.user.channel.inactive.notify';
-    static readonly channelInactiveDeleteEvent = 'bot.user.channel.delete.notify';
+export class BotEventName {
+    static readonly botConnectionLost = 'bot.connection.lost';
+
+    static readonly channelNotInactiveNotifyEvent =
+        'bot.user.channel.not-inactive.notify';
+    static readonly channelInactiveNotifyEvent =
+        'bot.user.channel.inactive.notify';
+    static readonly channelInactiveDeleteEvent =
+        'bot.user.channel.delete.notify';
 }

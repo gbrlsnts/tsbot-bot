@@ -1,13 +1,17 @@
+import config from 'config';
 import {
     TeamSpeak,
     TextMessageTargetMode,
     ConnectionParams,
 } from 'ts3-nodejs-library';
 import SelfInfo from './SelfInfo';
-import { BotEvent } from './Event/BotEvent';
-import { ChannelPermission, BotCodec, ClientType } from './Types';
+import { BotEvent, BotEventName } from './Event/BotEvent';
+import { ChannelPermission, BotCodec } from './Types';
 import File from '../Lib/File';
 import Logger from '../Log/Logger';
+import { BotConnectionLostEvent } from './Event/EventTypes';
+
+const reconnectConfig: any = config.get('bot.reconnect');
 
 export class Bot {
     private _isConnected = true;
@@ -22,7 +26,10 @@ export class Bot {
     ) {
         this.botEvents = new BotEvent();
 
-        this.setupConnectionLostHandler(-1, 1000);
+        this.setupConnectionLostHandler(
+            process.env.RECONNECT_ATTEMPTS || reconnectConfig.attempts,
+            process.env.RECONNECT_WAITMS || reconnectConfig.waitMs
+        );
     }
 
     /**
@@ -78,7 +85,10 @@ export class Bot {
                         canShare: true,
                     })
                 )
-                .catch(e => this.logger.error('Error while reconnecting', e));
+                .catch(e => {
+                    this.botEvents.emit(BotEventName.botConnectionLost);
+                    this.logger.error('Error while reconnecting', e);
+                });
         });
     }
 

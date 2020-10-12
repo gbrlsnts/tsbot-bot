@@ -4,14 +4,17 @@ import { ChannelInactiveNotifyHandler } from './Handler/ChannelInactiveNotifyHan
 import { ChannelInactiveDeleteHandler } from './Handler/ChannelInactiveDeleteHandler';
 import { EventHandlerInterface } from './EventHandlerInterface';
 import { ChannelNotInactiveHandler } from './Handler/ChannelNotInactiveHandler';
-import Logger from '../../Log/Logger';
 import { RepositoryInterface } from '../Repository/RepositoryInterface';
+import { NatsConnector } from '../../Commands/Nats/Connector';
+import Logger from '../../Log/Logger';
+import { BotConnectionLostHandler } from './Handler/BotConnectionLostHandler';
 
 export class MasterEventHandler {
     constructor(
         private readonly logger: Logger,
         private readonly bot: Bot,
-        private readonly repository: RepositoryInterface
+        private readonly repository: RepositoryInterface,
+        private readonly nats: NatsConnector
     ) {
         this.registerServerEvents();
         this.registerBotEvents();
@@ -33,6 +36,16 @@ export class MasterEventHandler {
 
     private registerBotEvents() {
         const botEvents = this.bot.getBotEvents();
+
+        botEvents.on(BotEventName.botConnectionLost, () =>
+            this.handleBotEvent(
+                new BotConnectionLostHandler(
+                    this.bot.serverId,
+                    this.logger,
+                    this.nats
+                )
+            )
+        );
 
         botEvents.on(BotEventName.channelNotInactiveNotifyEvent, event => {
             this.handleBotEvent(

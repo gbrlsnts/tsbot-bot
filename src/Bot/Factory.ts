@@ -7,12 +7,14 @@ import Manager from './Manager';
 import { LoaderInterface } from './Configuration/LoaderInterface';
 import Logger from '../Log/Logger';
 import { RepositoryInterface } from './Repository/RepositoryInterface';
+import { NatsConnector } from '../Commands/Nats/Connector';
 
 export default class Factory {
     constructor(
         private readonly configLoader: LoaderInterface,
         private readonly repository: RepositoryInterface,
-        private readonly logger: Logger
+        private readonly logger: Logger,
+        private readonly nats: NatsConnector
     ) {}
 
     async create(serverName: string): Promise<Manager> {
@@ -33,7 +35,8 @@ export default class Factory {
         const eventHandler = new MasterEventHandler(
             botLogger,
             bot,
-            this.repository
+            this.repository,
+            this.nats
         );
 
         let crawler: Crawler | undefined;
