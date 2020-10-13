@@ -1,4 +1,3 @@
-import { Client } from 'nats';
 import { InstanceManager } from '../Instance/InstanceManager';
 import { NatsConnector } from './Nats/Connector';
 import { CommandGateway } from './Gateway';
@@ -25,14 +24,13 @@ export class Commands {
         private readonly logger: Logger,
         private readonly natsClient: NatsConnector,
         private readonly manager: InstanceManager
-    ) {}
-
-    async init(): Promise<void> {
+    ) {
         const gateway = new CommandGateway(
             this.logger,
             this.manager,
             this.natsClient.getClient()
         );
+
         gateway.subscribe(this.getServerSubscribers());
 
         this.logger.info('Command gateway initialized');

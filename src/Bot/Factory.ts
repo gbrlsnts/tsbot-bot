@@ -19,53 +19,69 @@ export default class Factory {
     ) {}
 
     async create(serverName: string): Promise<Manager> {
-        const config = await this.configLoader.loadConfiguration(serverName);
-
-        const botLogger = this.logger.scoped({
-            server: serverName,
-        });
-
-        let ts3server: TeamSpeak;
-
         try {
-            ts3server = await TeamSpeak.connect({
-                ...config.connection,
-                protocol:
-                    config.connection.protocol === ConnectionProtocol.RAW
-                        ? QueryProtocol.RAW
-                        : QueryProtocol.SSH,
+            const config = await this.configLoader.loadConfiguration(
+                serverName
+            );
+
+            const botLogger = this.logger.scoped({
+                server: serverName,
+            });
+
+            let ts3server: TeamSpeak;
+
+            try {
+                ts3server = await TeamSpeak.connect({
+                    ...config.connection,
+                    protocol:
+                        config.connection.protocol === ConnectionProtocol.RAW
+                            ? QueryProtocol.RAW
+                            : QueryProtocol.SSH,
+                });
+            } catch (e) {
+                this.nats
+                    .getClient()
+                    .publish(botConnectionLostSubject(config.id));
+                throw e;
+            }
+
+            const bot = new Bot(botLogger, ts3server, config.id, serverName);
+
+            const eventHandler = new MasterEventHandler(
+                botLogger,
+                bot,
+                this.repository,
+                this.nats
+            );
+
+            let crawler: Crawler | undefined;
+            if (config.crawler) {
+                crawler = new Crawler(
+                    bot,
+                    botLogger,
+                    this.repository,
+                    config.crawler
+                );
+                crawler.boot();
+            }
+
+            return new Manager({
+                bot,
+                eventHandler,
+                crawler,
+                logger: botLogger,
+                repository: this.repository,
             });
         } catch (e) {
-            this.nats.getClient().publish(botConnectionLostSubject(config.id));
+            const prefix = `Error loading server [${serverName}]: `;
+
+            if (e instanceof Error) {
+                e.message = prefix + e.message;
+            } else if (typeof e === 'string') {
+                e = prefix + e;
+            }
+
             throw e;
         }
-
-        const bot = new Bot(botLogger, ts3server, config.id, serverName);
-
-        const eventHandler = new MasterEventHandler(
-            botLogger,
-            bot,
-            this.repository,
-            this.nats
-        );
-
-        let crawler: Crawler | undefined;
-        if (config.crawler) {
-            crawler = new Crawler(
-                bot,
-                botLogger,
-                this.repository,
-                config.crawler
-            );
-            crawler.boot();
-        }
-
-        return new Manager({
-            bot,
-            eventHandler,
-            crawler,
-            logger: botLogger,
-            repository: this.repository,
-        });
     }
 }

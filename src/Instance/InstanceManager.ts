@@ -32,7 +32,35 @@ export class InstanceManager {
     }
 
     /**
-     *
+     * @param id numeric id or server name of the instances to load.
+     *      server name should be used when using local configs
+     */
+    async loadInstances(
+        ids: string[] | number[]
+    ): Promise<LoadInstancesResult> {
+        const promises = [];
+
+        for (const instance of ids) {
+            promises.push(this.loadInstance(instance));
+        }
+
+        const result = await Promise.allSettled(promises);
+
+        const sucessCount = result
+            .map(r => (r.status === 'fulfilled' ? 1 : (0 as number)))
+            .reduce((acc, curr) => acc + curr, 0);
+
+        return {
+            success: sucessCount,
+            fail: promises.length - sucessCount,
+            result: result.map(r => ({
+                value: r.status === 'fulfilled' ? r.value : undefined,
+                error: r.status === 'rejected' ? r.reason : undefined,
+            })),
+        };
+    }
+
+    /**
      * @param id numeric id or server name of the instance to load.
      *      server name should be used when using local configs
      */
@@ -51,4 +79,10 @@ export class InstanceManager {
     removeInstance(serverId: number): void {
         this.instances.delete(serverId);
     }
+}
+
+export interface LoadInstancesResult {
+    success: number;
+    fail: number;
+    result: { value?: Manager; error?: any }[];
 }

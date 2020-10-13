@@ -3,8 +3,6 @@ import { LoaderInterface } from './LoaderInterface';
 import { NatsConnector } from '../../Commands/Nats/Connector';
 
 export class NatsLoader implements LoaderInterface {
-    private readonly getConfigSubject = 'backend.server.10.config.get';
-
     constructor(private readonly nats: NatsConnector) {}
 
     /**
@@ -12,7 +10,9 @@ export class NatsLoader implements LoaderInterface {
      * @param name The configuration name
      */
     async loadConfiguration(name: string): Promise<Configuration> {
-        const msg = await this.nats.request(this.getConfigSubject);
+        const msg = await this.nats.request(
+            `backend.server.${name}.config.get`
+        );
 
         return msg.data;
     }

@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import { BotConnectionLostHandler } from './Handler/BotConnectionLostHandler';
 import { BotConnectionLostEvent } from './EventTypes';
 import {
     ChannelInactiveNotifyEvent,

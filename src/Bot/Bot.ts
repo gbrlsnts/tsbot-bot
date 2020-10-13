@@ -1,9 +1,5 @@
 import config from 'config';
-import {
-    TeamSpeak,
-    TextMessageTargetMode,
-    ConnectionParams,
-} from 'ts3-nodejs-library';
+import { TeamSpeak, TextMessageTargetMode } from 'ts3-nodejs-library';
 import { BotEvent, BotEventName } from './Event/BotEvent';
 import { ChannelPermission, BotCodec } from './Types';
 import File from '../Lib/File';
