@@ -1,66 +1,62 @@
-import pino from "pino";
+import pino from 'pino';
 
 export default class Logger {
     readonly logger: pino.Logger;
 
-    constructor({ level, existing }: { level?: Level; existing?: pino.Logger; } = {})
-    {
+    constructor({
+        level,
+        existing,
+    }: { level?: Level; existing?: pino.Logger } = {}) {
         this.logger = existing || pino();
-        
-        if(level)
-            this.logger.level = level;
+
+        if (level) this.logger.level = level;
     }
 
-    scoped(merge: Log, level?: string): Logger
-    {
+    scoped(merge: Log, level?: string): Logger {
         const child = this.logger.child({
             level,
-            ...merge
+            ...merge,
         });
 
         return new Logger({ existing: child });
     }
 
-    trace(message: string, opts: ErrorLogOptions): void
-    {
+    trace(message: string, opts: ErrorLogOptions): void {
         this.logger.trace(this.getMergingObject(opts), message);
     }
 
-    debug(message: string, opts?: LogOptions): void
-    {
+    debug(message: string, opts?: LogOptions): void {
         this.logger.debug(this.getMergingObject(opts), message);
     }
 
-    info(message: string, opts?: LogOptions): void
-    {
+    info(message: string, opts?: LogOptions): void {
         this.logger.info(this.getMergingObject(opts), message);
     }
 
-    warn(message: string, opts?: LogOptions): void
-    {
+    warn(message: string, opts?: LogOptions): void {
         this.logger.warn(this.getMergingObject(opts), message);
     }
 
-    error(message: string, opts: ErrorLogOptions): void
-    {
+    error(message: string, opts: ErrorLogOptions): void {
         this.logger.error(this.getMergingObject(opts), message);
     }
 
-    fatal(message: string, opts: ErrorLogOptions): void
-    {
+    fatal(message: string, opts: ErrorLogOptions): void {
         this.logger.fatal(this.getMergingObject(opts), message);
     }
 
-    private getMergingObject(opts?: LogOptions | ErrorLogOptions): Object
-    {
+    private getMergingObject(opts?: LogOptions | ErrorLogOptions): Object {
         const ctx: { [key: string]: any } = { context: { ...opts?.context } };
 
-        if(opts?.canShare)
-            ctx.canShare = true;
+        if (opts?.canShare) ctx.canShare = true;
 
-        if(opts && this.isErrorLog(opts)) {
-            if(this.isException(opts.error)) {
-                ctx.error = { msg: opts.error.message, name: opts.error.name, stack: opts.error.stack };
+        if (opts && this.isErrorLog(opts)) {
+            if (this.isException(opts.error)) {
+                ctx.error = {
+                    msg: opts.error.message,
+                    name: opts.error.name,
+                    stack: opts.error.stack,
+                };
             } else {
                 ctx.error = opts.error;
             }
@@ -70,32 +66,29 @@ export default class Logger {
     }
 
     private isErrorLog(object: Object): object is ErrorLogOptions {
-        return 'error' in object;
+        return object && 'error' in object;
     }
 
     private isException(object: Object): object is Error {
-        return 'stack' in object;
+        return object && 'stack' in object;
     }
 }
 
 export type Level = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace';
 
-export interface Log
-{
+export interface Log {
     /** Context properties */
-    [key: string]: any,
+    [key: string]: any;
 }
 
-export interface LogOptions
-{
+export interface LogOptions {
     /** the log context */
-    context?: Log
+    context?: Log;
     /** If the log should be shared with the server owner. default: false */
     canShare?: boolean;
 }
 
-export interface ErrorLogOptions extends LogOptions
-{
+export interface ErrorLogOptions extends LogOptions {
     /** The error to log */
-    error?: any
+    error?: any;
 }
