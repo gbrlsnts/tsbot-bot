@@ -1,4 +1,4 @@
-import { QueryProtocol } from 'ts3-nodejs-library';
+import { QueryProtocol, TeamSpeak } from 'ts3-nodejs-library';
 import { ConnectionProtocol } from './Types';
 import { Bot } from './Bot';
 import { MasterEventHandler } from './Event/MasterEventHandler';
@@ -8,6 +8,7 @@ import { LoaderInterface } from './Configuration/LoaderInterface';
 import Logger from '../Log/Logger';
 import { RepositoryInterface } from './Repository/RepositoryInterface';
 import { NatsConnector } from '../Commands/Nats/Connector';
+import { botConnectionLostSubject } from '../Commands/Shared/Subjects';
 
 export default class Factory {
     constructor(
@@ -24,13 +25,22 @@ export default class Factory {
             server: serverName,
         });
 
-        const bot = await Bot.initialize(botLogger, config.id, serverName, {
-            ...config.connection,
-            protocol:
-                config.connection.protocol === ConnectionProtocol.RAW
-                    ? QueryProtocol.RAW
-                    : QueryProtocol.SSH,
-        });
+        let ts3server: TeamSpeak;
+
+        try {
+            ts3server = await TeamSpeak.connect({
+                ...config.connection,
+                protocol:
+                    config.connection.protocol === ConnectionProtocol.RAW
+                        ? QueryProtocol.RAW
+                        : QueryProtocol.SSH,
+            });
+        } catch (e) {
+            this.nats.getClient().publish(botConnectionLostSubject(config.id));
+            throw e;
+        }
+
+        const bot = new Bot(botLogger, ts3server, config.id, serverName);
 
         const eventHandler = new MasterEventHandler(
             botLogger,

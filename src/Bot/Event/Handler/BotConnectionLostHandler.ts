@@ -1,6 +1,7 @@
 import { EventHandlerInterface } from '../EventHandlerInterface';
 import { NatsConnector } from '../../../Commands/Nats/Connector';
 import Logger from '../../../Log/Logger';
+import { botConnectionLostSubject } from '../../../Commands/Shared/Subjects';
 
 export class BotConnectionLostHandler implements EventHandlerInterface {
     constructor(
@@ -13,7 +14,7 @@ export class BotConnectionLostHandler implements EventHandlerInterface {
         this.nats
             .getClient()
             .publish(
-                `bot.server.${this.serverId}.connection.lost`,
+                botConnectionLostSubject(this.serverId),
                 undefined,
                 error => {
                     if (error) this.logger.error(error.message, { error });

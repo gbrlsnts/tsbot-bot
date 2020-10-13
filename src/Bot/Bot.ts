@@ -4,12 +4,10 @@ import {
     TextMessageTargetMode,
     ConnectionParams,
 } from 'ts3-nodejs-library';
-import SelfInfo from './SelfInfo';
 import { BotEvent, BotEventName } from './Event/BotEvent';
 import { ChannelPermission, BotCodec } from './Types';
 import File from '../Lib/File';
 import Logger from '../Log/Logger';
-import { BotConnectionLostEvent } from './Event/EventTypes';
 
 const reconnectConfig: any = config.get('bot.reconnect');
 
@@ -20,7 +18,6 @@ export class Bot {
     constructor(
         private readonly logger: Logger,
         private readonly server: TeamSpeak,
-        readonly self: SelfInfo,
         readonly serverId: number,
         readonly name: string
     ) {
@@ -30,24 +27,6 @@ export class Bot {
             process.env.RECONNECT_ATTEMPTS || reconnectConfig.attempts,
             process.env.RECONNECT_WAITMS || reconnectConfig.waitMs
         );
-    }
-
-    /**
-     * Initialize the bot
-     * @param logger The logger instance
-     * @param server The Teamspeak server instance
-     * @param name Configuration name
-     */
-    static async initialize(
-        logger: Logger,
-        serverId: number,
-        name: string,
-        config: Partial<ConnectionParams>
-    ): Promise<Bot> {
-        const ts3server = await TeamSpeak.connect(config);
-        const self = await SelfInfo.initialize(ts3server);
-
-        return new Bot(logger, ts3server, self, serverId, name);
     }
 
     /**
@@ -78,7 +57,6 @@ export class Bot {
 
             this.server
                 .reconnect(attempts, waitMs)
-                .then(() => this.self.issueRefresh())
                 .then(() => (this._isConnected = true))
                 .then(() =>
                     this.logger.info(`Reconnected to server`, {
